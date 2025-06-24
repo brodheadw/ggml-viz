@@ -1,6 +1,6 @@
 # GGML Visualizer
 
-> **A cross‑platform, real‑time dashboard that lets you *****see***** whatʼs happening inside any GGML‑based runtime — from **``** on a Raspberry Pi to **``** on an M3 Max.**
+> **A cross‑platform, real‑time dashboard that lets you *****see***** whatʼs happening inside any GGML‑based runtime — from **`llama.cpp`** on a Raspberry Pi to **`whisper.cpp`** on an M3 Max.**
 
 ---
 
