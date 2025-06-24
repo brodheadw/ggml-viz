@@ -1,0 +1,256 @@
+#include "ggml_hook.hpp"
+#include "ggml.h" // for actual ggml definitions
+#include "ggml-impl.h"
+#include <thread>
+#include <cstring>
+#include <cassert>
+#include <iostream>
+#include <iomanip>
+
+namespace ggml_viz {
+
+namespace {
+    uint32_t get_thread_id() {
+        auto id = std::this_thread::get_id();
+        return std::hash<std::thread::id>{}(id) & 0xFFFFFFFF; // Ensure 32-bit
+    }
+
+    uint64_t get_timestamp_ns() {
+        using namespace std::chrono;
+        return duration_cast<nanoseconds>(
+            steady_clock::now().time_since_epoch()
+        ).count();
+    }
+}
+
+// Singleton implementation
+GGMLHook& GGMLHook::instance() {
+    static GGMLHook instance;
+    return instance;
+}
+
+void GGMLHook::configure(const HookConfig& config) {
+    if (active_) {
+        std::cerr << "Warning: Cannot reconfigure while hook is active.\n";
+        return;
+    }
+    config_ = config;
+}
+
+void GGMLHook::start() {
+    if (active_.exchange(true)) {
+        std::cerr << "Warning: GGMLHook is already active.\n";
+        return; // Already active
+    }
+
+    start_time_ = std::chrono::steady_clock::now();
+    event_count_ = 0;
+    write_pos_ = 0;
+    read_pos_ = 0;
+
+    if (config_.write_to_file) {
+        output_file_ = fopen(config_.output_filename.c_str(), "wb");
+        if (!output_file_) {
+            std::cerr << "Failed to open trace file: " << config_.output_filename << "\n";
+            active_ = false;
+            return;
+        }
+
+        const char magic[] = "GGMLVIZ1";
+        fwrite(magic, 1, 8, output_file_);
+        uint32_t version = 1;
+        fwrite(&version, sizeof(version), 1, output_file_);
+    }
+
+    std::cout << "GGML Hook started. Output: " << config_.output_filename << "\n";
+}
+
+void GGMLHook::stop() {
+    if (!active_.exchange(false)) {
+        return;
+    }
+
+    if (output_file_) {
+        flush_to_file();
+        fclose(output_file_);
+        output_file_ = nullptr;
+    }
+
+    std::cout << "GGML Hook stopped. Recorded " << event_count_ << " events.\n";
+}
+
+GGMLHook::~GGMLHook() {
+    stop();
+}
+
+void GGMLHook::record_event(const Event& event) {
+    if (!active_) return;
+
+    if (event_count_ >= config_.max_events) {
+        std::cerr << "Warning: Event limit reached, stopping trace\n";
+        stop();
+        return;
+    }
+
+    size_t pos = write_pos_.fetch_add(1) & (BUFFER_SIZE - 1); // Wrap around
+
+    event_buffer_[pos] = event;
+    event_count_++;
+
+    if (config_.write_to_file && (event_count_ & 0xFFF) == 0) {
+        flush_to_file();
+    }
+}
+
+void GGMLHook::flush_to_file() {
+    if (!output_file_) return;
+
+    size_t current_write = write_pos_.load();
+    size_t current_read = read_pos_.load();
+
+    while (current_read < current_write) {
+        size_t pos = current_read & (BUFFER_SIZE - 1);
+        const Event& e = event_buffer_[pos];
+
+        // Write event (binary format for speed)
+        fwrite(&e.type, sizeof(e.type), 1, output_file_);
+        fwrite(&e.timestamp_ns, sizeof(e.timestamp_ns), 1, output_file_);
+        fwrite(&e.thread_id, sizeof(e.thread_id), 1, output_file_);
+        fwrite(&e.data, sizeof(e.data), 1, output_file_);
+
+        // Write label if present
+        uint8_t has_label = (e.label != nullptr) ? 1 : 0;
+        fwrite(&has_label, 1, 1, output_file_);
+        if (has_label) {
+            uint32_t label_len = strlen(e.label);
+            fwrite(&label_len, sizeof(label_len), 1, output_file_);
+            fwrite(e.label, 1, label_len, output_file_);
+        }
+
+        current_read++;
+    }
+
+    read_pos_ = current_read;
+    fflush(output_file_);
+}
+
+void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph) {
+    if (!active_ || !config_.enable_op_timing) return;
+
+    Event event = {};
+    event.type = EventType::GRAPH_COMPUTE_BEGIN;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.graph.graph_ptr = graph; // Assuming ggml_cgraph has a pointer field
+    event.data.graph.n_nodes = graph->n_nodes;
+    event.data.graph.n_threads = 1; // TODO: Get actual thread count
+    event.label = nullptr;
+
+    record_event(event);
+}
+
+void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph) {
+    if (!active_ || !config_.enable_op_timing) return;
+
+    Event event = {};
+    event.type = EventType::GRAPH_COMPUTE_END;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.graph.graph_ptr = graph; // Assuming ggml_cgraph has a pointer field
+    event.data.graph.n_nodes = graph->n_nodes;
+    event.data.graph.n_threads = 1; // TODO: Get actual thread count
+    event.label = nullptr;
+
+    record_event(event);
+}
+
+void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor) {
+    if (!active_ || !config_.enable_op_timing) return;
+
+    if (!config_.op_types_to_trace.empty()) {
+        // Check if this op type is in the filter list
+        bool found = false;
+        for (uint32_t op : config_.op_types_to_trace) {
+            if (op == tensor->op) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) return;
+    }
+        
+    Event event = {};
+    event.type = EventType::OP_COMPUTE_BEGIN;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.op.tensor_ptr = tensor;
+    event.data.op.op_type = tensor->op;
+    event.data.op.op_size = ggml_nbytes(tensor);
+    event.label = config_.enable_tensor_names ? tensor->name : nullptr;
+    
+    record_event(event);
+}
+
+void GGMLHook::on_op_compute_end(const ggml_tensor* tensor) {
+    if (!active_ || !config_.enable_op_timing) return;
+    
+    // Same filtering as begin
+    if (!config_.op_types_to_trace.empty()) {
+        bool found = false;
+        for (uint32_t op : config_.op_types_to_trace) {
+            if (op == tensor->op) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) return;
+    }
+    
+    Event event = {};
+    event.type = EventType::OP_COMPUTE_END;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.op.tensor_ptr = tensor;
+    event.data.op.op_type = tensor->op;
+    event.data.op.op_size = ggml_nbytes(tensor);
+    event.label = config_.enable_tensor_names ? tensor->name : nullptr;
+    
+    record_event(event);
+}
+
+// C-style hook functions that can be called from ggml
+extern "C" {
+    void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph) {
+        GGMLHook::instance().on_graph_compute_begin(graph);
+    }
+
+    void ggml_viz_hook_graph_compute_end(const ggml_cgraph* graph) {
+        GGMLHook::instance().on_graph_compute_end(graph);
+    }
+
+    void ggml_viz_hook_graph_compute_stop(const ggml_tensor* tensor) {
+        GGMLHook::instance().on_op_compute_begin(tensor);
+    }
+
+    void ggml_viz_hook_graph_compute_stop(const ggml_tensor* tensor) {
+        GGMLHook::instance().on_op_compute_end(tensor);
+    }
+}
+
+
+// Installation helpers
+bool install_ggml_hooks() {
+    // Here we would typically patch the ggml functions to call our hooks
+    // This is a placeholder as actual patching depends on the build system and linking
+    std::cout << "Installing GGML hooks...\n";
+    return true; // Assume success for now
+}
+
+bool uninstall_ggml_hooks() {
+    // Here we would typically restore the original ggml functions
+    // This is a placeholder as actual patching depends on the build system and linking
+    std::cout << "Uninstalling GGML hooks...\n";
+    return true; // Assume success for now
+}
+
+} // namespace ggml_viz
