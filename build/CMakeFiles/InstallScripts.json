@@ -1,0 +1,14 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/willb/Vaults/Personal/\ud83d\udc68\u200d\ud83d\udcbb DevLab/ggml/ggml-viz/build/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/\ud83d\udc68\u200d\ud83d\udcbb DevLab/ggml/ggml-viz/build/third_party/ggml/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/\ud83d\udc68\u200d\ud83d\udcbb DevLab/ggml/ggml-viz/build/third_party/ggml/src/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/\ud83d\udc68\u200d\ud83d\udcbb DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/\ud83d\udc68\u200d\ud83d\udcbb DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/\ud83d\udc68\u200d\ud83d\udcbb DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/\ud83d\udc68\u200d\ud83d\udcbb DevLab/ggml/ggml-viz/build/src/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/\ud83d\udc68\u200d\ud83d\udcbb DevLab/ggml/ggml-viz/build/tests/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
