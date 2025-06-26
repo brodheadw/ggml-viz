@@ -1,0 +1,93 @@
+// tests/test_ggml_hook.cpp
+#include "ggml_hook.hpp"
+#include "ggml-impl.h"
+#include <iostream>
+#include <vector>
+#include <chrono>
+
+int main() {
+    // Initialize ggml
+    size_t mem_size = 128 * 1024 * 1024; // 128 MB
+    void* mem_buffer = malloc(mem_size);
+
+    struct ggml_init_params params = {
+        .mem_size = mem_size,
+        .mem_buffer = mem_buffer,
+        .no_alloc = false
+    };
+
+    struct ggml_context* ctx = ggml_init(params);
+
+    // Configure hooks
+    ggml_viz::HookConfig config;
+    config.enable_op_timing = true;
+    config.enable_tensor_names = true;
+    config.output_filename = "test_trace.ggmlviz";
+
+    // Only trace specific operations (optional)
+    // config.op_types_to_trace = { GGML_OP_ADD, GGML_OP_MUL_MAT };
+
+    ggml_viz::GGMLHook::instance().configure(config);
+    ggml_viz::GGMLHook::instance().start();
+
+    std::cout << "Creating computation graph...\n";
+
+    // Create a simple computation graph
+    int n = 1024;
+    struct ggml_tensor* A = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, n, n);
+    struct ggml_tensor* B = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, n, n);
+    struct ggml_tensor* C = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, n, n);
+
+    ggml_set_name(A, "matrix_A");
+    ggml_set_name(B, "matrix_B");
+    ggml_set_name(C, "matrix_C");
+
+    float* a_data = (float*)A->data;
+    float* b_data = (float*)B->data;
+    float* c_data = (float*)C->data;
+
+    for (int i=0; i<n*n; i++) {
+        a_data[i] = rand() / (float)RAND_MAX;
+        b_data[i] = rand() / (float)RAND_MAX;
+        c_data[i] = rand() / (float)RAND_MAX;
+    }
+
+    struct ggml_tensor* AB = ggml_mul_mat(ctx, A, B);
+    ggml_set_name(AB, "matmul_AB");
+
+    struct ggml_tensor* result = ggml_add(ctx, AB, C);
+    ggml_set_name(result, "final_result");
+
+    struct ggml_cgraph* gf = ggml_new_graph(ctx);
+    ggml_build_forward_expand(gf, result);
+
+    std::cout << "Graph has " << gf->n_nodes << " nodes\n";
+
+    std::cout << "Running computation...\n";
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (int i=0; i<10; i++) {
+        ggml_graph_compute(ctx, gf, 4);
+        std::cout << " Iteration " << i+1 << " complete\n";
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    std::cout << "Total time: " << duration.count() << " ms\n";
+
+    // Stop hooks and flush data
+    ggml_viz::GGMLHook::instance().stop();
+
+    std::cout << "\nTrace complete!\n";
+    std::cout << "Events recorded: " << ggml_viz::GGMLHook::instance().event_count() << "\n";
+    std::cout << "Trace file: test_trace.ggmlviz\n";
+
+    ggml_graph_dump_dot(gf, NULL, "test_graph.dot");
+    std::cout << "Graph structure: test_graph.dot\n";
+
+    ggml_free(ctx);
+    free(mem_buffer);
+
+    return 0;
+}

@@ -1,3 +1,4 @@
+// src/instrumentation/ggml_hook.hpp
 #pragma once
 
 #include <cstdint>
@@ -53,7 +54,6 @@ struct Event {
     const char* label;
 };
 
-// Hook configuration
 struct HookConfig {
     bool enable_op_timing = true;
     bool enable_memory_tracking = false;
@@ -66,7 +66,7 @@ struct HookConfig {
 
     // Filtering
     std::vector<uint32_t> op_types_to_trace; // Empty = trace all
-    size_t max_events = 1000000; // Prevent runaway memory usage
+    size_t max_events = 1000000;
 };
 
 class GGMLHook {
@@ -88,7 +88,6 @@ public:
     // Data access (for live viewers)
     std::vector<Event> get_events_size(uint64_t timestamp_ns);
 
-    // Callbacks (called by our patched ggml functions)
     void on_graph_compute_begin(const ggml_cgraph* graph);
     void on_graph_compute_end(const ggml_cgraph* graph);
     void on_op_compute_begin(const ggml_tensor* tensor);
@@ -112,17 +111,17 @@ private:
     // Ring buffer for events
     static constexpr size_t BUFFER_SIZE = 65536; // Must be pow of 2
     Event event_buffer_[BUFFER_SIZE];
+    std::mutex buffer_mutex_;
+    std::mutex file_mutex_;
+
     std::atomic<size_t> write_pos_{0};
     std::atomic<size_t> read_pos_{0};
 
-    // File output
     FILE* output_file_ = nullptr;
 
-    // Timing
     std::chrono::steady_clock::time_point start_time_;
 };
 
-// C-style functions that we'll inject into ggml
 extern "C" {
     void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph);
     void ggml_viz_hook_graph_compute_end(const ggml_cgraph* graph);
@@ -133,4 +132,4 @@ extern "C" {
 bool install_ggml_hooks();
 bool uninstall_ggml_hooks();
 
-}
+} // namespace ggml_viz

@@ -1,6 +1,6 @@
+// src/instrumentation/ggml_hook.cpp
 #include "ggml_hook.hpp"
-#include "ggml.h" // for actual ggml definitions
-#include "ggml-impl.h"
+#include "ggml-impl.h" // for ggml_cgraph, ggml_tensor
 #include <thread>
 #include <cstring>
 #include <cassert>
@@ -30,7 +30,7 @@ GGMLHook& GGMLHook::instance() {
 }
 
 void GGMLHook::configure(const HookConfig& config) {
-    if (active_) {
+    if (active_.load()) {
         std::cerr << "Warning: Cannot reconfigure while hook is active.\n";
         return;
     }
@@ -71,6 +71,7 @@ void GGMLHook::stop() {
     }
 
     if (output_file_) {
+        std::lock_guard<std::mutex> lock(file_mutex_);
         flush_to_file();
         fclose(output_file_);
         output_file_ = nullptr;
@@ -79,25 +80,59 @@ void GGMLHook::stop() {
     std::cout << "GGML Hook stopped. Recorded " << event_count_ << " events.\n";
 }
 
+void GGMLHook::reset_stats() {
+    if (active_.load()) {
+        std::cerr << "Warning: Cannot reset stats while hook is active.\n";
+        return;
+    }
+    event_count_ = 0;
+    write_pos_ = 0;
+    read_pos_ = 0;
+}
+
+std::vector<Event> GGMLHook::get_events_size(uint64_t timestamp_ns) {
+    std::vector<Event> events;
+    if (!active_.load()) return events;
+
+    const size_t current_write = write_pos_.load(std::memory_order_acquire);
+    size_t current_read = read_pos_.load(std::memory_order_relaxed);
+
+    for (size_t i=current_read; i<current_write; ++i) {
+        const size_t pos = i & (BUFFER_SIZE - 1);
+        const Event& e = event_buffer_[pos];
+
+        if (e.timestamp_ns <= timestamp_ns) {
+            events.push_back(e);
+        } else {
+            break;
+        }
+    }
+
+    read_pos_.store(current_read + events.size(), std::memory_order_release);
+    return events;
+}
+
 GGMLHook::~GGMLHook() {
     stop();
 }
 
 void GGMLHook::record_event(const Event& event) {
-    if (!active_) return;
+    if (!active_.load()) return;
 
-    if (event_count_ >= config_.max_events) {
+    if (event_count_.load() >= config_.max_events) {
         std::cerr << "Warning: Event limit reached, stopping trace\n";
         stop();
         return;
     }
 
-    size_t pos = write_pos_.fetch_add(1) & (BUFFER_SIZE - 1); // Wrap around
-
-    event_buffer_[pos] = event;
-    event_count_++;
+    const size_t pos = write_pos_.fetch_add(1, std::memory_order_relaxed) & (BUFFER_SIZE - 1);
+    {
+        std::lock_guard<std::mutex> lock(buffer_mutex_);
+        event_buffer_[pos] = event;
+    }
 
     if (config_.write_to_file && (event_count_ & 0xFFF) == 0) {
+        std::lock_guard<std::mutex> lock(file_mutex_);
         flush_to_file();
     }
 }
@@ -135,7 +170,7 @@ void GGMLHook::flush_to_file() {
 }
 
 void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph) {
-    if (!active_ || !config_.enable_op_timing) return;
+    if (!active_.load() || !config_.enable_op_timing) return;
 
     Event event = {};
     event.type = EventType::GRAPH_COMPUTE_BEGIN;
@@ -150,7 +185,7 @@ void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph) {
 }
 
 void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph) {
-    if (!active_ || !config_.enable_op_timing) return;
+    if (!active_.load() || !config_.enable_op_timing) return;
 
     Event event = {};
     event.type = EventType::GRAPH_COMPUTE_END;
@@ -165,7 +200,7 @@ void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph) {
 }
 
 void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor) {
-    if (!active_ || !config_.enable_op_timing) return;
+    if (!active_.load() || !config_.enable_op_timing) return;
 
     if (!config_.op_types_to_trace.empty()) {
         // Check if this op type is in the filter list
@@ -192,7 +227,7 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor) {
 }
 
 void GGMLHook::on_op_compute_end(const ggml_tensor* tensor) {
-    if (!active_ || !config_.enable_op_timing) return;
+    if (!active_.load() || !config_.enable_op_timing) return;
     
     // Same filtering as begin
     if (!config_.op_types_to_trace.empty()) {
@@ -228,11 +263,11 @@ extern "C" {
         GGMLHook::instance().on_graph_compute_end(graph);
     }
 
-    void ggml_viz_hook_graph_compute_stop(const ggml_tensor* tensor) {
+    void ggml_viz_hook_op_compute_begin(const ggml_tensor* tensor) {
         GGMLHook::instance().on_op_compute_begin(tensor);
     }
 
-    void ggml_viz_hook_graph_compute_stop(const ggml_tensor* tensor) {
+    void ggml_viz_hook_op_compute_end(const ggml_tensor* tensor) {
         GGMLHook::instance().on_op_compute_end(tensor);
     }
 }
