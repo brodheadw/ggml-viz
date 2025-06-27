@@ -73,77 +73,18 @@ Hooks are **not yet patched** into the GGML compute graph:
 
 ---
 ---
-
-## 🔧 GGML Hook Integration Plan
-
-Your hook system defines 4 C-style interface functions:
-
-```c
-void ggml_viz_hook_graph_compute_begin(const struct ggml_cgraph* graph);
-void ggml_viz_hook_graph_compute_end(const struct ggml_cgraph* graph);
-void ggml_viz_hook_op_compute_begin(const struct ggml_tensor* tensor);
-void ggml_viz_hook_op_compute_end(const struct ggml_tensor* tensor);
-```
-
-### 📌 Required Hook Placement
-
-#### 1. `ggml_graph_compute()` — *Graph-level hooks*
-
-In `third_party/ggml/src/ggml-cpu/ggml-cpu.c`, around `ggml_graph_compute()`:
-
-```c
-#ifdef GGML_VIZ_ENABLE_HOOKS
-    ggml_viz_hook_graph_compute_begin(cgraph);
-#endif
-
-// existing graph compute logic...
-
-#ifdef GGML_VIZ_ENABLE_HOOKS
-    ggml_viz_hook_graph_compute_end(cgraph);
-#endif
-```
-
-#### 2. `for (int i = 0; i < cgraph->n_nodes; i++)` — *Op-level hooks*
-
-Wrap each node’s compute:
-
-```c
-#ifdef GGML_VIZ_ENABLE_HOOKS
-    ggml_viz_hook_op_compute_begin(node);
-#endif
-
-// actual op compute...
-
-#ifdef GGML_VIZ_ENABLE_HOOKS
-    ggml_viz_hook_op_compute_end(node);
-#endif
-```
-
-#### 3. `ggml-cpu.h` — *Header declarations*
-
-Add declarations under conditional flag:
-
-```c
-#ifdef GGML_VIZ_ENABLE_HOOKS
-    extern void ggml_viz_hook_graph_compute_begin(const struct ggml_cgraph* graph);
-    extern void ggml_viz_hook_graph_compute_end(const struct ggml_cgraph* graph);
-    extern void ggml_viz_hook_op_compute_begin(const struct ggml_tensor* tensor);
-    extern void ggml_viz_hook_op_compute_end(const struct ggml_tensor* tensor);
-#endif
-```
-
 ---
 
 ## 🛠 Hook Integration Strategy
 
-- [ ] **Conditional Compilation** — Use `#ifdef GGML_VIZ_ENABLE_HOOKS`
-- [ ] **Link-Time Integration** — Hook functions are provided by the `ggml_hook` library
-- [ ] **CMake Build Integration** — Ensure `GGML_VIZ_ENABLE_HOOKS` is defined in CMake when visualization is enabled
+- [✅] **Conditional Compilation** — Use `#ifdef GGML_VIZ_ENABLE_HOOKS`
+- [✅] **Link-Time Integration** — Hook functions are provided by the `ggml_hook` library
+- [✅] **CMake Build Integration** — Ensure `GGML_VIZ_ENABLE_HOOKS` is defined in CMake when visualization is enabled
 
 ### 📂 Files to Modify
-- [ ] `third_party/ggml/src/ggml-cpu/ggml-cpu.c` — Add hook invocations
-- [ ] `third_party/ggml/include/ggml-cpu.h` — Add hook function declarations
-- [ ] `third_party/ggml/src/CMakeLists.txt` — Add `GGML_VIZ_ENABLE_HOOKS` flag
+- [✅] `third_party/ggml/src/ggml-cpu/ggml-cpu.c` — Add hook invocations
+- [✅] `third_party/ggml/include/ggml-cpu.h` — Add hook function declarations
+- [✅] `third_party/ggml/src/CMakeLists.txt` — Add `GGML_VIZ_ENABLE_HOOKS` flag
 
 ---
 

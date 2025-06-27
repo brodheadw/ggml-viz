@@ -53,10 +53,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz"
+CMAKE_SOURCE_DIR = /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build"
+CMAKE_BINARY_DIR = /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build
 
 # Include any dependencies generated for this target.
 include third_party/ggml/src/CMakeFiles/ggml.dir/depend.make
@@ -73,18 +73,18 @@ third_party/ggml/src/CMakeFiles/ggml.dir/codegen:
 .PHONY : third_party/ggml/src/CMakeFiles/ggml.dir/codegen
 
 third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o: third_party/ggml/src/CMakeFiles/ggml.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp
+third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp
 third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o: third_party/ggml/src/CMakeFiles/ggml.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o -MF CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o.d -o CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o -MF CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o.d -o CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp
 
 third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml.dir/ggml-backend-reg.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp" > CMakeFiles/ggml.dir/ggml-backend-reg.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp > CMakeFiles/ggml.dir/ggml-backend-reg.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml.dir/ggml-backend-reg.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp" -o CMakeFiles/ggml.dir/ggml-backend-reg.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp -o CMakeFiles/ggml.dir/ggml-backend-reg.cpp.s
 
 # Object files for target ggml
 ggml_OBJECTS = \
@@ -97,21 +97,20 @@ third_party/ggml/src/libggml.dylib: third_party/ggml/src/CMakeFiles/ggml.dir/ggm
 third_party/ggml/src/libggml.dylib: third_party/ggml/src/CMakeFiles/ggml.dir/build.make
 third_party/ggml/src/libggml.dylib: third_party/ggml/src/libggml-cpu.dylib
 third_party/ggml/src/libggml.dylib: third_party/ggml/src/ggml-blas/libggml-blas.dylib
-third_party/ggml/src/libggml.dylib: third_party/ggml/src/ggml-metal/libggml-metal.dylib
 third_party/ggml/src/libggml.dylib: third_party/ggml/src/libggml-base.dylib
 third_party/ggml/src/libggml.dylib: third_party/ggml/src/CMakeFiles/ggml.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared library libggml.dylib"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ggml.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX shared library libggml.dylib"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ggml.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 third_party/ggml/src/CMakeFiles/ggml.dir/build: third_party/ggml/src/libggml.dylib
 .PHONY : third_party/ggml/src/CMakeFiles/ggml.dir/build
 
 third_party/ggml/src/CMakeFiles/ggml.dir/clean:
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && $(CMAKE_COMMAND) -P CMakeFiles/ggml.dir/cmake_clean.cmake
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && $(CMAKE_COMMAND) -P CMakeFiles/ggml.dir/cmake_clean.cmake
 .PHONY : third_party/ggml/src/CMakeFiles/ggml.dir/clean
 
 third_party/ggml/src/CMakeFiles/ggml.dir/depend:
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml.dir/DependInfo.cmake" "--color=$(COLOR)"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : third_party/ggml/src/CMakeFiles/ggml.dir/depend
 

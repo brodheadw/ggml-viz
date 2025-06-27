@@ -53,10 +53,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz"
+CMAKE_SOURCE_DIR = /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build"
+CMAKE_BINARY_DIR = /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build
 
 # Include any dependencies generated for this target.
 include src/CMakeFiles/ggml_hook.dir/depend.make
@@ -73,18 +73,18 @@ src/CMakeFiles/ggml_hook.dir/codegen:
 .PHONY : src/CMakeFiles/ggml_hook.dir/codegen
 
 src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: src/CMakeFiles/ggml_hook.dir/flags.make
-src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.cpp
+src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.cpp
 src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: src/CMakeFiles/ggml_hook.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o -MF CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o.d -o CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o -MF CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o.d -o CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.cpp
 
 src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.cpp" > CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.cpp > CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.i
 
 src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.cpp" -o CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.cpp -o CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.s
 
 # Object files for target ggml_hook
 ggml_hook_OBJECTS = \
@@ -96,19 +96,19 @@ ggml_hook_EXTERNAL_OBJECTS =
 src/libggml_hook.a: src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o
 src/libggml_hook.a: src/CMakeFiles/ggml_hook.dir/build.make
 src/libggml_hook.a: src/CMakeFiles/ggml_hook.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libggml_hook.a"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src" && $(CMAKE_COMMAND) -P CMakeFiles/ggml_hook.dir/cmake_clean_target.cmake
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src" && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ggml_hook.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libggml_hook.a"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src && $(CMAKE_COMMAND) -P CMakeFiles/ggml_hook.dir/cmake_clean_target.cmake
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ggml_hook.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 src/CMakeFiles/ggml_hook.dir/build: src/libggml_hook.a
 .PHONY : src/CMakeFiles/ggml_hook.dir/build
 
 src/CMakeFiles/ggml_hook.dir/clean:
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src" && $(CMAKE_COMMAND) -P CMakeFiles/ggml_hook.dir/cmake_clean.cmake
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src && $(CMAKE_COMMAND) -P CMakeFiles/ggml_hook.dir/cmake_clean.cmake
 .PHONY : src/CMakeFiles/ggml_hook.dir/clean
 
 src/CMakeFiles/ggml_hook.dir/depend:
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/src" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml_hook.dir/DependInfo.cmake" "--color=$(COLOR)"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml_hook.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : src/CMakeFiles/ggml_hook.dir/depend
 

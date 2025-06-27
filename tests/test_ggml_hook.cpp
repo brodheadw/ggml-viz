@@ -31,6 +31,7 @@ int main() {
     ggml_viz::GGMLHook::instance().configure(config);
     ggml_viz::GGMLHook::instance().start();
 
+    std::cout << "Hook started, active: " << ggml_viz::GGMLHook::instance().is_active() << "\n";
     std::cout << "Creating computation graph...\n";
 
     // Create a simple computation graph
@@ -65,6 +66,7 @@ int main() {
     std::cout << "Graph has " << gf->n_nodes << " nodes\n";
 
     std::cout << "Running computation...\n";
+    std::cout << "Hook active before computation: " << ggml_viz::GGMLHook::instance().is_active() << "\n";
     auto start = std::chrono::high_resolution_clock::now();
 
     for (int i=0; i<10; i++) {

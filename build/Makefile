@@ -57,10 +57,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz"
+CMAKE_SOURCE_DIR = /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build"
+CMAKE_BINARY_DIR = /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -142,9 +142,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build//CMakeFiles/progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -170,6 +170,19 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
+
+#=============================================================================
+# Target rules for targets named ggml_hook
+
+# Build rule for target.
+ggml_hook: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml_hook
+.PHONY : ggml_hook
+
+# fast build rule for target.
+ggml_hook/fast:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/build
+.PHONY : ggml_hook/fast
 
 #=============================================================================
 # Target rules for targets named ggml-base
@@ -224,32 +237,6 @@ ggml-blas/fast:
 .PHONY : ggml-blas/fast
 
 #=============================================================================
-# Target rules for targets named ggml-metal
-
-# Build rule for target.
-ggml-metal: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml-metal
-.PHONY : ggml-metal
-
-# fast build rule for target.
-ggml-metal/fast:
-	$(MAKE) $(MAKESILENT) -f third_party/ggml/src/ggml-metal/CMakeFiles/ggml-metal.dir/build.make third_party/ggml/src/ggml-metal/CMakeFiles/ggml-metal.dir/build
-.PHONY : ggml-metal/fast
-
-#=============================================================================
-# Target rules for targets named ggml_hook
-
-# Build rule for target.
-ggml_hook: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml_hook
-.PHONY : ggml_hook
-
-# fast build rule for target.
-ggml_hook/fast:
-	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/build
-.PHONY : ggml_hook/fast
-
-#=============================================================================
 # Target rules for targets named test_ggml_hook
 
 # Build rule for target.
@@ -279,7 +266,6 @@ help:
 	@echo "... ggml-base"
 	@echo "... ggml-blas"
 	@echo "... ggml-cpu"
-	@echo "... ggml-metal"
 	@echo "... ggml_hook"
 	@echo "... test_ggml_hook"
 .PHONY : help

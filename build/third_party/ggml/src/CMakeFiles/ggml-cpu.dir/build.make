@@ -53,10 +53,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz"
+CMAKE_SOURCE_DIR = /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build"
+CMAKE_BINARY_DIR = /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build
 
 # Include any dependencies generated for this target.
 include third_party/ggml/src/CMakeFiles/ggml-cpu.dir/depend.make
@@ -73,200 +73,200 @@ third_party/ggml/src/CMakeFiles/ggml-cpu.dir/codegen:
 .PHONY : third_party/ggml/src/CMakeFiles/ggml-cpu.dir/codegen
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c" > CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c > CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building C object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c" > CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c > CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c -o CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Building C object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c" > CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c > CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.s
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make
-third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o: /Users/willb/Vaults/Personal/👨‍💻\ DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp
+third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o -c "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o -MF CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o.d -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.i"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp" > CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp > CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.i
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.s"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp" -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.s
 
 # Object files for target ggml-cpu
 ggml__cpu_OBJECTS = \
@@ -304,19 +304,20 @@ third_party/ggml/src/libggml-cpu.dylib: third_party/ggml/src/CMakeFiles/ggml-cpu
 third_party/ggml/src/libggml-cpu.dylib: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o
 third_party/ggml/src/libggml-cpu.dylib: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/build.make
 third_party/ggml/src/libggml-cpu.dylib: third_party/ggml/src/libggml-base.dylib
+third_party/ggml/src/libggml-cpu.dylib: src/libggml_hook.a
 third_party/ggml/src/libggml-cpu.dylib: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX shared library libggml-cpu.dylib"
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ggml-cpu.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX shared library libggml-cpu.dylib"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ggml-cpu.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/build: third_party/ggml/src/libggml-cpu.dylib
 .PHONY : third_party/ggml/src/CMakeFiles/ggml-cpu.dir/build
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/clean:
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" && $(CMAKE_COMMAND) -P CMakeFiles/ggml-cpu.dir/cmake_clean.cmake
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src && $(CMAKE_COMMAND) -P CMakeFiles/ggml-cpu.dir/cmake_clean.cmake
 .PHONY : third_party/ggml/src/CMakeFiles/ggml-cpu.dir/clean
 
 third_party/ggml/src/CMakeFiles/ggml-cpu.dir/depend:
-	cd "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src" "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml-cpu.dir/DependInfo.cmake" "--color=$(COLOR)"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml-cpu.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : third_party/ggml/src/CMakeFiles/ggml-cpu.dir/depend
 

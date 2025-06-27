@@ -1,4 +1,4 @@
-# Install script for directory: /Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/third_party/ggml/src
+# Install script for directory: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -12,7 +12,7 @@ if(NOT DEFINED CMAKE_INSTALL_CONFIG_NAME)
     string(REGEX REPLACE "^[^A-Za-z0-9_]+" ""
            CMAKE_INSTALL_CONFIG_NAME "${BUILD_TYPE}")
   else()
-    set(CMAKE_INSTALL_CONFIG_NAME "Release")
+    set(CMAKE_INSTALL_CONFIG_NAME "Debug")
   endif()
   message(STATUS "Install configuration: \"${CMAKE_INSTALL_CONFIG_NAME}\"")
 endif()
@@ -39,15 +39,15 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/cmake_install.cmake")
+  include("/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/libggml-cpu.dylib")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/libggml-cpu.dylib")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libggml-cpu.dylib" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libggml-cpu.dylib")
     execute_process(COMMAND /usr/bin/install_name_tool
-      -delete_rpath "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src"
+      -delete_rpath "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src"
       "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libggml-cpu.dylib")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" -x "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libggml-cpu.dylib")
@@ -60,17 +60,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/cmake_install.cmake")
+  include("/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/cmake_install.cmake")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/install_local_manifest.txt"
+  file(WRITE "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

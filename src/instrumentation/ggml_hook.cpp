@@ -26,6 +26,7 @@ namespace {
 // Singleton implementation
 GGMLHook& GGMLHook::instance() {
     static GGMLHook instance;
+    printf("[DEBUG] GGMLHook::instance() called, returning %p\n", &instance);
     return instance;
 }
 
@@ -69,6 +70,8 @@ void GGMLHook::stop() {
     if (!active_.exchange(false)) {
         return;
     }
+    
+    printf("[DEBUG] GGMLHook::stop() called from somewhere\n");
 
     if (output_file_) {
         std::lock_guard<std::mutex> lock(file_mutex_);
@@ -113,13 +116,19 @@ std::vector<Event> GGMLHook::get_events_size(uint64_t timestamp_ns) {
 }
 
 GGMLHook::~GGMLHook() {
+    printf("[DEBUG] GGMLHook destructor called\n");
     stop();
 }
 
 void GGMLHook::record_event(const Event& event) {
-    if (!active_.load()) return;
+    if (!active_.load()) {
+        printf("[DEBUG] record_event: not active\n");
+        return;
+    }
 
     if (event_count_.load() >= config_.max_events) {
+        printf("[DEBUG] Event limit reached: %zu >= %zu, stopping trace\n", 
+               event_count_.load(), config_.max_events);
         std::cerr << "Warning: Event limit reached, stopping trace\n";
         stop();
         return;
@@ -130,8 +139,11 @@ void GGMLHook::record_event(const Event& event) {
         std::lock_guard<std::mutex> lock(buffer_mutex_);
         event_buffer_[pos] = event;
     }
+    
+    // Increment event count after storing the event
+    event_count_.fetch_add(1, std::memory_order_relaxed);
 
-    if (config_.write_to_file && (event_count_ & 0xFFF) == 0) {
+    if (config_.write_to_file && (event_count_.load() & 0xFFF) == 0) {
         std::lock_guard<std::mutex> lock(file_mutex_);
         flush_to_file();
     }
@@ -170,7 +182,12 @@ void GGMLHook::flush_to_file() {
 }
 
 void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph) {
+    printf("[DEBUG] on_graph_compute_begin called, active: %d, enable_op_timing: %d\n", 
+           active_.load(), config_.enable_op_timing);
+    
     if (!active_.load() || !config_.enable_op_timing) return;
+
+    std::cout << "[DEBUG] Graph compute begin, nodes: " << graph->n_nodes << "\n";
 
     Event event = {};
     event.type = EventType::GRAPH_COMPUTE_BEGIN;
@@ -213,6 +230,8 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor) {
         }
         if (!found) return;
     }
+
+    std::cout << "[DEBUG] Op compute begin: " << tensor->name << " type: " << tensor->op << "\n";
         
     Event event = {};
     event.type = EventType::OP_COMPUTE_BEGIN;
@@ -256,6 +275,7 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor) {
 // C-style hook functions that can be called from ggml
 extern "C" {
     void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph) {
+        printf("[DEBUG] C wrapper called: ggml_viz_hook_graph_compute_begin\n");
         GGMLHook::instance().on_graph_compute_begin(graph);
     }
 

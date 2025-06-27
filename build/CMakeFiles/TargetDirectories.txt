@@ -1,63 +1,55 @@
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles/test.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles/edit_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles/rebuild_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles/list_install_components.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles/install.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles/install/local.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/CMakeFiles/install/strip.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/test.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/edit_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/rebuild_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/list_install_components.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/install.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/install/local.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/install/strip.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml-base.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml-cpu.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/test.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/edit_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/rebuild_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/list_install_components.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/install.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/install/local.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/install/strip.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/test.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/edit_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/rebuild_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/list_install_components.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/install.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/install/local.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/install/strip.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/test.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/edit_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/rebuild_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/list_install_components.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install/local.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install/strip.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/CMakeFiles/ggml-metal.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/CMakeFiles/test.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/CMakeFiles/edit_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/CMakeFiles/rebuild_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/CMakeFiles/list_install_components.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/CMakeFiles/install.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/CMakeFiles/install/local.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-metal/CMakeFiles/install/strip.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml_hook.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/test.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/edit_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/rebuild_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/list_install_components.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/install.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/install/local.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/src/CMakeFiles/install/strip.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test_ggml_hook.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/tests/CMakeFiles/edit_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/tests/CMakeFiles/rebuild_cache.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/tests/CMakeFiles/list_install_components.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/tests/CMakeFiles/install.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/tests/CMakeFiles/install/local.dir
-/Users/willb/Vaults/Personal/👨‍💻 DevLab/ggml/ggml-viz/build/tests/CMakeFiles/install/strip.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/test.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/edit_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/rebuild_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/list_install_components.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/install.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/install/local.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/install/strip.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml_hook.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/test.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/edit_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/rebuild_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/list_install_components.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/install.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/install/local.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/install/strip.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/test.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/edit_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/rebuild_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/list_install_components.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/install.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/install/local.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/CMakeFiles/install/strip.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml-base.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/ggml-cpu.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/test.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/edit_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/rebuild_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/list_install_components.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/install.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/install/local.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/CMakeFiles/install/strip.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/test.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/edit_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/rebuild_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/list_install_components.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/install.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/install/local.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-cpu/CMakeFiles/install/strip.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/test.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/edit_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/rebuild_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/list_install_components.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install/local.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install/strip.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test_ggml_hook.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/edit_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/rebuild_cache.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/list_install_components.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/install.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/install/local.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/install/strip.dir
