@@ -1,5 +1,6 @@
 // tests/test_ggml_hook.cpp
 #include "ggml_hook.hpp"
+#include "ggml-cpu.h"
 #include "ggml-impl.h"
 #include <iostream>
 #include <vector>
@@ -67,7 +68,7 @@ int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
     for (int i=0; i<10; i++) {
-        ggml_graph_compute(ctx, gf, 4);
+        ggml_graph_compute_with_ctx(ctx, gf, 4);
         std::cout << " Iteration " << i+1 << " complete\n";
     }
 
