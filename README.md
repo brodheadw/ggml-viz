@@ -138,13 +138,20 @@ We especially welcome:
 
 ---
 
-## 8 • License
+## 8 • Index
+To run tests:
+- `mkdir -p build && cd build // create dir and navigate to build folder`
+  `cmake .. DCMAKE_BUILD_TYPE=Debug -DGGML_METAL=OFF`
+  `make -4`
+  `./bin/test_some_program`
+
+## 9 • License
 
 `ggml‑visualizer` is licensed under the **Apache 2.0** license.  We use icons licensed under CC‑BY‑4.0; see `docs/THIRD_PARTY.md`.
 
 ---
 
-## 9 • Credits & Inspiration
+## 10 • Credits & Inspiration
 
 - Georgi Gerganov and the **GGML** community for the blazing‑fast runtime.
 - Anthropicʼs **Neuronpedia** and Metaʼs **LLM Transparency Tool** for paving the way in model interpretability.
