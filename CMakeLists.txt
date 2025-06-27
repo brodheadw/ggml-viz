@@ -10,6 +10,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Find Threads
 find_package(Threads REQUIRED)
 
+# Enable visualization hooks in GGML
+set(GGML_VIZ_ENABLE_HOOKS ON CACHE BOOL "Enable hooks for ggml-viz visualization" FORCE)
+
 # Bring in ggml submodule (will define a 'ggml' target)
 add_subdirectory(third_party/ggml EXCLUDE_FROM_ALL)
 
