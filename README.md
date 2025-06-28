@@ -4,10 +4,6 @@
 
 ---
 
-&#x20;&#x20;
-
----
-
 ## 1 • Why does this exist?
 
 Low‑level LLM runtimes like **GGML** squeeze every last drop of performance out of CPUs and GPUs, but they are effectively a black box once the code is running.  Developers currently debug with `printf()` and perf logs — painful and time‑consuming. **GGML Visualizer** removes that friction:
