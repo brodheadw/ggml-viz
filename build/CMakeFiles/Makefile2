@@ -88,10 +88,12 @@ clean: tests/clean
 
 # Recursive "all" directory target.
 src/all: src/CMakeFiles/ggml_hook.dir/all
+src/all: src/CMakeFiles/ggml_utils.dir/all
 .PHONY : src/all
 
 # Recursive "codegen" directory target.
 src/codegen: src/CMakeFiles/ggml_hook.dir/codegen
+src/codegen: src/CMakeFiles/ggml_utils.dir/codegen
 .PHONY : src/codegen
 
 # Recursive "preinstall" directory target.
@@ -100,6 +102,7 @@ src/preinstall:
 
 # Recursive "clean" directory target.
 src/clean: src/CMakeFiles/ggml_hook.dir/clean
+src/clean: src/CMakeFiles/ggml_utils.dir/clean
 .PHONY : src/clean
 
 #=============================================================================
@@ -107,10 +110,12 @@ src/clean: src/CMakeFiles/ggml_hook.dir/clean
 
 # Recursive "all" directory target.
 tests/all: tests/CMakeFiles/test_ggml_hook.dir/all
+tests/all: tests/CMakeFiles/test_trace_reader.dir/all
 .PHONY : tests/all
 
 # Recursive "codegen" directory target.
 tests/codegen: tests/CMakeFiles/test_ggml_hook.dir/codegen
+tests/codegen: tests/CMakeFiles/test_trace_reader.dir/codegen
 .PHONY : tests/codegen
 
 # Recursive "preinstall" directory target.
@@ -119,6 +124,7 @@ tests/preinstall:
 
 # Recursive "clean" directory target.
 tests/clean: tests/CMakeFiles/test_ggml_hook.dir/clean
+tests/clean: tests/CMakeFiles/test_trace_reader.dir/clean
 .PHONY : tests/clean
 
 #=============================================================================
@@ -241,6 +247,38 @@ src/CMakeFiles/ggml_hook.dir/codegen:
 src/CMakeFiles/ggml_hook.dir/clean:
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/clean
 .PHONY : src/CMakeFiles/ggml_hook.dir/clean
+
+#=============================================================================
+# Target rules for target src/CMakeFiles/ggml_utils.dir
+
+# All Build rule for target.
+src/CMakeFiles/ggml_utils.dir/all: src/CMakeFiles/ggml_hook.dir/all
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/depend
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=31,32,33,34 "Built target ggml_utils"
+.PHONY : src/CMakeFiles/ggml_utils.dir/all
+
+# Build rule for subdir invocation for target.
+src/CMakeFiles/ggml_utils.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles 6
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/ggml_utils.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles 0
+.PHONY : src/CMakeFiles/ggml_utils.dir/rule
+
+# Convenience name for target.
+ggml_utils: src/CMakeFiles/ggml_utils.dir/rule
+.PHONY : ggml_utils
+
+# codegen rule for target.
+src/CMakeFiles/ggml_utils.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=31,32,33,34 "Finished codegen for target ggml_utils"
+.PHONY : src/CMakeFiles/ggml_utils.dir/codegen
+
+# clean rule for target.
+src/CMakeFiles/ggml_utils.dir/clean:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/clean
+.PHONY : src/CMakeFiles/ggml_utils.dir/clean
 
 #=============================================================================
 # Target rules for target third_party/ggml/src/CMakeFiles/ggml-base.dir
@@ -384,7 +422,7 @@ tests/CMakeFiles/test_ggml_hook.dir/all: third_party/ggml/src/CMakeFiles/ggml-cp
 tests/CMakeFiles/test_ggml_hook.dir/all: third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=31,32 "Built target test_ggml_hook"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=35,36 "Built target test_ggml_hook"
 .PHONY : tests/CMakeFiles/test_ggml_hook.dir/all
 
 # Build rule for subdir invocation for target.
@@ -401,13 +439,50 @@ test_ggml_hook: tests/CMakeFiles/test_ggml_hook.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_ggml_hook.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=31,32 "Finished codegen for target test_ggml_hook"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=35,36 "Finished codegen for target test_ggml_hook"
 .PHONY : tests/CMakeFiles/test_ggml_hook.dir/codegen
 
 # clean rule for target.
 tests/CMakeFiles/test_ggml_hook.dir/clean:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/clean
 .PHONY : tests/CMakeFiles/test_ggml_hook.dir/clean
+
+#=============================================================================
+# Target rules for target tests/CMakeFiles/test_trace_reader.dir
+
+# All Build rule for target.
+tests/CMakeFiles/test_trace_reader.dir/all: src/CMakeFiles/ggml_hook.dir/all
+tests/CMakeFiles/test_trace_reader.dir/all: src/CMakeFiles/ggml_utils.dir/all
+tests/CMakeFiles/test_trace_reader.dir/all: third_party/ggml/src/CMakeFiles/ggml-base.dir/all
+tests/CMakeFiles/test_trace_reader.dir/all: third_party/ggml/src/CMakeFiles/ggml.dir/all
+tests/CMakeFiles/test_trace_reader.dir/all: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/all
+tests/CMakeFiles/test_trace_reader.dir/all: third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir/all
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/depend
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=37,38 "Built target test_trace_reader"
+.PHONY : tests/CMakeFiles/test_trace_reader.dir/all
+
+# Build rule for subdir invocation for target.
+tests/CMakeFiles/test_trace_reader.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles 36
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_trace_reader.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles 0
+.PHONY : tests/CMakeFiles/test_trace_reader.dir/rule
+
+# Convenience name for target.
+test_trace_reader: tests/CMakeFiles/test_trace_reader.dir/rule
+.PHONY : test_trace_reader
+
+# codegen rule for target.
+tests/CMakeFiles/test_trace_reader.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=37,38 "Finished codegen for target test_trace_reader"
+.PHONY : tests/CMakeFiles/test_trace_reader.dir/codegen
+
+# clean rule for target.
+tests/CMakeFiles/test_trace_reader.dir/clean:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/clean
+.PHONY : tests/CMakeFiles/test_trace_reader.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

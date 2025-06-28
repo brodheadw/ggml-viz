@@ -3,6 +3,8 @@
 #include <iostream>
 #include <algorithm>
 #include <unordered_map>
+#include <cstring>
+#include <cstdlib>
 
 namespace ggml_viz {
 
@@ -68,6 +70,8 @@ bool TraceReader::load_events() {
 
         events_.push_back(event);
     }
+    
+    return true;
 }
 
 std::vector<const Event*> TraceReader::get_graph_events() const {

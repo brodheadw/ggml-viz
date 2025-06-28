@@ -185,6 +185,20 @@ ggml_hook/fast:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/build
 .PHONY : ggml_hook/fast
 
+# Convenience name for target.
+src/CMakeFiles/ggml_utils.dir/rule:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/ggml_utils.dir/rule
+.PHONY : src/CMakeFiles/ggml_utils.dir/rule
+
+# Convenience name for target.
+ggml_utils: src/CMakeFiles/ggml_utils.dir/rule
+.PHONY : ggml_utils
+
+# fast build rule for target.
+ggml_utils/fast:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/build
+.PHONY : ggml_utils/fast
+
 instrumentation/ggml_hook.o: instrumentation/ggml_hook.cpp.o
 .PHONY : instrumentation/ggml_hook.o
 
@@ -209,6 +223,78 @@ instrumentation/ggml_hook.cpp.s:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.s
 .PHONY : instrumentation/ggml_hook.cpp.s
 
+utils/config.o: utils/config.cpp.o
+.PHONY : utils/config.o
+
+# target to build an object file
+utils/config.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/config.cpp.o
+.PHONY : utils/config.cpp.o
+
+utils/config.i: utils/config.cpp.i
+.PHONY : utils/config.i
+
+# target to preprocess a source file
+utils/config.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/config.cpp.i
+.PHONY : utils/config.cpp.i
+
+utils/config.s: utils/config.cpp.s
+.PHONY : utils/config.s
+
+# target to generate assembly for a file
+utils/config.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/config.cpp.s
+.PHONY : utils/config.cpp.s
+
+utils/logger.o: utils/logger.cpp.o
+.PHONY : utils/logger.o
+
+# target to build an object file
+utils/logger.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/logger.cpp.o
+.PHONY : utils/logger.cpp.o
+
+utils/logger.i: utils/logger.cpp.i
+.PHONY : utils/logger.i
+
+# target to preprocess a source file
+utils/logger.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/logger.cpp.i
+.PHONY : utils/logger.cpp.i
+
+utils/logger.s: utils/logger.cpp.s
+.PHONY : utils/logger.s
+
+# target to generate assembly for a file
+utils/logger.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/logger.cpp.s
+.PHONY : utils/logger.cpp.s
+
+utils/trace_reader.o: utils/trace_reader.cpp.o
+.PHONY : utils/trace_reader.o
+
+# target to build an object file
+utils/trace_reader.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/trace_reader.cpp.o
+.PHONY : utils/trace_reader.cpp.o
+
+utils/trace_reader.i: utils/trace_reader.cpp.i
+.PHONY : utils/trace_reader.i
+
+# target to preprocess a source file
+utils/trace_reader.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/trace_reader.cpp.i
+.PHONY : utils/trace_reader.cpp.i
+
+utils/trace_reader.s: utils/trace_reader.cpp.s
+.PHONY : utils/trace_reader.s
+
+# target to generate assembly for a file
+utils/trace_reader.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/utils/trace_reader.cpp.s
+.PHONY : utils/trace_reader.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -223,9 +309,19 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... ggml_hook"
+	@echo "... ggml_utils"
 	@echo "... instrumentation/ggml_hook.o"
 	@echo "... instrumentation/ggml_hook.i"
 	@echo "... instrumentation/ggml_hook.s"
+	@echo "... utils/config.o"
+	@echo "... utils/config.i"
+	@echo "... utils/config.s"
+	@echo "... utils/logger.o"
+	@echo "... utils/logger.i"
+	@echo "... utils/logger.s"
+	@echo "... utils/trace_reader.o"
+	@echo "... utils/trace_reader.i"
+	@echo "... utils/trace_reader.s"
 .PHONY : help
 
 

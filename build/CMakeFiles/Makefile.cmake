@@ -181,9 +181,11 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "src/CMakeFiles/ggml_hook.dir/DependInfo.cmake"
+  "src/CMakeFiles/ggml_utils.dir/DependInfo.cmake"
   "third_party/ggml/src/CMakeFiles/ggml-base.dir/DependInfo.cmake"
   "third_party/ggml/src/CMakeFiles/ggml.dir/DependInfo.cmake"
   "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/DependInfo.cmake"
   "third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir/DependInfo.cmake"
   "tests/CMakeFiles/test_ggml_hook.dir/DependInfo.cmake"
+  "tests/CMakeFiles/test_trace_reader.dir/DependInfo.cmake"
   )
