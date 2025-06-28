@@ -70,4 +70,62 @@ bool TraceReader::load_events() {
     }
 }
 
+std::vector<const Event*> TraceReader::get_graph_events() const {
+    std::vector<const Event*> result;
+    for (const auto& event : events_) {
+        if (event.type == EventType::GRAPH_COMPUTE_BEGIN || 
+            event.type == EventType::GRAPH_COMPUTE_END) {
+            result.push_back(&event);
+        }
+    }
+    return result;
+}
+
+std::vector<const Event*> TraceReader::get_op_events_for_type(uint32_t op_type) const {
+    std::vector<const Event*> result;
+    for (const auto& event : events_) {
+        if ((event.type == EventType::OP_COMPUTE_BEGIN || 
+             event.type == EventType::OP_COMPUTE_END) &&
+            event.data.op.op_type == op_type) {
+            result.push_back(&event);
+        }
+    }
+    return result;
+}
+
+uint64_t TraceReader::get_total_duration_ns() const {
+    if (events_.size() < 2) return 0;
+    return events_.back().timestamp_ns - events_.front().timestamp_ns;
+}
+
+std::vector<TraceReader::OpTiming> TraceReader::get_op_timings() const {
+    std::vector<OpTiming> timings;
+    std::unordered_map<const void*, const Event*> pending_ops;
+    
+    for (const auto& event : events_) {
+        if (event.type == EventType::OP_COMPUTE_BEGIN) {
+            pending_ops[event.data.op.tensor_ptr] = &event;
+        } else if (event.type == EventType::OP_COMPUTE_END) {
+            auto it = pending_ops.find(event.data.op.tensor_ptr);
+            if (it != pending_ops.end()) {
+                OpTiming timing;
+                timing.begin = it->second;
+                timing.end = &event;
+                timing.duration_ns = event.timestamp_ns - it->second->timestamp_ns;
+                timing.name = event.label ? event.label : "unnamed";
+                timings.push_back(timing);
+                pending_ops.erase(it);
+            }
+        }
+    }
+    
+    // Sort by duration (longest first)
+    std::sort(timings.begin(), timings.end(), 
+              [](const OpTiming& a, const OpTiming& b) {
+                  return a.duration_ns > b.duration_ns;
+              });
+    
+    return timings;
+}
+
 } // namespace ggml_viz
