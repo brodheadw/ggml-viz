@@ -42,3 +42,50 @@ target_link_libraries(ggml_utils
       ggml_hook
       Threads::Threads
 )
+
+# Add frontend library
+add_library(ggml_frontend STATIC
+    frontend/imgui_app.cpp
+    frontend/imgui_widgets.hpp
+    frontend/imgui_widgets.cpp
+)
+
+target_include_directories(ggml_frontend
+    PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}
+      ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation
+      ${CMAKE_CURRENT_SOURCE_DIR}/utils
+      ${CMAKE_SOURCE_DIR}/third_party/imgui
+      ${CMAKE_SOURCE_DIR}/third_party/imgui/backends
+)
+
+target_link_libraries(ggml_frontend
+    PUBLIC
+      ggml_utils
+      imgui
+      OpenGL::GL
+      Threads::Threads
+)
+
+target_compile_definitions(ggml_frontend
+    PUBLIC
+      IMGUI_IMPL_OPENGL_LOADER_GL3W=0
+      IMGUI_DEFINE_MATH_OPERATORS
+)
+
+# Main executable
+add_executable(ggml-viz
+    main.cpp
+)
+
+target_include_directories(ggml-viz
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(ggml-viz
+    PRIVATE
+      ggml_frontend
+      ggml_utils
+      ggml_hook
+)

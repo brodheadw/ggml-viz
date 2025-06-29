@@ -39,6 +39,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/cmake_install.cmake")
 endif()
 
