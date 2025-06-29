@@ -185,6 +185,19 @@ ggml_hook/fast:
 .PHONY : ggml_hook/fast
 
 #=============================================================================
+# Target rules for targets named ggml_utils
+
+# Build rule for target.
+ggml_utils: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml_utils
+.PHONY : ggml_utils
+
+# fast build rule for target.
+ggml_utils/fast:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/build
+.PHONY : ggml_utils/fast
+
+#=============================================================================
 # Target rules for targets named ggml-base
 
 # Build rule for target.
@@ -249,6 +262,19 @@ test_ggml_hook/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/build
 .PHONY : test_ggml_hook/fast
 
+#=============================================================================
+# Target rules for targets named test_trace_reader
+
+# Build rule for target.
+test_trace_reader: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_trace_reader
+.PHONY : test_trace_reader
+
+# fast build rule for target.
+test_trace_reader/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/build
+.PHONY : test_trace_reader/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -267,7 +293,9 @@ help:
 	@echo "... ggml-blas"
 	@echo "... ggml-cpu"
 	@echo "... ggml_hook"
+	@echo "... ggml_utils"
 	@echo "... test_ggml_hook"
+	@echo "... test_trace_reader"
 .PHONY : help
 
 

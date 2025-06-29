@@ -47,8 +47,8 @@ This file tracks the remaining implementation work required for the `ggml-viz` p
 ## ⚙️ Missing GGML Submodule Integration
 Hooks are **not yet patched** into the GGML compute graph:
 
-- [ ] No `ggml_viz_hook_*` functions found in `third_party/ggml/`
-- [ ] Modify `third_party/ggml/src/ggml.c` (or `ggml.cpp`) to inject hooks:
+- [✅] No `ggml_viz_hook_*` functions found in `third_party/ggml/`
+- [✅] Modify `third_party/ggml/src/ggml.c` (or `ggml.cpp`) to inject hooks:
   - `ggml_viz_hook_graph_compute_begin(graph);`
   - `ggml_viz_hook_op_compute_begin(tensor);`
   - `ggml_viz_hook_op_compute_end(tensor);`
