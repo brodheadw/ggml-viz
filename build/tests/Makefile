@@ -185,6 +185,20 @@ test_ggml_hook/fast:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/build
 .PHONY : test_ggml_hook/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_trace_reader.dir/rule:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_trace_reader.dir/rule
+.PHONY : tests/CMakeFiles/test_trace_reader.dir/rule
+
+# Convenience name for target.
+test_trace_reader: tests/CMakeFiles/test_trace_reader.dir/rule
+.PHONY : test_trace_reader
+
+# fast build rule for target.
+test_trace_reader/fast:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/build
+.PHONY : test_trace_reader/fast
+
 test_ggml_hook.o: test_ggml_hook.cpp.o
 .PHONY : test_ggml_hook.o
 
@@ -209,6 +223,30 @@ test_ggml_hook.cpp.s:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/test_ggml_hook.cpp.s
 .PHONY : test_ggml_hook.cpp.s
 
+test_trace_reader.o: test_trace_reader.cpp.o
+.PHONY : test_trace_reader.o
+
+# target to build an object file
+test_trace_reader.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/test_trace_reader.cpp.o
+.PHONY : test_trace_reader.cpp.o
+
+test_trace_reader.i: test_trace_reader.cpp.i
+.PHONY : test_trace_reader.i
+
+# target to preprocess a source file
+test_trace_reader.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/test_trace_reader.cpp.i
+.PHONY : test_trace_reader.cpp.i
+
+test_trace_reader.s: test_trace_reader.cpp.s
+.PHONY : test_trace_reader.s
+
+# target to generate assembly for a file
+test_trace_reader.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/test_trace_reader.cpp.s
+.PHONY : test_trace_reader.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -223,9 +261,13 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... test_ggml_hook"
+	@echo "... test_trace_reader"
 	@echo "... test_ggml_hook.o"
 	@echo "... test_ggml_hook.i"
 	@echo "... test_ggml_hook.s"
+	@echo "... test_trace_reader.o"
+	@echo "... test_trace_reader.i"
+	@echo "... test_trace_reader.s"
 .PHONY : help
 
 
