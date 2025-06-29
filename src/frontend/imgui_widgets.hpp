@@ -85,4 +85,82 @@ namespace TimelineUtils {
     std::string format_timestamp(float timestamp_ms);
 }
 
+// Compute graph visualization widget
+class GraphWidget {
+public:
+    struct GraphConfig {
+        float node_width = 120.0f;
+        float node_height = 60.0f;
+        float node_spacing_x = 160.0f;
+        float node_spacing_y = 100.0f;
+        bool show_op_types = true;
+        bool show_timing = true;
+        bool auto_layout = true;
+        float zoom = 1.0f;
+        ImVec2 pan_offset{0.0f, 0.0f};
+    };
+
+    struct GraphNode {
+        int node_id;
+        ImVec2 position;
+        ImVec2 size;
+        std::string label;
+        std::string op_type;
+        float duration_ms;
+        std::vector<int> inputs;  // Node IDs of input nodes
+        std::vector<int> outputs; // Node IDs of output nodes
+        ImU32 color;
+        const void* tensor_ptr;   // For linking to trace events
+        bool is_selected;
+    };
+
+    GraphWidget();
+    
+    // Render the graph widget
+    bool render(const char* label, const TraceReader* trace_reader, GraphConfig& config);
+    
+    // Get currently selected node
+    int get_selected_node() const { return selected_node_; }
+    
+    // Set the selected node
+    void set_selected_node(int node_id) { selected_node_ = node_id; }
+
+private:
+    // Build graph structure from trace data
+    std::vector<GraphNode> build_graph_from_trace(const TraceReader* trace_reader);
+    
+    // Auto-layout the graph nodes
+    void auto_layout_nodes(std::vector<GraphNode>& nodes, const GraphConfig& config);
+    
+    // Render the graph canvas
+    void render_graph_canvas(std::vector<GraphNode>& nodes, GraphConfig& config);
+    
+    // Render graph controls
+    void render_graph_controls(GraphConfig& config);
+    
+    // Render a single node
+    void render_node(ImDrawList* draw_list, const GraphNode& node, const GraphConfig& config, 
+                     const ImVec2& canvas_pos, bool is_hovered);
+    
+    // Render connections between nodes
+    void render_connections(ImDrawList* draw_list, const std::vector<GraphNode>& nodes, 
+                           const GraphConfig& config, const ImVec2& canvas_pos);
+    
+    // Convert graph coordinates to screen coordinates
+    ImVec2 graph_to_screen(const ImVec2& graph_pos, const GraphConfig& config, const ImVec2& canvas_pos);
+    
+    // Convert screen coordinates to graph coordinates
+    ImVec2 screen_to_graph(const ImVec2& screen_pos, const GraphConfig& config, const ImVec2& canvas_pos);
+    
+    // Check if point is inside node
+    bool point_in_node(const ImVec2& point, const GraphNode& node);
+    
+    // Get color for operation type
+    ImU32 get_op_color(const std::string& op_type);
+    
+    int selected_node_ = -1;
+    std::vector<GraphNode> cached_nodes_;
+    bool nodes_dirty_ = true;
+};
+
 } // namespace ggml_viz

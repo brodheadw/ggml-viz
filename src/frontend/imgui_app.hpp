@@ -48,6 +48,10 @@ private:
     // Timeline widget
     TimelineWidget timeline_widget_;
     TimelineWidget::TimelineConfig timeline_config_;
+    
+    // Graph widget
+    GraphWidget graph_widget_;
+    GraphWidget::GraphConfig graph_config_;
 };
 
 } // namespace ggml_viz

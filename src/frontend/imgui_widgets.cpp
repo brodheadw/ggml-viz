@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <sstream>
 #include <iomanip>
+#include <queue>
+#include <cmath>
 
 namespace ggml_viz {
 
@@ -356,5 +358,431 @@ std::string format_timestamp(float timestamp_ms) {
 }
 
 } // namespace TimelineUtils
+
+// GraphWidget implementation
+GraphWidget::GraphWidget() {
+}
+
+bool GraphWidget::render(const char* label, const TraceReader* trace_reader, GraphConfig& config) {
+    if (!trace_reader || trace_reader->event_count() == 0) {
+        ImGui::Text("No trace data available for graph visualization");
+        return false;
+    }
+    
+    ImGui::PushID(label);
+    
+    // Rebuild graph if needed
+    if (nodes_dirty_) {
+        cached_nodes_ = build_graph_from_trace(trace_reader);
+        if (config.auto_layout) {
+            auto_layout_nodes(cached_nodes_, config);
+        }
+        nodes_dirty_ = false;
+    }
+    
+    // Render graph controls
+    render_graph_controls(config);
+    
+    // Render the graph canvas
+    render_graph_canvas(cached_nodes_, config);
+    
+    ImGui::PopID();
+    
+    return false; // No changes for now
+}
+
+std::vector<GraphWidget::GraphNode> GraphWidget::build_graph_from_trace(const TraceReader* trace_reader) {
+    std::vector<GraphNode> nodes;
+    const auto& events = trace_reader->events();
+    auto op_timings = trace_reader->get_op_timings();
+    
+    // Create a map of tensor pointers to node IDs
+    std::unordered_map<const void*, int> tensor_to_node;
+    
+    int node_id = 0;
+    
+    // Build nodes from operation timings
+    for (const auto& timing : op_timings) {
+        GraphNode node;
+        node.node_id = node_id++;
+        node.label = timing.name.empty() ? ("op_" + std::to_string(node.node_id)) : timing.name;
+        node.duration_ms = timing.duration_ns / 1e6f;
+        node.tensor_ptr = timing.begin->data.op.tensor_ptr;
+        node.size = ImVec2(120.0f, 60.0f);
+        node.is_selected = false;
+        
+        // Try to determine operation type from event data or label
+        if (timing.begin && timing.begin->data.op.op_type != 0) {
+            node.op_type = "op_" + std::to_string(timing.begin->data.op.op_type);
+        } else {
+            // Extract op type from label if possible
+            std::string label_str = node.label;
+            if (label_str.find("add") != std::string::npos) node.op_type = "ADD";
+            else if (label_str.find("mul") != std::string::npos) node.op_type = "MUL";
+            else if (label_str.find("conv") != std::string::npos) node.op_type = "CONV";
+            else if (label_str.find("linear") != std::string::npos) node.op_type = "LINEAR";
+            else if (label_str.find("softmax") != std::string::npos) node.op_type = "SOFTMAX";
+            else if (label_str.find("relu") != std::string::npos) node.op_type = "RELU";
+            else if (label_str.find("norm") != std::string::npos) node.op_type = "NORM";
+            else node.op_type = "UNKNOWN";
+        }
+        
+        node.color = get_op_color(node.op_type);
+        
+        // Map tensor pointer to node ID for later connection building
+        tensor_to_node[node.tensor_ptr] = node.node_id;
+        
+        nodes.push_back(node);
+    }
+    
+    // For now, create a simple linear connection pattern
+    // In a real implementation, this would analyze tensor dependencies
+    for (size_t i = 1; i < nodes.size(); i++) {
+        nodes[i].inputs.push_back(nodes[i-1].node_id);
+        nodes[i-1].outputs.push_back(nodes[i].node_id);
+    }
+    
+    return nodes;
+}
+
+void GraphWidget::auto_layout_nodes(std::vector<GraphNode>& nodes, const GraphConfig& config) {
+    if (nodes.empty()) return;
+    
+    // Simple layered layout algorithm
+    // Group nodes by their depth in the graph
+    std::vector<std::vector<int>> layers;
+    std::vector<int> node_depths(nodes.size(), -1);
+    
+    // Find root nodes (no inputs)
+    std::vector<int> roots;
+    for (size_t i = 0; i < nodes.size(); i++) {
+        if (nodes[i].inputs.empty()) {
+            roots.push_back(i);
+            node_depths[i] = 0;
+        }
+    }
+    
+    // If no clear roots, start with first node
+    if (roots.empty() && !nodes.empty()) {
+        roots.push_back(0);
+        node_depths[0] = 0;
+    }
+    
+    // Breadth-first traversal to assign depths
+    std::queue<int> queue;
+    for (int root : roots) {
+        queue.push(root);
+    }
+    
+    int max_depth = 0;
+    while (!queue.empty()) {
+        int current = queue.front();
+        queue.pop();
+        
+        int current_depth = node_depths[current];
+        max_depth = std::max(max_depth, current_depth);
+        
+        for (int output_id : nodes[current].outputs) {
+            if (output_id < nodes.size() && node_depths[output_id] < current_depth + 1) {
+                node_depths[output_id] = current_depth + 1;
+                queue.push(output_id);
+            }
+        }
+    }
+    
+    // Group nodes by depth
+    layers.resize(max_depth + 1);
+    for (size_t i = 0; i < nodes.size(); i++) {
+        int depth = node_depths[i];
+        if (depth >= 0) {
+            layers[depth].push_back(i);
+        } else {
+            // Handle disconnected nodes
+            layers[0].push_back(i);
+        }
+    }
+    
+    // Position nodes in layers
+    for (size_t layer = 0; layer < layers.size(); layer++) {
+        const auto& layer_nodes = layers[layer];
+        float y = layer * config.node_spacing_y;
+        
+        // Center nodes horizontally in each layer
+        float total_width = (layer_nodes.size() - 1) * config.node_spacing_x;
+        float start_x = -total_width * 0.5f;
+        
+        for (size_t i = 0; i < layer_nodes.size(); i++) {
+            int node_idx = layer_nodes[i];
+            nodes[node_idx].position = ImVec2(start_x + i * config.node_spacing_x, y);
+            nodes[node_idx].size = ImVec2(config.node_width, config.node_height);
+        }
+    }
+}
+
+void GraphWidget::render_graph_canvas(std::vector<GraphNode>& nodes, GraphConfig& config) {
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImVec2 canvas_pos = ImGui::GetCursorScreenPos();
+    ImVec2 canvas_size = ImGui::GetContentRegionAvail();
+    
+    // Minimum canvas size
+    canvas_size.x = std::max(canvas_size.x, 400.0f);
+    canvas_size.y = std::max(canvas_size.y, 300.0f);
+    
+    // Draw canvas background
+    draw_list->AddRectFilled(canvas_pos, 
+                           ImVec2(canvas_pos.x + canvas_size.x, canvas_pos.y + canvas_size.y),
+                           IM_COL32(25, 25, 25, 255));
+    
+    // Draw grid
+    float grid_step = 50.0f * config.zoom;
+    if (grid_step > 10.0f) {
+        ImU32 grid_color = IM_COL32(50, 50, 50, 100);
+        
+        // Vertical lines
+        for (float x = fmod(config.pan_offset.x, grid_step); x < canvas_size.x; x += grid_step) {
+            draw_list->AddLine(ImVec2(canvas_pos.x + x, canvas_pos.y),
+                              ImVec2(canvas_pos.x + x, canvas_pos.y + canvas_size.y),
+                              grid_color);
+        }
+        
+        // Horizontal lines
+        for (float y = fmod(config.pan_offset.y, grid_step); y < canvas_size.y; y += grid_step) {
+            draw_list->AddLine(ImVec2(canvas_pos.x, canvas_pos.y + y),
+                              ImVec2(canvas_pos.x + canvas_size.x, canvas_pos.y + y),
+                              grid_color);
+        }
+    }
+    
+    // Render connections first (so they appear behind nodes)
+    render_connections(draw_list, nodes, config, canvas_pos);
+    
+    // Render nodes
+    ImVec2 mouse_pos = ImGui::GetMousePos();
+    int hovered_node = -1;
+    
+    for (auto& node : nodes) {
+        ImVec2 screen_pos = graph_to_screen(node.position, config, canvas_pos);
+        
+        // Check if node is visible
+        if (screen_pos.x + node.size.x * config.zoom < canvas_pos.x ||
+            screen_pos.x > canvas_pos.x + canvas_size.x ||
+            screen_pos.y + node.size.y * config.zoom < canvas_pos.y ||
+            screen_pos.y > canvas_pos.y + canvas_size.y) {
+            continue;
+        }
+        
+        // Check if mouse is over this node
+        bool is_hovered = (mouse_pos.x >= screen_pos.x && 
+                          mouse_pos.x <= screen_pos.x + node.size.x * config.zoom &&
+                          mouse_pos.y >= screen_pos.y && 
+                          mouse_pos.y <= screen_pos.y + node.size.y * config.zoom);
+        
+        if (is_hovered) {
+            hovered_node = node.node_id;
+        }
+        
+        node.is_selected = (selected_node_ == node.node_id);
+        render_node(draw_list, node, config, canvas_pos, is_hovered);
+    }
+    
+    // Handle mouse interaction
+    ImGui::InvisibleButton("graph_canvas", canvas_size);
+    
+    if (ImGui::IsItemHovered()) {
+        // Handle node selection
+        if (ImGui::IsMouseClicked(0) && hovered_node >= 0) {
+            selected_node_ = hovered_node;
+        }
+        
+        // Handle panning
+        if (ImGui::IsMouseDragging(0) && hovered_node < 0) {
+            ImVec2 delta = ImGui::GetMouseDragDelta(0);
+            config.pan_offset.x += delta.x;
+            config.pan_offset.y += delta.y;
+            ImGui::ResetMouseDragDelta(0);
+        }
+        
+        // Handle zoom
+        if (ImGui::GetIO().MouseWheel != 0.0f) {
+            float wheel = ImGui::GetIO().MouseWheel;
+            float old_zoom = config.zoom;
+            config.zoom *= (1.0f + wheel * 0.1f);
+            config.zoom = std::max(0.1f, std::min(config.zoom, 5.0f));
+            
+            // Adjust pan to zoom towards mouse
+            ImVec2 mouse_graph = screen_to_graph(mouse_pos, config, canvas_pos);
+            config.pan_offset.x += (mouse_pos.x - canvas_pos.x) * (1.0f - config.zoom / old_zoom);
+            config.pan_offset.y += (mouse_pos.y - canvas_pos.y) * (1.0f - config.zoom / old_zoom);
+        }
+        
+        // Show tooltip for hovered node
+        if (hovered_node >= 0 && hovered_node < nodes.size()) {
+            const auto& node = nodes[hovered_node];
+            ImGui::BeginTooltip();
+            ImGui::Text("Node: %s", node.label.c_str());
+            ImGui::Text("Type: %s", node.op_type.c_str());
+            if (config.show_timing) {
+                ImGui::Text("Duration: %.3f ms", node.duration_ms);
+            }
+            ImGui::Text("Inputs: %zu, Outputs: %zu", node.inputs.size(), node.outputs.size());
+            ImGui::EndTooltip();
+        }
+    }
+}
+
+void GraphWidget::render_graph_controls(GraphConfig& config) {
+    // Layout controls
+    ImGui::Text("Layout:");
+    ImGui::SameLine();
+    if (ImGui::Button("Auto Layout")) {
+        if (!cached_nodes_.empty()) {
+            auto_layout_nodes(cached_nodes_, config);
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Reset View")) {
+        config.zoom = 1.0f;
+        config.pan_offset = ImVec2(0.0f, 0.0f);
+    }
+    
+    // Display options
+    ImGui::SameLine();
+    ImGui::Checkbox("Op Types", &config.show_op_types);
+    ImGui::SameLine();
+    ImGui::Checkbox("Timing", &config.show_timing);
+    
+    // Zoom control
+    ImGui::SameLine();
+    ImGui::Text("Zoom:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100);
+    ImGui::SliderFloat("##zoom", &config.zoom, 0.1f, 5.0f, "%.1fx");
+}
+
+void GraphWidget::render_node(ImDrawList* draw_list, const GraphNode& node, const GraphConfig& config, 
+                             const ImVec2& canvas_pos, bool is_hovered) {
+    ImVec2 screen_pos = graph_to_screen(node.position, config, canvas_pos);
+    ImVec2 size = ImVec2(node.size.x * config.zoom, node.size.y * config.zoom);
+    
+    // Node background
+    ImU32 bg_color = node.color;
+    if (node.is_selected) {
+        bg_color = IM_COL32(255, 200, 100, 255);  // Highlight selected
+    } else if (is_hovered) {
+        // Brighten color for hover
+        ImU32 r = (bg_color >> 0) & 0xFF;
+        ImU32 g = (bg_color >> 8) & 0xFF;
+        ImU32 b = (bg_color >> 16) & 0xFF;
+        r = std::min(255u, r + 40);
+        g = std::min(255u, g + 40);
+        b = std::min(255u, b + 40);
+        bg_color = IM_COL32(r, g, b, 255);
+    }
+    
+    // Draw node rectangle
+    draw_list->AddRectFilled(screen_pos, 
+                           ImVec2(screen_pos.x + size.x, screen_pos.y + size.y),
+                           bg_color, 5.0f * config.zoom);
+    
+    // Draw node border
+    ImU32 border_color = node.is_selected ? IM_COL32(255, 255, 0, 255) : IM_COL32(100, 100, 100, 255);
+    draw_list->AddRect(screen_pos, 
+                      ImVec2(screen_pos.x + size.x, screen_pos.y + size.y),
+                      border_color, 5.0f * config.zoom, 0, 2.0f);
+    
+    // Draw node text
+    if (config.zoom > 0.5f) {  // Only draw text if zoomed in enough
+        ImVec2 text_pos = ImVec2(screen_pos.x + 5 * config.zoom, screen_pos.y + 5 * config.zoom);
+        
+        // Node label
+        draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), node.label.c_str());
+        
+        // Operation type
+        if (config.show_op_types && !node.op_type.empty()) {
+            text_pos.y += 15 * config.zoom;
+            draw_list->AddText(text_pos, IM_COL32(200, 200, 200, 255), node.op_type.c_str());
+        }
+        
+        // Timing information
+        if (config.show_timing && node.duration_ms > 0) {
+            text_pos.y += 15 * config.zoom;
+            std::string timing = TimelineUtils::format_duration(node.duration_ms);
+            draw_list->AddText(text_pos, IM_COL32(255, 255, 100, 255), timing.c_str());
+        }
+    }
+}
+
+void GraphWidget::render_connections(ImDrawList* draw_list, const std::vector<GraphNode>& nodes, 
+                                   const GraphConfig& config, const ImVec2& canvas_pos) {
+    ImU32 connection_color = IM_COL32(150, 150, 150, 255);
+    float thickness = 2.0f * config.zoom;
+    
+    for (const auto& node : nodes) {
+        ImVec2 node_center = graph_to_screen(
+            ImVec2(node.position.x + node.size.x * 0.5f, node.position.y + node.size.y * 0.5f),
+            config, canvas_pos);
+        
+        // Draw connections to output nodes
+        for (int output_id : node.outputs) {
+            if (output_id < nodes.size()) {
+                const auto& output_node = nodes[output_id];
+                ImVec2 output_center = graph_to_screen(
+                    ImVec2(output_node.position.x + output_node.size.x * 0.5f, 
+                           output_node.position.y + output_node.size.y * 0.5f),
+                    config, canvas_pos);
+                
+                // Draw curved connection
+                ImVec2 cp1 = ImVec2(node_center.x + 50 * config.zoom, node_center.y);
+                ImVec2 cp2 = ImVec2(output_center.x - 50 * config.zoom, output_center.y);
+                
+                draw_list->AddBezierCubic(node_center, cp1, cp2, output_center, 
+                                        connection_color, thickness);
+                
+                // Draw arrow at the end
+                ImVec2 arrow_dir = ImVec2(output_center.x - cp2.x, output_center.y - cp2.y);
+                float arrow_len = sqrt(arrow_dir.x * arrow_dir.x + arrow_dir.y * arrow_dir.y);
+                if (arrow_len > 0) {
+                    arrow_dir.x /= arrow_len;
+                    arrow_dir.y /= arrow_len;
+                    
+                    ImVec2 arrow_p1 = ImVec2(output_center.x - 10 * config.zoom * arrow_dir.x + 5 * config.zoom * arrow_dir.y,
+                                           output_center.y - 10 * config.zoom * arrow_dir.y - 5 * config.zoom * arrow_dir.x);
+                    ImVec2 arrow_p2 = ImVec2(output_center.x - 10 * config.zoom * arrow_dir.x - 5 * config.zoom * arrow_dir.y,
+                                           output_center.y - 10 * config.zoom * arrow_dir.y + 5 * config.zoom * arrow_dir.x);
+                    
+                    draw_list->AddTriangleFilled(output_center, arrow_p1, arrow_p2, connection_color);
+                }
+            }
+        }
+    }
+}
+
+ImVec2 GraphWidget::graph_to_screen(const ImVec2& graph_pos, const GraphConfig& config, const ImVec2& canvas_pos) {
+    return ImVec2(canvas_pos.x + (graph_pos.x + config.pan_offset.x) * config.zoom,
+                  canvas_pos.y + (graph_pos.y + config.pan_offset.y) * config.zoom);
+}
+
+ImVec2 GraphWidget::screen_to_graph(const ImVec2& screen_pos, const GraphConfig& config, const ImVec2& canvas_pos) {
+    return ImVec2((screen_pos.x - canvas_pos.x) / config.zoom - config.pan_offset.x,
+                  (screen_pos.y - canvas_pos.y) / config.zoom - config.pan_offset.y);
+}
+
+bool GraphWidget::point_in_node(const ImVec2& point, const GraphNode& node) {
+    return point.x >= node.position.x && point.x <= node.position.x + node.size.x &&
+           point.y >= node.position.y && point.y <= node.position.y + node.size.y;
+}
+
+ImU32 GraphWidget::get_op_color(const std::string& op_type) {
+    // Color coding for different operation types
+    if (op_type == "ADD" || op_type == "SUB") return IM_COL32(100, 200, 100, 255);      // Green - arithmetic
+    if (op_type == "MUL" || op_type == "DIV") return IM_COL32(200, 100, 100, 255);      // Red - arithmetic
+    if (op_type == "CONV") return IM_COL32(100, 100, 200, 255);                         // Blue - convolution
+    if (op_type == "LINEAR") return IM_COL32(200, 100, 200, 255);                       // Purple - linear
+    if (op_type == "SOFTMAX") return IM_COL32(200, 200, 100, 255);                      // Yellow - activation
+    if (op_type == "RELU") return IM_COL32(100, 200, 200, 255);                         // Cyan - activation
+    if (op_type == "NORM") return IM_COL32(150, 150, 200, 255);                         // Light blue - normalization
+    
+    return IM_COL32(120, 120, 120, 255);  // Gray - unknown
+}
 
 } // namespace ggml_viz

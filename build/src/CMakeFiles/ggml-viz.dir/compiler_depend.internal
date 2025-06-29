@@ -17,6 +17,7 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o
  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stddef_ptrdiff_t.h
  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stddef_size_t.h
  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stddef_wchar_t.h
+ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/float.h
  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/limits.h
  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/stdarg.h
  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/stddef.h
@@ -29,12 +30,14 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__wctype.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__xlocale.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_locale.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_mb_cur_max.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_printf.h
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_static_assert.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdlib.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_string.h
@@ -63,6 +66,7 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/limits.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/signal.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/types.h
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/assert.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/adjacent_find.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/all_of.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/any_of.h
@@ -204,6 +208,7 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/traits.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/convert_to_timespec.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/duration.h
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/file_clock.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/high_resolution_clock.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/steady_clock.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/system_clock.h
@@ -605,6 +610,7 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/bitset
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cctype
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cerrno
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/chrono
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/climits
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/clocale
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cmath
@@ -623,7 +629,9 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/deque
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/errno.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/exception
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/float.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/format
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/forward_list
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/functional
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/initializer_list
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/ios
@@ -666,6 +674,7 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/wctype.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/ctype.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/errno.h
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/float.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libkern/_OSByteOrder.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libkern/arm/_OSByteOrder.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/limits.h
@@ -794,4 +803,9 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_wchar.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_wctype.h
  /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/frontend/imgui_app.hpp
+ /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/frontend/imgui_widgets.hpp
+ /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.hpp
+ /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/utils/trace_reader.hpp
+ /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/imgui/imconfig.h
+ /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/imgui/imgui.h
 

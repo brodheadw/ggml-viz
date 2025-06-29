@@ -400,8 +400,18 @@ void ImGuiApp::render_graph_view() {
         auto graph_events = data_->trace_reader->get_graph_events();
         ImGui::Text("Graph Events: %zu", graph_events.size());
         
-        // TODO: Implement graph visualization
-        ImGui::Text("Graph visualization coming soon...");
+        ImGui::Separator();
+        
+        // Render the graph widget
+        graph_widget_.render("##compute_graph", data_->trace_reader.get(), graph_config_);
+        
+        // Sync selection between graph widget and other views
+        int selected_node = graph_widget_.get_selected_node();
+        if (selected_node >= 0) {
+            // In a complete implementation, we would map node selection back to events
+            // For now, just show that a node is selected
+            ImGui::Text("Selected Node: %d", selected_node);
+        }
     }
     ImGui::End();
 }
