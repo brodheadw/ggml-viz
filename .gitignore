@@ -1,3 +1,17 @@
 CLAUDE.md
 .DS_Store
 */build
+
+# Test executables
+test_*
+simple_*
+*_test
+*.o
+
+# Build artifacts
+bin/
+build/
+imgui.ini
+
+# GGML visualization files
+*.ggmlviz
