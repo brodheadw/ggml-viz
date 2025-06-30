@@ -15,3 +15,5 @@ imgui.ini
 
 # GGML visualization files
 *.ggmlviz
+
+.gitignore
