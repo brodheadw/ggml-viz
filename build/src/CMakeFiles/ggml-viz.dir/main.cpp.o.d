@@ -645,7 +645,6 @@ src/CMakeFiles/ggml-viz.dir/main.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/float.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/float.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/assert.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_static_assert.h \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/utils/trace_reader.hpp \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.hpp \

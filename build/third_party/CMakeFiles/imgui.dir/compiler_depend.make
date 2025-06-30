@@ -409,7 +409,6 @@ third_party/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.o: /Users/wi
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -882,7 +881,6 @@ third_party/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.o: /Users
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_printf.h \
@@ -1011,7 +1009,6 @@ third_party/CMakeFiles/imgui.dir/imgui/imgui.cpp.o: /Users/willb/Vaults/Personal
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_printf.h \
@@ -1278,7 +1275,6 @@ third_party/CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.o: /Users/willb/Vaults/Per
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -1532,7 +1528,6 @@ third_party/CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.o: /Users/willb/Vaults/Per
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_printf.h \
@@ -1781,7 +1776,6 @@ third_party/CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.o: /Users/willb/Vaults/P
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_printf.h \
@@ -2028,7 +2022,6 @@ third_party/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.o: /Users/willb/Vaults/
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_printf.h \
@@ -2662,6 +2655,10 @@ third_party/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.o: /Users/willb/Vaults/
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libDER/DERItem.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdlib.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdio.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/UTCUtils.h:
@@ -2985,12 +2982,6 @@ third_party/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.o: /Users/willb/Vaults/
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_blksize_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libDER/DERItem.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdlib.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h:
 

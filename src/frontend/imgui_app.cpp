@@ -1,12 +1,14 @@
 // src/frontend/imgui_app.cpp
 #include "imgui_app.hpp"
 #include "utils/trace_reader.hpp"
+#include "instrumentation/ggml_hook.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <memory>
+#include <chrono>
 
 namespace ggml_viz {
 
@@ -19,6 +21,12 @@ struct ImGuiApp::AppData {
     // UI state
     bool trace_loaded = false;
     int selected_event = -1;
+    
+    // Live mode support
+    bool live_mode = false;
+    std::vector<Event> live_events;
+    std::chrono::steady_clock::time_point last_live_update;
+    std::atomic<bool> live_data_available{false};
     
     // File browser state
     char file_path_buffer[512] = {0};
@@ -89,6 +97,51 @@ bool ImGuiApp::initialize() {
     return true;
 }
 
+void ImGuiApp::enable_live_mode() {
+    data_->live_mode = true;
+    data_->live_events.clear();
+    data_->last_live_update = std::chrono::steady_clock::now();
+    data_->current_filename = "[Live Mode]";
+    std::cout << "[ImGuiApp] Live mode enabled" << std::endl;
+}
+
+void ImGuiApp::disable_live_mode() {
+    data_->live_mode = false;
+    data_->live_events.clear();
+    std::cout << "[ImGuiApp] Live mode disabled" << std::endl;
+}
+
+bool ImGuiApp::is_live_mode() const {
+    return data_->live_mode;
+}
+
+void ImGuiApp::update_live_data() {
+    if (!data_->live_mode) return;
+    
+    // Try to get live events from GGMLHook
+    try {
+        auto& hook = GGMLHook::instance();
+        if (hook.is_active()) {
+            auto new_events = hook.consume_available_events();
+            if (!new_events.empty()) {
+                // Add new events to our live buffer
+                data_->live_events.insert(data_->live_events.end(), new_events.begin(), new_events.end());
+                data_->last_live_update = std::chrono::steady_clock::now();
+                data_->live_data_available = true;
+                
+                // Limit buffer size to prevent memory issues
+                const size_t max_events = 50000;
+                if (data_->live_events.size() > max_events) {
+                    data_->live_events.erase(data_->live_events.begin(), 
+                                           data_->live_events.begin() + (data_->live_events.size() - max_events));
+                }
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "[ImGuiApp] Error updating live data: " << e.what() << std::endl;
+    }
+}
+
 void ImGuiApp::shutdown() {
     if (data_->window) {
         ImGui_ImplOpenGL3_Shutdown();
@@ -102,6 +155,9 @@ void ImGuiApp::shutdown() {
 }
 
 void ImGuiApp::render_frame() {
+    // Update live data if in live mode
+    update_live_data();
+    
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -237,20 +293,96 @@ void ImGuiApp::render_file_browser() {
 
 bool ImGuiApp::load_trace_file(const std::string& filename) {
     try {
-        auto reader = std::make_unique<TraceReader>(filename);
-        if (!reader->is_valid()) {
-            data_->error_message = "Failed to load trace file: " + filename;
+        // First check if file exists and is accessible
+        FILE* test_file = fopen(filename.c_str(), "rb");
+        if (!test_file) {
+            // Determine specific reason for file access failure
+            if (filename.empty()) {
+                data_->error_message = "Error: No file path specified.";
+            } else if (filename.find_last_of('.') == std::string::npos || 
+                      filename.substr(filename.find_last_of('.')) != ".ggmlviz") {
+                data_->error_message = "Error: Invalid file type.\n\nExpected a .ggmlviz trace file.\nSelected: " + filename;
+            } else {
+                data_->error_message = "Error: File not found or access denied.\n\nFile: " + filename + 
+                                      "\n\nPlease check:\n• File exists\n• File permissions\n• Path is correct";
+            }
             return false;
         }
         
+        // Check if file is empty
+        fseek(test_file, 0, SEEK_END);
+        long file_size = ftell(test_file);
+        fclose(test_file);
+        
+        if (file_size == 0) {
+            data_->error_message = "Error: Empty trace file.\n\nFile: " + filename + 
+                                  "\n\nThe trace file contains no data. Please ensure the file was generated correctly.";
+            return false;
+        }
+        
+        if (file_size < 12) {  // Minimum size for header
+            data_->error_message = "Error: Invalid trace file.\n\nFile: " + filename + 
+                                  "\n\nFile is too small (" + std::to_string(file_size) + " bytes) to contain valid trace data.";
+            return false;
+        }
+        
+        // Now attempt to load with TraceReader
+        auto reader = std::make_unique<TraceReader>(filename);
+        if (!reader->is_valid()) {
+            // Determine specific reason for TraceReader failure
+            FILE* check_file = fopen(filename.c_str(), "rb");
+            if (check_file) {
+                char magic[8] = {0};
+                if (fread(magic, 1, 8, check_file) == 8) {
+                    if (strncmp(magic, "GGMLVIZ1", 8) != 0) {
+                        data_->error_message = "Error: Invalid trace file format.\n\nFile: " + filename + 
+                                              "\n\nThis does not appear to be a valid GGML trace file.\n" +
+                                              "Expected magic header 'GGMLVIZ1', found: '" + std::string(magic, 8) + "'";
+                    } else {
+                        data_->error_message = "Error: Corrupted trace file.\n\nFile: " + filename + 
+                                              "\n\nThe file header is valid but the trace data appears to be corrupted.\n" +
+                                              "The file may have been truncated or damaged.";
+                    }
+                } else {
+                    data_->error_message = "Error: Cannot read trace file header.\n\nFile: " + filename + 
+                                          "\n\nFile exists but cannot be read properly. Check file permissions.";
+                }
+                fclose(check_file);
+            } else {
+                data_->error_message = "Error: File access lost during loading.\n\nFile: " + filename;
+            }
+            return false;
+        }
+        
+        // Check if trace file has any meaningful data
+        if (reader->event_count() == 0) {
+            data_->error_message = "Warning: Empty trace data.\n\nFile: " + filename + 
+                                  "\n\nThe trace file loaded successfully but contains no events.\n" +
+                                  "This might indicate:\n• No GGML operations were traced\n• Tracing was not enabled\n• The model ran but no operations occurred";
+            // Still allow loading empty traces for debugging
+        }
+        
+        // Success - load the trace
         data_->trace_reader = std::move(reader);
         data_->trace_loaded = true;
-        data_->current_filename = filename;
+        data_->current_filename = filename.substr(filename.find_last_of("/\\") + 1); // Just filename for display
         data_->selected_event = -1;
         
         return true;
+        
+    } catch (const std::bad_alloc& e) {
+        data_->error_message = "Error: Out of memory.\n\nFile: " + filename + 
+                              "\n\nNot enough memory to load this trace file.\n" +
+                              "Try closing other applications or loading a smaller trace file.";
+        return false;
     } catch (const std::exception& e) {
-        data_->error_message = "Error loading trace: " + std::string(e.what());
+        data_->error_message = "Error: Unexpected error loading trace.\n\nFile: " + filename + 
+                              "\n\nDetails: " + std::string(e.what()) + 
+                              "\n\nThis may indicate a bug in the application or a severely corrupted file.";
+        return false;
+    } catch (...) {
+        data_->error_message = "Error: Unknown error occurred.\n\nFile: " + filename + 
+                              "\n\nAn unexpected error occurred while loading the trace file.";
         return false;
     }
 }

@@ -126,6 +126,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "src/CMakeFiles/ggml_hook.dir/DependInfo.cmake"
   "src/CMakeFiles/ggml_utils.dir/DependInfo.cmake"
   "src/CMakeFiles/ggml_frontend.dir/DependInfo.cmake"
+  "src/CMakeFiles/ggml_viz_hook.dir/DependInfo.cmake"
   "src/CMakeFiles/ggml-viz.dir/DependInfo.cmake"
   "third_party/ggml/src/CMakeFiles/ggml-base.dir/DependInfo.cmake"
   "third_party/ggml/src/CMakeFiles/ggml.dir/DependInfo.cmake"

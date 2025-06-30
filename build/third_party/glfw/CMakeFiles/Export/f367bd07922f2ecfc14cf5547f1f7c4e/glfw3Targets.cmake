@@ -56,10 +56,11 @@ if(_IMPORT_PREFIX STREQUAL "/")
 endif()
 
 # Create imported target glfw
-add_library(glfw SHARED IMPORTED)
+add_library(glfw STATIC IMPORTED)
 
 set_target_properties(glfw PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:Threads::Threads>;-framework Cocoa;-framework IOKit;-framework CoreFoundation;-framework QuartzCore"
 )
 
 # Load information for each installed configuration.

@@ -1,1 +1,2 @@
-/usr/bin/c++ -g -arch arm64 -dynamiclib -Wl,-headerpad_max_install_names -o libggml.dylib -install_name @rpath/libggml.dylib "CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o"  -Wl,-rpath,/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src -Wl,-rpath,/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas libggml-cpu.dylib ggml-blas/libggml-blas.dylib libggml-base.dylib
+/usr/bin/ar qc libggml.a "CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o"
+/usr/bin/ranlib libggml.a

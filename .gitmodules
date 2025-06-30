@@ -7,3 +7,6 @@
 [submodule "third_party/glfw"]
 	path = third_party/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "third_party/llama.cpp"]
+	path = third_party/llama.cpp
+	url = https://github.com/ggml-org/llama.cpp.git

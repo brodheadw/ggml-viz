@@ -360,8 +360,7 @@ std::string format_timestamp(float timestamp_ms) {
 } // namespace TimelineUtils
 
 // GraphWidget implementation
-GraphWidget::GraphWidget() {
-}
+GraphWidget::GraphWidget() {}
 
 bool GraphWidget::render(const char* label, const TraceReader* trace_reader, GraphConfig& config) {
     if (!trace_reader || trace_reader->event_count() == 0) {

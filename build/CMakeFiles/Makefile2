@@ -94,6 +94,7 @@ clean: tests/clean
 src/all: src/CMakeFiles/ggml_hook.dir/all
 src/all: src/CMakeFiles/ggml_utils.dir/all
 src/all: src/CMakeFiles/ggml_frontend.dir/all
+src/all: src/CMakeFiles/ggml_viz_hook.dir/all
 src/all: src/CMakeFiles/ggml-viz.dir/all
 .PHONY : src/all
 
@@ -101,6 +102,7 @@ src/all: src/CMakeFiles/ggml-viz.dir/all
 src/codegen: src/CMakeFiles/ggml_hook.dir/codegen
 src/codegen: src/CMakeFiles/ggml_utils.dir/codegen
 src/codegen: src/CMakeFiles/ggml_frontend.dir/codegen
+src/codegen: src/CMakeFiles/ggml_viz_hook.dir/codegen
 src/codegen: src/CMakeFiles/ggml-viz.dir/codegen
 .PHONY : src/codegen
 
@@ -112,6 +114,7 @@ src/preinstall:
 src/clean: src/CMakeFiles/ggml_hook.dir/clean
 src/clean: src/CMakeFiles/ggml_utils.dir/clean
 src/clean: src/CMakeFiles/ggml_frontend.dir/clean
+src/clean: src/CMakeFiles/ggml_viz_hook.dir/clean
 src/clean: src/CMakeFiles/ggml-viz.dir/clean
 .PHONY : src/clean
 
@@ -295,7 +298,7 @@ third_party/glfw/src/clean: third_party/glfw/src/CMakeFiles/update_mappings.dir/
 third_party/CMakeFiles/imgui.dir/all: third_party/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f third_party/CMakeFiles/imgui.dir/build.make third_party/CMakeFiles/imgui.dir/depend
 	$(MAKE) $(MAKESILENT) -f third_party/CMakeFiles/imgui.dir/build.make third_party/CMakeFiles/imgui.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=62,63,64,65,66,67,68,69 "Built target imgui"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=65,66,67,68,69,70,71,72 "Built target imgui"
 .PHONY : third_party/CMakeFiles/imgui.dir/all
 
 # Build rule for subdir invocation for target.
@@ -312,7 +315,7 @@ imgui: third_party/CMakeFiles/imgui.dir/rule
 # codegen rule for target.
 third_party/CMakeFiles/imgui.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f third_party/CMakeFiles/imgui.dir/build.make third_party/CMakeFiles/imgui.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=62,63,64,65,66,67,68,69 "Finished codegen for target imgui"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=65,66,67,68,69,70,71,72 "Finished codegen for target imgui"
 .PHONY : third_party/CMakeFiles/imgui.dir/codegen
 
 # clean rule for target.
@@ -359,7 +362,7 @@ third_party/glfw/CMakeFiles/uninstall.dir/clean:
 third_party/glfw/src/CMakeFiles/glfw.dir/all:
 	$(MAKE) $(MAKESILENT) -f third_party/glfw/src/CMakeFiles/glfw.dir/build.make third_party/glfw/src/CMakeFiles/glfw.dir/depend
 	$(MAKE) $(MAKESILENT) -f third_party/glfw/src/CMakeFiles/glfw.dir/build.make third_party/glfw/src/CMakeFiles/glfw.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61 "Built target glfw"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64 "Built target glfw"
 .PHONY : third_party/glfw/src/CMakeFiles/glfw.dir/all
 
 # Build rule for subdir invocation for target.
@@ -376,7 +379,7 @@ glfw: third_party/glfw/src/CMakeFiles/glfw.dir/rule
 # codegen rule for target.
 third_party/glfw/src/CMakeFiles/glfw.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f third_party/glfw/src/CMakeFiles/glfw.dir/build.make third_party/glfw/src/CMakeFiles/glfw.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61 "Finished codegen for target glfw"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64 "Finished codegen for target glfw"
 .PHONY : third_party/glfw/src/CMakeFiles/glfw.dir/codegen
 
 # clean rule for target.
@@ -391,7 +394,7 @@ third_party/glfw/src/CMakeFiles/glfw.dir/clean:
 third_party/glfw/src/CMakeFiles/update_mappings.dir/all:
 	$(MAKE) $(MAKESILENT) -f third_party/glfw/src/CMakeFiles/update_mappings.dir/build.make third_party/glfw/src/CMakeFiles/update_mappings.dir/depend
 	$(MAKE) $(MAKESILENT) -f third_party/glfw/src/CMakeFiles/update_mappings.dir/build.make third_party/glfw/src/CMakeFiles/update_mappings.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=74 "Built target update_mappings"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=77 "Built target update_mappings"
 .PHONY : third_party/glfw/src/CMakeFiles/update_mappings.dir/all
 
 # Build rule for subdir invocation for target.
@@ -408,7 +411,7 @@ update_mappings: third_party/glfw/src/CMakeFiles/update_mappings.dir/rule
 # codegen rule for target.
 third_party/glfw/src/CMakeFiles/update_mappings.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f third_party/glfw/src/CMakeFiles/update_mappings.dir/build.make third_party/glfw/src/CMakeFiles/update_mappings.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=74 "Finished codegen for target update_mappings"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=77 "Finished codegen for target update_mappings"
 .PHONY : third_party/glfw/src/CMakeFiles/update_mappings.dir/codegen
 
 # clean rule for target.
@@ -516,6 +519,38 @@ src/CMakeFiles/ggml_frontend.dir/clean:
 .PHONY : src/CMakeFiles/ggml_frontend.dir/clean
 
 #=============================================================================
+# Target rules for target src/CMakeFiles/ggml_viz_hook.dir
+
+# All Build rule for target.
+src/CMakeFiles/ggml_viz_hook.dir/all:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/depend
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=40,41,42 "Built target ggml_viz_hook"
+.PHONY : src/CMakeFiles/ggml_viz_hook.dir/all
+
+# Build rule for subdir invocation for target.
+src/CMakeFiles/ggml_viz_hook.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/ggml_viz_hook.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles 0
+.PHONY : src/CMakeFiles/ggml_viz_hook.dir/rule
+
+# Convenience name for target.
+ggml_viz_hook: src/CMakeFiles/ggml_viz_hook.dir/rule
+.PHONY : ggml_viz_hook
+
+# codegen rule for target.
+src/CMakeFiles/ggml_viz_hook.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=40,41,42 "Finished codegen for target ggml_viz_hook"
+.PHONY : src/CMakeFiles/ggml_viz_hook.dir/codegen
+
+# clean rule for target.
+src/CMakeFiles/ggml_viz_hook.dir/clean:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/clean
+.PHONY : src/CMakeFiles/ggml_viz_hook.dir/clean
+
+#=============================================================================
 # Target rules for target src/CMakeFiles/ggml-viz.dir
 
 # All Build rule for target.
@@ -587,6 +622,7 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/clean:
 # Target rules for target third_party/ggml/src/CMakeFiles/ggml.dir
 
 # All Build rule for target.
+third_party/ggml/src/CMakeFiles/ggml.dir/all: src/CMakeFiles/ggml_hook.dir/all
 third_party/ggml/src/CMakeFiles/ggml.dir/all: third_party/ggml/src/CMakeFiles/ggml-base.dir/all
 third_party/ggml/src/CMakeFiles/ggml.dir/all: third_party/ggml/src/CMakeFiles/ggml-cpu.dir/all
 third_party/ggml/src/CMakeFiles/ggml.dir/all: third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir/all
@@ -693,7 +729,7 @@ tests/CMakeFiles/test_ggml_hook.dir/all: third_party/ggml/src/CMakeFiles/ggml-cp
 tests/CMakeFiles/test_ggml_hook.dir/all: third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=70,71 "Built target test_ggml_hook"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=73,74 "Built target test_ggml_hook"
 .PHONY : tests/CMakeFiles/test_ggml_hook.dir/all
 
 # Build rule for subdir invocation for target.
@@ -710,7 +746,7 @@ test_ggml_hook: tests/CMakeFiles/test_ggml_hook.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_ggml_hook.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ggml_hook.dir/build.make tests/CMakeFiles/test_ggml_hook.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=70,71 "Finished codegen for target test_ggml_hook"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=73,74 "Finished codegen for target test_ggml_hook"
 .PHONY : tests/CMakeFiles/test_ggml_hook.dir/codegen
 
 # clean rule for target.
@@ -730,7 +766,7 @@ tests/CMakeFiles/test_trace_reader.dir/all: third_party/ggml/src/CMakeFiles/ggml
 tests/CMakeFiles/test_trace_reader.dir/all: third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=72,73 "Built target test_trace_reader"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=75,76 "Built target test_trace_reader"
 .PHONY : tests/CMakeFiles/test_trace_reader.dir/all
 
 # Build rule for subdir invocation for target.
@@ -747,7 +783,7 @@ test_trace_reader: tests/CMakeFiles/test_trace_reader.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_trace_reader.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=72,73 "Finished codegen for target test_trace_reader"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=75,76 "Finished codegen for target test_trace_reader"
 .PHONY : tests/CMakeFiles/test_trace_reader.dir/codegen
 
 # clean rule for target.

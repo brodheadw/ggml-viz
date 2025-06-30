@@ -6,7 +6,7 @@ CXX_DEFINES = -DGGML_VIZ_ENABLE_HOOKS
 
 CXX_INCLUDES = -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src
 
-CXX_FLAGSarm64 = -g -std=c++17 -arch arm64
+CXX_FLAGSarm64 = -O3 -DNDEBUG -std=c++17 -arch arm64
 
-CXX_FLAGS = -g -std=c++17 -arch arm64
+CXX_FLAGS = -O3 -DNDEBUG -std=c++17 -arch arm64
 

@@ -96,11 +96,11 @@ test_trace_reader_EXTERNAL_OBJECTS =
 bin/test_trace_reader: tests/CMakeFiles/test_trace_reader.dir/test_trace_reader.cpp.o
 bin/test_trace_reader: tests/CMakeFiles/test_trace_reader.dir/build.make
 bin/test_trace_reader: src/libggml_utils.a
-bin/test_trace_reader: third_party/ggml/src/libggml.dylib
+bin/test_trace_reader: third_party/ggml/src/libggml.a
+bin/test_trace_reader: third_party/ggml/src/libggml-cpu.a
 bin/test_trace_reader: src/libggml_hook.a
-bin/test_trace_reader: third_party/ggml/src/libggml-cpu.dylib
-bin/test_trace_reader: third_party/ggml/src/ggml-blas/libggml-blas.dylib
-bin/test_trace_reader: third_party/ggml/src/libggml-base.dylib
+bin/test_trace_reader: third_party/ggml/src/ggml-blas/libggml-blas.a
+bin/test_trace_reader: third_party/ggml/src/libggml-base.a
 bin/test_trace_reader: tests/CMakeFiles/test_trace_reader.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable ../bin/test_trace_reader"
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/test_trace_reader.dir/link.txt --verbose=$(VERBOSE)

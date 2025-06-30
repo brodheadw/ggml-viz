@@ -3,19 +3,19 @@
 
 # compile C with /usr/bin/cc
 # compile CXX with /usr/bin/c++
-C_DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_VIZ_ENABLE_HOOKS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+C_DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_VIZ_ENABLE_HOOKS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600
 
 C_INCLUDES = -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include
 
-C_FLAGSarm64 = -g -std=gnu11 -arch arm64 -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion
+C_FLAGSarm64 = -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion
 
-C_FLAGS = -g -std=gnu11 -arch arm64 -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion
+C_FLAGS = -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion
 
-CXX_DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_VIZ_ENABLE_HOOKS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+CXX_DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_VIZ_ENABLE_HOOKS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600
 
 CXX_INCLUDES = -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include
 
-CXX_FLAGSarm64 = -g -std=c++17 -arch arm64 -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi
+CXX_FLAGSarm64 = -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi
 
-CXX_FLAGS = -g -std=c++17 -arch arm64 -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi
+CXX_FLAGS = -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi
 

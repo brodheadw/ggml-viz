@@ -33,6 +33,7 @@
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml_hook.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml_utils.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml_frontend.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml_viz_hook.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/ggml-viz.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/test.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/src/CMakeFiles/edit_cache.dir

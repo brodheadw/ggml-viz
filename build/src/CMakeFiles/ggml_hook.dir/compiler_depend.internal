@@ -32,7 +32,6 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__wctype.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__xlocale.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h
- /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h
@@ -689,6 +688,7 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/wchar.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/wctype.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/ctype.h
+ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/dlfcn.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/errno.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libkern/_OSByteOrder.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libkern/arm/_OSByteOrder.h
@@ -818,6 +818,8 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_wchar.h
  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_wctype.h
  /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.hpp
+ /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/ggml-alloc.h
+ /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/ggml-backend.h
  /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/ggml.h
  /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/gguf.h
  /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-impl.h

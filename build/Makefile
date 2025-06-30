@@ -263,6 +263,19 @@ ggml_frontend/fast:
 .PHONY : ggml_frontend/fast
 
 #=============================================================================
+# Target rules for targets named ggml_viz_hook
+
+# Build rule for target.
+ggml_viz_hook: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml_viz_hook
+.PHONY : ggml_viz_hook
+
+# fast build rule for target.
+ggml_viz_hook/fast:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/build
+.PHONY : ggml_viz_hook/fast
+
+#=============================================================================
 # Target rules for targets named ggml-viz
 
 # Build rule for target.
@@ -376,6 +389,7 @@ help:
 	@echo "... ggml_frontend"
 	@echo "... ggml_hook"
 	@echo "... ggml_utils"
+	@echo "... ggml_viz_hook"
 	@echo "... glfw"
 	@echo "... imgui"
 	@echo "... test_ggml_hook"

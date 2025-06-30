@@ -214,6 +214,20 @@ ggml_frontend/fast:
 .PHONY : ggml_frontend/fast
 
 # Convenience name for target.
+src/CMakeFiles/ggml_viz_hook.dir/rule:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/ggml_viz_hook.dir/rule
+.PHONY : src/CMakeFiles/ggml_viz_hook.dir/rule
+
+# Convenience name for target.
+ggml_viz_hook: src/CMakeFiles/ggml_viz_hook.dir/rule
+.PHONY : ggml_viz_hook
+
+# fast build rule for target.
+ggml_viz_hook/fast:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/build
+.PHONY : ggml_viz_hook/fast
+
+# Convenience name for target.
 src/CMakeFiles/ggml-viz.dir/rule:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/ggml-viz.dir/rule
 .PHONY : src/CMakeFiles/ggml-viz.dir/rule
@@ -281,6 +295,7 @@ instrumentation/ggml_hook.o: instrumentation/ggml_hook.cpp.o
 # target to build an object file
 instrumentation/ggml_hook.cpp.o:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_hook.cpp.o
 .PHONY : instrumentation/ggml_hook.cpp.o
 
 instrumentation/ggml_hook.i: instrumentation/ggml_hook.cpp.i
@@ -289,6 +304,7 @@ instrumentation/ggml_hook.i: instrumentation/ggml_hook.cpp.i
 # target to preprocess a source file
 instrumentation/ggml_hook.cpp.i:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_hook.cpp.i
 .PHONY : instrumentation/ggml_hook.cpp.i
 
 instrumentation/ggml_hook.s: instrumentation/ggml_hook.cpp.s
@@ -297,7 +313,32 @@ instrumentation/ggml_hook.s: instrumentation/ggml_hook.cpp.s
 # target to generate assembly for a file
 instrumentation/ggml_hook.cpp.s:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_hook.cpp.s
 .PHONY : instrumentation/ggml_hook.cpp.s
+
+instrumentation/ggml_viz_init.o: instrumentation/ggml_viz_init.cpp.o
+.PHONY : instrumentation/ggml_viz_init.o
+
+# target to build an object file
+instrumentation/ggml_viz_init.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_viz_init.cpp.o
+.PHONY : instrumentation/ggml_viz_init.cpp.o
+
+instrumentation/ggml_viz_init.i: instrumentation/ggml_viz_init.cpp.i
+.PHONY : instrumentation/ggml_viz_init.i
+
+# target to preprocess a source file
+instrumentation/ggml_viz_init.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_viz_init.cpp.i
+.PHONY : instrumentation/ggml_viz_init.cpp.i
+
+instrumentation/ggml_viz_init.s: instrumentation/ggml_viz_init.cpp.s
+.PHONY : instrumentation/ggml_viz_init.s
+
+# target to generate assembly for a file
+instrumentation/ggml_viz_init.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_viz_init.cpp.s
+.PHONY : instrumentation/ggml_viz_init.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -412,6 +453,7 @@ help:
 	@echo "... ggml_frontend"
 	@echo "... ggml_hook"
 	@echo "... ggml_utils"
+	@echo "... ggml_viz_hook"
 	@echo "... frontend/imgui_app.o"
 	@echo "... frontend/imgui_app.i"
 	@echo "... frontend/imgui_app.s"
@@ -421,6 +463,9 @@ help:
 	@echo "... instrumentation/ggml_hook.o"
 	@echo "... instrumentation/ggml_hook.i"
 	@echo "... instrumentation/ggml_hook.s"
+	@echo "... instrumentation/ggml_viz_init.o"
+	@echo "... instrumentation/ggml_viz_init.i"
+	@echo "... instrumentation/ggml_viz_init.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

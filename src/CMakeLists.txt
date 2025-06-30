@@ -73,6 +73,59 @@ target_compile_definitions(ggml_frontend
       IMGUI_DEFINE_MATH_OPERATORS
 )
 
+# Shared library for automatic injection
+add_library(ggml_viz_hook SHARED
+    instrumentation/ggml_hook.cpp
+    instrumentation/ggml_hook.hpp
+    instrumentation/ggml_viz_init.cpp
+)
+
+target_include_directories(ggml_viz_hook
+    PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation
+      ${CMAKE_SOURCE_DIR}/third_party/ggml/include
+      ${CMAKE_SOURCE_DIR}/third_party/ggml/src        # for ggml-impl.h
+)
+
+target_compile_definitions(ggml_viz_hook
+    PUBLIC 
+      GGML_VIZ_ENABLE_HOOKS
+      GGML_VIZ_SHARED_BUILD
+    PRIVATE
+      BUILDING_GGML_VIZ
+)
+
+target_link_libraries(ggml_viz_hook
+    PUBLIC 
+      Threads::Threads
+      # Note: We intentionally don't link ggml-base to allow function interception
+)
+
+# Set shared library properties
+# Hide all symbols by default, only export what we explicitly mark
+set_target_properties(ggml_viz_hook PROPERTIES
+    VERSION 0.1
+    SOVERSION 1
+    OUTPUT_NAME "ggml_viz_hook"
+    POSITION_INDEPENDENT_CODE ON
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN YES
+)
+
+# Platform-specific shared library setup
+if(APPLE)
+    set_target_properties(ggml_viz_hook PROPERTIES
+        MACOSX_RPATH ON
+        INSTALL_RPATH "@rpath"
+        BUILD_WITH_INSTALL_RPATH ON
+    )
+elseif(UNIX)
+    set_target_properties(ggml_viz_hook PROPERTIES
+        INSTALL_RPATH "$ORIGIN"
+        BUILD_WITH_INSTALL_RPATH ON
+    )
+endif()
+
 # Main executable
 add_executable(ggml-viz
     main.cpp

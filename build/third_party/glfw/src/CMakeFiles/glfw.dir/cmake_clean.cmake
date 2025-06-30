@@ -1,5 +1,4 @@
 file(REMOVE_RECURSE
-  ".3"
   "CMakeFiles/glfw.dir/cocoa_init.m.o"
   "CMakeFiles/glfw.dir/cocoa_init.m.o.d"
   "CMakeFiles/glfw.dir/cocoa_joystick.m.o"
@@ -42,10 +41,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/glfw.dir/vulkan.c.o.d"
   "CMakeFiles/glfw.dir/window.c.o"
   "CMakeFiles/glfw.dir/window.c.o.d"
-  "libglfw.3.5.dylib"
-  "libglfw.3.dylib"
-  "libglfw.dylib"
-  "libglfw.pdb"
+  "libglfw3.a"
+  "libglfw3.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

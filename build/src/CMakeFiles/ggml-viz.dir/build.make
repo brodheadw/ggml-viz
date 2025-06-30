@@ -99,7 +99,7 @@ bin/ggml-viz: src/libggml_frontend.a
 bin/ggml-viz: src/libggml_utils.a
 bin/ggml-viz: src/libggml_hook.a
 bin/ggml-viz: third_party/libimgui.a
-bin/ggml-viz: third_party/glfw/src/libglfw.3.5.dylib
+bin/ggml-viz: third_party/glfw/src/libglfw3.a
 bin/ggml-viz: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
 bin/ggml-viz: src/CMakeFiles/ggml-viz.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable ../bin/ggml-viz"

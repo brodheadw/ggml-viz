@@ -31,7 +31,6 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__wctype.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__xlocale.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -688,6 +687,7 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/wchar.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/wctype.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/ctype.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/dlfcn.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/errno.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libkern/_OSByteOrder.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libkern/arm/_OSByteOrder.h \
@@ -817,12 +817,18 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_wchar.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_wctype.h \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.hpp \
+  /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/ggml-alloc.h \
+  /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/ggml-backend.h \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/ggml.h \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/gguf.h \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-impl.h
 
 
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-impl.h:
+
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/ggml-backend.h:
+
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/ggml-alloc.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_wctype.h:
 
@@ -1016,6 +1022,8 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdlib.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdio.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdint.h:
@@ -1115,6 +1123,8 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/time_point.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/forward_like.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/dlfcn.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/exception_guard.h:
 
@@ -1950,12 +1960,6 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/rotate.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/common_comparison_category.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/math.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/invert_if.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__thread/support/pthread.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/resource.h:
@@ -2040,9 +2044,9 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_timespec.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/concepts.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/compressed_pair.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/concepts.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/set_difference.h:
 
@@ -2252,6 +2256,10 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/locale.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/generate_n.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/for_each_segment.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/comp_ref_type.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdlib.h:
@@ -2318,6 +2326,12 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/streambuf.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/common_comparison_category.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/math.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/invert_if.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/_types.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_time.h:
@@ -2339,6 +2353,8 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/adjacent_find.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types/_uint64_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/ranges_iterator_traits.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/limits.h:
 
@@ -2382,22 +2398,6 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/generate_n.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/for_each_segment.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_volatile.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/check_memory_order.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iosfwd:
-
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stddef_offsetof.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdlib.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types/_uint8_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h:
@@ -2440,8 +2440,6 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__tuple/tuple_types.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/ranges_iterator_traits.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/is_transparent.h:
 
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/stdarg.h:
@@ -2455,6 +2453,14 @@ src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o: /Users/willb/Vault
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/special_functions.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/contention_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_volatile.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/check_memory_order.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iosfwd:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stddef_offsetof.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_final.h:
 

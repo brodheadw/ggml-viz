@@ -1067,7 +1067,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o: /Users/willb/Vaults/Per
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -2493,7 +2492,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o: /Users/willb/Vaults
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -3924,7 +3922,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o: /Users/willb/Vaults/
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -4785,7 +4782,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_time.c.o: /Users/willb/Vaults/Per
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -6181,7 +6177,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o: /Users/willb/Vaults/P
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -7042,7 +7037,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/context.c.o: /Users/willb/Vaults/Person
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -7871,7 +7865,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/egl_context.c.o: /Users/willb/Vaults/Pe
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -8700,7 +8693,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/init.c.o: /Users/willb/Vaults/Personal/
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -9529,7 +9521,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/input.c.o: /Users/willb/Vaults/Personal
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -10359,7 +10350,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/monitor.c.o: /Users/willb/Vaults/Person
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -11751,7 +11741,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o: /Users/willb/Vaults/P
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -12612,7 +12601,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/null_init.c.o: /Users/willb/Vaults/Pers
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -13441,7 +13429,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/null_joystick.c.o: /Users/willb/Vaults/
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -14270,7 +14257,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/null_monitor.c.o: /Users/willb/Vaults/P
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -15099,7 +15085,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/null_window.c.o: /Users/willb/Vaults/Pe
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -15928,7 +15913,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/osmesa_context.c.o: /Users/willb/Vaults
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -16757,7 +16741,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/platform.c.o: /Users/willb/Vaults/Perso
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -17586,7 +17569,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/posix_module.c.o: /Users/willb/Vaults/P
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -18416,7 +18398,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/posix_thread.c.o: /Users/willb/Vaults/P
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -19245,7 +19226,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/vulkan.c.o: /Users/willb/Vaults/Persona
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -20074,7 +20054,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/window.c.o: /Users/willb/Vaults/Persona
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/MacTypes.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -20816,8 +20795,6 @@ third_party/glfw/src/CMakeFiles/glfw.dir/window.c.o: /Users/willb/Vaults/Persona
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h:
 

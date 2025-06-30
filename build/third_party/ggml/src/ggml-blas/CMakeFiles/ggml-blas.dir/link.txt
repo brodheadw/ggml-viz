@@ -1,1 +1,2 @@
-/usr/bin/c++ -g -arch arm64 -dynamiclib -Wl,-headerpad_max_install_names -o libggml-blas.dylib -install_name @rpath/libggml-blas.dylib "CMakeFiles/ggml-blas.dir/ggml-blas.cpp.o"  -Wl,-rpath,/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src ../libggml-base.dylib -framework Accelerate
+/usr/bin/ar qc libggml-blas.a "CMakeFiles/ggml-blas.dir/ggml-blas.cpp.o"
+/usr/bin/ranlib libggml-blas.a

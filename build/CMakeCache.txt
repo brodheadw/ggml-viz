@@ -21,7 +21,7 @@ ACCELERATE_FRAMEWORK:FILEPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX.sd
 BLAS_Accelerate_LIBRARY:FILEPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework
 
 //ggml: build shared libraries
-BUILD_SHARED_LIBS:BOOL=ON
+BUILD_SHARED_LIBS:BOOL=OFF
 
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=CMAKE_ADDR2LINE-NOTFOUND
@@ -29,9 +29,27 @@ CMAKE_ADDR2LINE:FILEPATH=CMAKE_ADDR2LINE-NOTFOUND
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
 
+//ASM compiler
+CMAKE_ASM_COMPILER:FILEPATH=/usr/bin/cc
+
+//Flags used by the ASM compiler during all build types.
+CMAKE_ASM_FLAGS:STRING=
+
+//Flags used by the ASM compiler during DEBUG builds.
+CMAKE_ASM_FLAGS_DEBUG:STRING=-g
+
+//Flags used by the ASM compiler during MINSIZEREL builds.
+CMAKE_ASM_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG
+
+//Flags used by the ASM compiler during RELEASE builds.
+CMAKE_ASM_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
+
+//Flags used by the ASM compiler during RELWITHDEBINFO builds.
+CMAKE_ASM_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
+
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
-CMAKE_BUILD_TYPE:STRING=Debug
+CMAKE_BUILD_TYPE:STRING=Release
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
@@ -183,7 +201,7 @@ CMAKE_NM:FILEPATH=/usr/bin/nm
 CMAKE_OBJCOPY:FILEPATH=CMAKE_OBJCOPY-NOTFOUND
 
 //OBJC compiler
-CMAKE_OBJC_COMPILER:FILEPATH=/usr/bin/clang
+CMAKE_OBJC_COMPILER:FILEPATH=/usr/bin/cc
 
 //Flags used by the Objective-C compiler during all build types.
 CMAKE_OBJC_FLAGS:STRING=
@@ -303,6 +321,9 @@ CMAKE_TAPI:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeD
 // during the make.  This is useful for debugging only. With Visual
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
+
+//Path to a library.
+FOUNDATION_LIBRARY:FILEPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Foundation.framework
 
 //ggml: enable Accelerate framework
 GGML_ACCELERATE:BOOL=ON
@@ -476,7 +497,7 @@ GGML_LTO:BOOL=OFF
 GGML_METAL:BOOL=OFF
 
 //ggml: embed Metal library
-GGML_METAL_EMBED_LIBRARY:BOOL=OFF
+GGML_METAL_EMBED_LIBRARY:BOOL=ON
 
 //ggml: metal minimum macOS version
 GGML_METAL_MACOSX_VERSION_MIN:STRING=
@@ -632,6 +653,12 @@ GLFW_SOURCE_DIR:STATIC=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_p
 //Path to a library.
 MATH_LIBRARY:FILEPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libm.tbd
 
+//Path to a library.
+METALKIT_FRAMEWORK:FILEPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalKit.framework
+
+//Path to a library.
+METAL_FRAMEWORK:FILEPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Metal.framework
+
 //Include for the OpenGL GLU library
 OPENGL_GLU_INCLUDE_DIR:PATH=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
 
@@ -708,6 +735,19 @@ BLAS_Accelerate_WORKS:INTERNAL=1
 CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
 CMAKE_AR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER
+CMAKE_ASM_COMPILER-ADVANCED:INTERNAL=1
+CMAKE_ASM_COMPILER_WORKS:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS
+CMAKE_ASM_FLAGS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_DEBUG
+CMAKE_ASM_FLAGS_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_MINSIZEREL
+CMAKE_ASM_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_RELEASE
+CMAKE_ASM_FLAGS_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_RELWITHDEBINFO
+CMAKE_ASM_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //This is the directory where this CMakeCache.txt was created
 CMAKE_CACHEFILE_DIR:INTERNAL=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build
 //Major version of cmake used to create the current loaded cache
@@ -898,7 +938,7 @@ FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[/Library/Developer/CommandLineTool
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //List of backends for cmake package
-GGML_AVAILABLE_BACKENDS:INTERNAL=ggml-cpu;ggml-blas
+GGML_AVAILABLE_BACKENDS:INTERNAL=ggml-cpu;ggml-blas;ggml-metal
 //Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E
 GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E:INTERNAL=
 //STRINGS property for variable: GGML_CUDA_COMPRESSION_MODE

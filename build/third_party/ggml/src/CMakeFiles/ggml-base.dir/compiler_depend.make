@@ -27,7 +27,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o: /Users/willb/Vault
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_printf.h \
@@ -158,7 +157,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o: /Users/willb/V
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__wctype.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__xlocale.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -946,7 +944,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o: /Users/willb/Vault
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__wctype.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__xlocale.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -1784,7 +1781,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o: /Users/willb/Vaul
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_printf.h \
@@ -2573,7 +2569,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o: /Users/willb/Vaults/Pers
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_inttypes.h \
@@ -2856,7 +2851,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o: /Users/willb/Vaults/Pe
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__wctype.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__xlocale.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -3619,7 +3613,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__wctype.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/__xlocale.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
@@ -4608,8 +4601,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/function.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/binder2nd.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/bind.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/add_volatile.h:
@@ -4665,6 +4656,8 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_ino_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_ino64_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/binder2nd.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/machine/limits.h:
 
@@ -4741,6 +4734,8 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cstring:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdlib.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdio.h:
 
@@ -5258,18 +5253,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/istream_iterator.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/invocable.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_fd_clr.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/pthread/sched.h:
-
-/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/gguf.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/functional.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/insert_iterator.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_fd_copy.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/front_insert_iterator.h:
@@ -5329,6 +5312,12 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/rank.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/unreachable_sentinel.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/insert_iterator.h:
+
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include/gguf.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/functional.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/totally_ordered.h:
 
@@ -5421,6 +5410,10 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__exception/exception.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__debug_utils/randomize_range.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_fd_clr.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/invocable.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/machine/_endian.h:
 
@@ -6080,6 +6073,12 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_sigset_t.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_constant_evaluated.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/istreambuf_iterator.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/minmax.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_sigaltstack.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__tuple/tuple_like_ext.h:
@@ -6099,6 +6098,10 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/replace_copy_if.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_null.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/count.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_int8_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/semiregular.h:
 
@@ -6143,6 +6146,8 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types/_wctrans_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_mode_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/pthread/sched.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/default_sentinel.h:
 
@@ -6206,10 +6211,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/sysctl.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/count.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_int8_t.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/equality_comparable.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach/vm_prot.h:
@@ -6238,12 +6239,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_time.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/istreambuf_iterator.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/minmax.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_constant_evaluated.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/stable_sort.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/find_end.h:
@@ -6255,12 +6250,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/unique_ptr.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/secure/_stdio.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/search.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_const_ref.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/endian.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_trivially_relocatable.h:
 
@@ -6282,22 +6271,6 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/formatter.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/has_unique_object_representation.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/remainder.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/select.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iosfwd:
-
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stddef_offsetof.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdlib.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/iter_swap.h:
 
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-alloc.c:
@@ -6309,6 +6282,12 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/___wctype.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/destruct_n.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/has_unique_object_representation.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/remainder.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/wrap_iter.h:
 
@@ -6352,6 +6331,12 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/streambuf.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/search.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_const_ref.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/endian.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/includes.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_final.h:
@@ -6359,3 +6344,9 @@ third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: /Users/willb/Vaults/Pe
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/adjacent_find.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types/_uint64_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/select.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iosfwd:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stddef_offsetof.h:

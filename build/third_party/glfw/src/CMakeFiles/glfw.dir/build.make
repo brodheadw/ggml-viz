@@ -300,71 +300,71 @@ third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o: third_party/glfw/src/CM
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_init.m
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building OBJC object third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o -MF CMakeFiles/glfw.dir/cocoa_init.m.o.d -o CMakeFiles/glfw.dir/cocoa_init.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_init.m
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o -MF CMakeFiles/glfw.dir/cocoa_init.m.o.d -o CMakeFiles/glfw.dir/cocoa_init.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_init.m
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing OBJC source to CMakeFiles/glfw.dir/cocoa_init.m.i"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_init.m > CMakeFiles/glfw.dir/cocoa_init.m.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_init.m > CMakeFiles/glfw.dir/cocoa_init.m.i
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling OBJC source to assembly CMakeFiles/glfw.dir/cocoa_init.m.s"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_init.m -o CMakeFiles/glfw.dir/cocoa_init.m.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_init.m -o CMakeFiles/glfw.dir/cocoa_init.m.s
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/flags.make
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_joystick.m
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building OBJC object third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o -MF CMakeFiles/glfw.dir/cocoa_joystick.m.o.d -o CMakeFiles/glfw.dir/cocoa_joystick.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_joystick.m
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o -MF CMakeFiles/glfw.dir/cocoa_joystick.m.o.d -o CMakeFiles/glfw.dir/cocoa_joystick.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_joystick.m
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing OBJC source to CMakeFiles/glfw.dir/cocoa_joystick.m.i"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_joystick.m > CMakeFiles/glfw.dir/cocoa_joystick.m.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_joystick.m > CMakeFiles/glfw.dir/cocoa_joystick.m.i
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling OBJC source to assembly CMakeFiles/glfw.dir/cocoa_joystick.m.s"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_joystick.m -o CMakeFiles/glfw.dir/cocoa_joystick.m.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_joystick.m -o CMakeFiles/glfw.dir/cocoa_joystick.m.s
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/flags.make
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_monitor.m
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building OBJC object third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o -MF CMakeFiles/glfw.dir/cocoa_monitor.m.o.d -o CMakeFiles/glfw.dir/cocoa_monitor.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_monitor.m
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o -MF CMakeFiles/glfw.dir/cocoa_monitor.m.o.d -o CMakeFiles/glfw.dir/cocoa_monitor.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_monitor.m
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing OBJC source to CMakeFiles/glfw.dir/cocoa_monitor.m.i"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_monitor.m > CMakeFiles/glfw.dir/cocoa_monitor.m.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_monitor.m > CMakeFiles/glfw.dir/cocoa_monitor.m.i
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling OBJC source to assembly CMakeFiles/glfw.dir/cocoa_monitor.m.s"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_monitor.m -o CMakeFiles/glfw.dir/cocoa_monitor.m.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_monitor.m -o CMakeFiles/glfw.dir/cocoa_monitor.m.s
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/flags.make
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_window.m
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building OBJC object third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o -MF CMakeFiles/glfw.dir/cocoa_window.m.o.d -o CMakeFiles/glfw.dir/cocoa_window.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_window.m
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o -MF CMakeFiles/glfw.dir/cocoa_window.m.o.d -o CMakeFiles/glfw.dir/cocoa_window.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_window.m
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing OBJC source to CMakeFiles/glfw.dir/cocoa_window.m.i"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_window.m > CMakeFiles/glfw.dir/cocoa_window.m.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_window.m > CMakeFiles/glfw.dir/cocoa_window.m.i
 
 third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling OBJC source to assembly CMakeFiles/glfw.dir/cocoa_window.m.s"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_window.m -o CMakeFiles/glfw.dir/cocoa_window.m.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cocoa_window.m -o CMakeFiles/glfw.dir/cocoa_window.m.s
 
 third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/flags.make
 third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/nsgl_context.m
 third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o: third_party/glfw/src/CMakeFiles/glfw.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building OBJC object third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o -MF CMakeFiles/glfw.dir/nsgl_context.m.o.d -o CMakeFiles/glfw.dir/nsgl_context.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/nsgl_context.m
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) -x objective-c $(OBJC_FLAGS) -MD -MT third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o -MF CMakeFiles/glfw.dir/nsgl_context.m.o.d -o CMakeFiles/glfw.dir/nsgl_context.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/nsgl_context.m
 
 third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing OBJC source to CMakeFiles/glfw.dir/nsgl_context.m.i"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/nsgl_context.m > CMakeFiles/glfw.dir/nsgl_context.m.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -E /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/nsgl_context.m > CMakeFiles/glfw.dir/nsgl_context.m.i
 
 third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling OBJC source to assembly CMakeFiles/glfw.dir/nsgl_context.m.s"
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/clang $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/nsgl_context.m -o CMakeFiles/glfw.dir/nsgl_context.m.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && /usr/bin/cc $(OBJC_DEFINES) $(OBJC_INCLUDES) $(OBJC_FLAGS) -S /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/nsgl_context.m -o CMakeFiles/glfw.dir/nsgl_context.m.s
 
 # Object files for target glfw
 glfw_OBJECTS = \
@@ -393,41 +393,35 @@ glfw_OBJECTS = \
 # External object files for target glfw
 glfw_EXTERNAL_OBJECTS =
 
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/context.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/init.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/input.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/monitor.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/platform.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/vulkan.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/window.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/egl_context.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/osmesa_context.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/null_init.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/null_monitor.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/null_window.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/null_joystick.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_time.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/posix_module.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/posix_thread.c.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/build.make
-third_party/glfw/src/libglfw.3.5.dylib: third_party/glfw/src/CMakeFiles/glfw.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Linking C shared library libglfw.dylib"
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/context.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/init.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/input.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/monitor.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/platform.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/vulkan.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/window.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/egl_context.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/osmesa_context.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/null_init.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/null_monitor.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/null_window.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/null_joystick.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_time.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/posix_module.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/posix_thread.c.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_init.m.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/cocoa_window.m.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/nsgl_context.m.o
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/build.make
+third_party/glfw/src/libglfw3.a: third_party/glfw/src/CMakeFiles/glfw.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Linking C static library libglfw3.a"
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && $(CMAKE_COMMAND) -P CMakeFiles/glfw.dir/cmake_clean_target.cmake
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/glfw.dir/link.txt --verbose=$(VERBOSE)
-	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src && $(CMAKE_COMMAND) -E cmake_symlink_library libglfw.3.5.dylib libglfw.3.dylib libglfw.dylib
-
-third_party/glfw/src/libglfw.3.dylib: third_party/glfw/src/libglfw.3.5.dylib
-	@$(CMAKE_COMMAND) -E touch_nocreate third_party/glfw/src/libglfw.3.dylib
-
-third_party/glfw/src/libglfw.dylib: third_party/glfw/src/libglfw.3.5.dylib
-	@$(CMAKE_COMMAND) -E touch_nocreate third_party/glfw/src/libglfw.dylib
 
 # Rule to build all files generated by this target.
-third_party/glfw/src/CMakeFiles/glfw.dir/build: third_party/glfw/src/libglfw.dylib
+third_party/glfw/src/CMakeFiles/glfw.dir/build: third_party/glfw/src/libglfw3.a
 .PHONY : third_party/glfw/src/CMakeFiles/glfw.dir/build
 
 third_party/glfw/src/CMakeFiles/glfw.dir/clean:

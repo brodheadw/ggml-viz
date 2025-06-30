@@ -15,7 +15,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/ggml-base.dir/ggml.cpp.o.d"
   "CMakeFiles/ggml-base.dir/gguf.cpp.o"
   "CMakeFiles/ggml-base.dir/gguf.cpp.o.d"
-  "libggml-base.dylib"
+  "libggml-base.a"
   "libggml-base.pdb"
 )
 

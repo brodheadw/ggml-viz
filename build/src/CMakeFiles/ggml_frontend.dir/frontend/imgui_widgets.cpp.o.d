@@ -111,7 +111,6 @@ src/CMakeFiles/ggml_frontend.dir/frontend/imgui_widgets.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_dev_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_mode_t.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_static_assert.h \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/utils/trace_reader.hpp \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation/ggml_hook.hpp \

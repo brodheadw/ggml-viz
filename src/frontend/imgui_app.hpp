@@ -19,6 +19,11 @@ public:
     
     // Load a trace file for visualization
     bool load_trace_file(const std::string& filename);
+    
+    // Enable live mode - reads from running GGML applications
+    void enable_live_mode();
+    void disable_live_mode();
+    bool is_live_mode() const;
 
 private:
     struct AppData;
@@ -36,6 +41,9 @@ private:
     void render_tensor_inspector();
     void render_memory_view();
     void render_file_browser();
+    
+    // Live mode support
+    void update_live_data();
     
     // GUI state
     bool show_demo_window_ = false;

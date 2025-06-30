@@ -12,7 +12,7 @@ if(NOT DEFINED CMAKE_INSTALL_CONFIG_NAME)
     string(REGEX REPLACE "^[^A-Za-z0-9_]+" ""
            CMAKE_INSTALL_CONFIG_NAME "${BUILD_TYPE}")
   else()
-    set(CMAKE_INSTALL_CONFIG_NAME "Debug")
+    set(CMAKE_INSTALL_CONFIG_NAME "Release")
   endif()
   message(STATUS "Install configuration: \"${CMAKE_INSTALL_CONFIG_NAME}\"")
 endif()
@@ -38,25 +38,11 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES
-    "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src/libglfw.3.5.dylib"
-    "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src/libglfw.3.dylib"
-    )
-  foreach(file
-      "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libglfw.3.5.dylib"
-      "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libglfw.3.dylib"
-      )
-    if(EXISTS "${file}" AND
-       NOT IS_SYMLINK "${file}")
-      if(CMAKE_INSTALL_DO_STRIP)
-        execute_process(COMMAND "/usr/bin/strip" -x "${file}")
-      endif()
-    endif()
-  endforeach()
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src/libglfw.dylib")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/glfw/src/libglfw3.a")
+  if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libglfw3.a" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libglfw3.a")
+    execute_process(COMMAND "/usr/bin/ranlib" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libglfw3.a")
+  endif()
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT

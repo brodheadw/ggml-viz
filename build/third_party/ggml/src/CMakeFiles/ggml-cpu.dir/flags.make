@@ -3,19 +3,19 @@
 
 # compile C with /usr/bin/cc
 # compile CXX with /usr/bin/c++
-C_DEFINES = -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -DGGML_VIZ_ENABLE_HOOKS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+C_DEFINES = -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -DGGML_VIZ_ENABLE_HOOKS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600
 
 C_INCLUDES = -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks
 
-C_FLAGSarm64 = -g -std=gnu11 -arch arm64 -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -mcpu=native+dotprod+noi8mm+nosve+nosme
+C_FLAGSarm64 = -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -mcpu=native+dotprod+noi8mm+nosve+nosme
 
-C_FLAGS = -g -std=gnu11 -arch arm64 -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -mcpu=native+dotprod+noi8mm+nosve+nosme
+C_FLAGS = -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -mcpu=native+dotprod+noi8mm+nosve+nosme
 
-CXX_DEFINES = -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -DGGML_VIZ_ENABLE_HOOKS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+CXX_DEFINES = -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -DGGML_VIZ_ENABLE_HOOKS -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600
 
 CXX_INCLUDES = -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/instrumentation -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/include -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks
 
-CXX_FLAGSarm64 = -g -std=c++17 -arch arm64 -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme
+CXX_FLAGSarm64 = -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme
 
-CXX_FLAGS = -g -std=c++17 -arch arm64 -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme
+CXX_FLAGS = -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme
 

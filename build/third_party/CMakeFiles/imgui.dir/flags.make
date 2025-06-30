@@ -6,7 +6,7 @@ CXX_DEFINES = -DGL_SILENCE_DEPRECATION
 
 CXX_INCLUDES = -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/imgui -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/imgui/backends -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/include -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party
 
-CXX_FLAGSarm64 = -g -std=c++17 -arch arm64
+CXX_FLAGSarm64 = -O3 -DNDEBUG -std=c++17 -arch arm64
 
-CXX_FLAGS = -g -std=c++17 -arch arm64
+CXX_FLAGS = -O3 -DNDEBUG -std=c++17 -arch arm64
 

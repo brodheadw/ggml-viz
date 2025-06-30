@@ -112,11 +112,10 @@ third_party/glfw/src/CMakeFiles/glfw.dir/monitor.c.o: \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stdarg___va_copy.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stdarg_va_copy.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/assert.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_static_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/ctype.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_ctype.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/runetype.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_ct_rune_t.h \
