@@ -87,6 +87,13 @@ public:
 
     // Data access (for live viewers)
     std::vector<Event> get_events_size(uint64_t timestamp_ns);
+    
+    // Live data access for real-time visualization
+    std::vector<Event> consume_available_events();
+    Event* get_ring_buffer() { return event_buffer_; }
+    size_t get_buffer_size() const { return BUFFER_SIZE; }
+    size_t get_current_write_pos() const { return write_pos_.load(std::memory_order_acquire); }
+    size_t get_current_read_pos() const { return read_pos_.load(std::memory_order_acquire); }
 
     void on_graph_compute_begin(const ggml_cgraph* graph);
     void on_graph_compute_end(const ggml_cgraph* graph);
@@ -122,14 +129,33 @@ private:
     std::chrono::steady_clock::time_point start_time_;
 };
 
+// Visibility macros for shared library
+#ifdef GGML_VIZ_SHARED_BUILD
+    #if defined(_WIN32) || defined(__CYGWIN__)
+        #ifdef BUILDING_GGML_VIZ
+            #define GGML_VIZ_API __declspec(dllexport)
+        #else
+            #define GGML_VIZ_API __declspec(dllimport)
+        #endif
+    #else
+        #define GGML_VIZ_API __attribute__((visibility("default")))
+    #endif
+#else
+    #define GGML_VIZ_API
+#endif
+
 extern "C" {
-    void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph);
-    void ggml_viz_hook_graph_compute_end(const ggml_cgraph* graph);
-    void ggml_viz_hook_op_compute_begin(const ggml_tensor* tensor);
-    void ggml_viz_hook_op_compute_end(const ggml_tensor* tensor);
+    GGML_VIZ_API void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph);
+    GGML_VIZ_API void ggml_viz_hook_graph_compute_end(const ggml_cgraph* graph);
+    GGML_VIZ_API void ggml_viz_hook_op_compute_begin(const ggml_tensor* tensor);
+    GGML_VIZ_API void ggml_viz_hook_op_compute_end(const ggml_tensor* tensor);
+    
+    // Status functions for debugging
+    GGML_VIZ_API bool ggml_viz_is_initialized();
+    GGML_VIZ_API void ggml_viz_print_status();
 }
 
-bool install_ggml_hooks();
-bool uninstall_ggml_hooks();
+GGML_VIZ_API bool install_ggml_hooks();
+GGML_VIZ_API bool uninstall_ggml_hooks();
 
 } // namespace ggml_viz

@@ -172,6 +172,58 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named imgui
+
+# Build rule for target.
+imgui: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 imgui
+.PHONY : imgui
+
+# fast build rule for target.
+imgui/fast:
+	$(MAKE) $(MAKESILENT) -f third_party/CMakeFiles/imgui.dir/build.make third_party/CMakeFiles/imgui.dir/build
+.PHONY : imgui/fast
+
+#=============================================================================
+# Target rules for targets named uninstall
+
+# Build rule for target.
+uninstall: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 uninstall
+.PHONY : uninstall
+
+# fast build rule for target.
+uninstall/fast:
+	$(MAKE) $(MAKESILENT) -f third_party/glfw/CMakeFiles/uninstall.dir/build.make third_party/glfw/CMakeFiles/uninstall.dir/build
+.PHONY : uninstall/fast
+
+#=============================================================================
+# Target rules for targets named glfw
+
+# Build rule for target.
+glfw: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 glfw
+.PHONY : glfw
+
+# fast build rule for target.
+glfw/fast:
+	$(MAKE) $(MAKESILENT) -f third_party/glfw/src/CMakeFiles/glfw.dir/build.make third_party/glfw/src/CMakeFiles/glfw.dir/build
+.PHONY : glfw/fast
+
+#=============================================================================
+# Target rules for targets named update_mappings
+
+# Build rule for target.
+update_mappings: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 update_mappings
+.PHONY : update_mappings
+
+# fast build rule for target.
+update_mappings/fast:
+	$(MAKE) $(MAKESILENT) -f third_party/glfw/src/CMakeFiles/update_mappings.dir/build.make third_party/glfw/src/CMakeFiles/update_mappings.dir/build
+.PHONY : update_mappings/fast
+
+#=============================================================================
 # Target rules for targets named ggml_hook
 
 # Build rule for target.
@@ -196,6 +248,45 @@ ggml_utils: cmake_check_build_system
 ggml_utils/fast:
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/build
 .PHONY : ggml_utils/fast
+
+#=============================================================================
+# Target rules for targets named ggml_frontend
+
+# Build rule for target.
+ggml_frontend: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml_frontend
+.PHONY : ggml_frontend
+
+# fast build rule for target.
+ggml_frontend/fast:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_frontend.dir/build.make src/CMakeFiles/ggml_frontend.dir/build
+.PHONY : ggml_frontend/fast
+
+#=============================================================================
+# Target rules for targets named ggml_viz_hook
+
+# Build rule for target.
+ggml_viz_hook: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml_viz_hook
+.PHONY : ggml_viz_hook
+
+# fast build rule for target.
+ggml_viz_hook/fast:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/build
+.PHONY : ggml_viz_hook/fast
+
+#=============================================================================
+# Target rules for targets named ggml-viz
+
+# Build rule for target.
+ggml-viz: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml-viz
+.PHONY : ggml-viz
+
+# fast build rule for target.
+ggml-viz/fast:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml-viz.dir/build.make src/CMakeFiles/ggml-viz.dir/build
+.PHONY : ggml-viz/fast
 
 #=============================================================================
 # Target rules for targets named ggml-base
@@ -288,12 +379,19 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... test"
+	@echo "... uninstall"
+	@echo "... update_mappings"
 	@echo "... ggml"
 	@echo "... ggml-base"
 	@echo "... ggml-blas"
 	@echo "... ggml-cpu"
+	@echo "... ggml-viz"
+	@echo "... ggml_frontend"
 	@echo "... ggml_hook"
 	@echo "... ggml_utils"
+	@echo "... ggml_viz_hook"
+	@echo "... glfw"
+	@echo "... imgui"
 	@echo "... test_ggml_hook"
 	@echo "... test_trace_reader"
 .PHONY : help

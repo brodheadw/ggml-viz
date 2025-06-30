@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o"
   "CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o.d"
-  "libggml.dylib"
+  "libggml.a"
   "libggml.pdb"
 )
 

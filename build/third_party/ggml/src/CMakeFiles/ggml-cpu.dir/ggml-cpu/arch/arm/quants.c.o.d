@@ -62,7 +62,6 @@ third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o: \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/./ggml-impl.h \
   /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include/gguf.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/assert.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_static_assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/math.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdlib.h \

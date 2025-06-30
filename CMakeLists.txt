@@ -7,10 +7,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Find Threads
+# Find required packages
 find_package(Threads REQUIRED)
+find_package(OpenGL REQUIRED)
 
-# Build our instrumentation library first
+# Build GUI dependencies first
+add_subdirectory(third_party)
+
+# Build our instrumentation library
 add_subdirectory(src)
 
 # Enable visualization hooks in GGML

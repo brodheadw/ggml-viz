@@ -96,10 +96,11 @@ test_ggml_hook_EXTERNAL_OBJECTS =
 bin/test_ggml_hook: tests/CMakeFiles/test_ggml_hook.dir/test_ggml_hook.cpp.o
 bin/test_ggml_hook: tests/CMakeFiles/test_ggml_hook.dir/build.make
 bin/test_ggml_hook: src/libggml_hook.a
-bin/test_ggml_hook: third_party/ggml/src/libggml.dylib
-bin/test_ggml_hook: third_party/ggml/src/libggml-cpu.dylib
-bin/test_ggml_hook: third_party/ggml/src/ggml-blas/libggml-blas.dylib
-bin/test_ggml_hook: third_party/ggml/src/libggml-base.dylib
+bin/test_ggml_hook: third_party/ggml/src/libggml.a
+bin/test_ggml_hook: third_party/ggml/src/libggml-cpu.a
+bin/test_ggml_hook: src/libggml_hook.a
+bin/test_ggml_hook: third_party/ggml/src/ggml-blas/libggml-blas.a
+bin/test_ggml_hook: third_party/ggml/src/libggml-base.a
 bin/test_ggml_hook: tests/CMakeFiles/test_ggml_hook.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable ../bin/test_ggml_hook"
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/test_ggml_hook.dir/link.txt --verbose=$(VERBOSE)

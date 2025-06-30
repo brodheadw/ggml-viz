@@ -199,12 +199,103 @@ ggml_utils/fast:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_utils.dir/build.make src/CMakeFiles/ggml_utils.dir/build
 .PHONY : ggml_utils/fast
 
+# Convenience name for target.
+src/CMakeFiles/ggml_frontend.dir/rule:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/ggml_frontend.dir/rule
+.PHONY : src/CMakeFiles/ggml_frontend.dir/rule
+
+# Convenience name for target.
+ggml_frontend: src/CMakeFiles/ggml_frontend.dir/rule
+.PHONY : ggml_frontend
+
+# fast build rule for target.
+ggml_frontend/fast:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_frontend.dir/build.make src/CMakeFiles/ggml_frontend.dir/build
+.PHONY : ggml_frontend/fast
+
+# Convenience name for target.
+src/CMakeFiles/ggml_viz_hook.dir/rule:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/ggml_viz_hook.dir/rule
+.PHONY : src/CMakeFiles/ggml_viz_hook.dir/rule
+
+# Convenience name for target.
+ggml_viz_hook: src/CMakeFiles/ggml_viz_hook.dir/rule
+.PHONY : ggml_viz_hook
+
+# fast build rule for target.
+ggml_viz_hook/fast:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/build
+.PHONY : ggml_viz_hook/fast
+
+# Convenience name for target.
+src/CMakeFiles/ggml-viz.dir/rule:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/ggml-viz.dir/rule
+.PHONY : src/CMakeFiles/ggml-viz.dir/rule
+
+# Convenience name for target.
+ggml-viz: src/CMakeFiles/ggml-viz.dir/rule
+.PHONY : ggml-viz
+
+# fast build rule for target.
+ggml-viz/fast:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml-viz.dir/build.make src/CMakeFiles/ggml-viz.dir/build
+.PHONY : ggml-viz/fast
+
+frontend/imgui_app.o: frontend/imgui_app.cpp.o
+.PHONY : frontend/imgui_app.o
+
+# target to build an object file
+frontend/imgui_app.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_frontend.dir/build.make src/CMakeFiles/ggml_frontend.dir/frontend/imgui_app.cpp.o
+.PHONY : frontend/imgui_app.cpp.o
+
+frontend/imgui_app.i: frontend/imgui_app.cpp.i
+.PHONY : frontend/imgui_app.i
+
+# target to preprocess a source file
+frontend/imgui_app.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_frontend.dir/build.make src/CMakeFiles/ggml_frontend.dir/frontend/imgui_app.cpp.i
+.PHONY : frontend/imgui_app.cpp.i
+
+frontend/imgui_app.s: frontend/imgui_app.cpp.s
+.PHONY : frontend/imgui_app.s
+
+# target to generate assembly for a file
+frontend/imgui_app.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_frontend.dir/build.make src/CMakeFiles/ggml_frontend.dir/frontend/imgui_app.cpp.s
+.PHONY : frontend/imgui_app.cpp.s
+
+frontend/imgui_widgets.o: frontend/imgui_widgets.cpp.o
+.PHONY : frontend/imgui_widgets.o
+
+# target to build an object file
+frontend/imgui_widgets.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_frontend.dir/build.make src/CMakeFiles/ggml_frontend.dir/frontend/imgui_widgets.cpp.o
+.PHONY : frontend/imgui_widgets.cpp.o
+
+frontend/imgui_widgets.i: frontend/imgui_widgets.cpp.i
+.PHONY : frontend/imgui_widgets.i
+
+# target to preprocess a source file
+frontend/imgui_widgets.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_frontend.dir/build.make src/CMakeFiles/ggml_frontend.dir/frontend/imgui_widgets.cpp.i
+.PHONY : frontend/imgui_widgets.cpp.i
+
+frontend/imgui_widgets.s: frontend/imgui_widgets.cpp.s
+.PHONY : frontend/imgui_widgets.s
+
+# target to generate assembly for a file
+frontend/imgui_widgets.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_frontend.dir/build.make src/CMakeFiles/ggml_frontend.dir/frontend/imgui_widgets.cpp.s
+.PHONY : frontend/imgui_widgets.cpp.s
+
 instrumentation/ggml_hook.o: instrumentation/ggml_hook.cpp.o
 .PHONY : instrumentation/ggml_hook.o
 
 # target to build an object file
 instrumentation/ggml_hook.cpp.o:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_hook.cpp.o
 .PHONY : instrumentation/ggml_hook.cpp.o
 
 instrumentation/ggml_hook.i: instrumentation/ggml_hook.cpp.i
@@ -213,6 +304,7 @@ instrumentation/ggml_hook.i: instrumentation/ggml_hook.cpp.i
 # target to preprocess a source file
 instrumentation/ggml_hook.cpp.i:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.i
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_hook.cpp.i
 .PHONY : instrumentation/ggml_hook.cpp.i
 
 instrumentation/ggml_hook.s: instrumentation/ggml_hook.cpp.s
@@ -221,7 +313,56 @@ instrumentation/ggml_hook.s: instrumentation/ggml_hook.cpp.s
 # target to generate assembly for a file
 instrumentation/ggml_hook.cpp.s:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_hook.dir/build.make src/CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.s
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_hook.cpp.s
 .PHONY : instrumentation/ggml_hook.cpp.s
+
+instrumentation/ggml_viz_init.o: instrumentation/ggml_viz_init.cpp.o
+.PHONY : instrumentation/ggml_viz_init.o
+
+# target to build an object file
+instrumentation/ggml_viz_init.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_viz_init.cpp.o
+.PHONY : instrumentation/ggml_viz_init.cpp.o
+
+instrumentation/ggml_viz_init.i: instrumentation/ggml_viz_init.cpp.i
+.PHONY : instrumentation/ggml_viz_init.i
+
+# target to preprocess a source file
+instrumentation/ggml_viz_init.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_viz_init.cpp.i
+.PHONY : instrumentation/ggml_viz_init.cpp.i
+
+instrumentation/ggml_viz_init.s: instrumentation/ggml_viz_init.cpp.s
+.PHONY : instrumentation/ggml_viz_init.s
+
+# target to generate assembly for a file
+instrumentation/ggml_viz_init.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml_viz_hook.dir/build.make src/CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_viz_init.cpp.s
+.PHONY : instrumentation/ggml_viz_init.cpp.s
+
+main.o: main.cpp.o
+.PHONY : main.o
+
+# target to build an object file
+main.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml-viz.dir/build.make src/CMakeFiles/ggml-viz.dir/main.cpp.o
+.PHONY : main.cpp.o
+
+main.i: main.cpp.i
+.PHONY : main.i
+
+# target to preprocess a source file
+main.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml-viz.dir/build.make src/CMakeFiles/ggml-viz.dir/main.cpp.i
+.PHONY : main.cpp.i
+
+main.s: main.cpp.s
+.PHONY : main.s
+
+# target to generate assembly for a file
+main.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/ggml-viz.dir/build.make src/CMakeFiles/ggml-viz.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 utils/config.o: utils/config.cpp.o
 .PHONY : utils/config.o
@@ -308,11 +449,26 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... test"
+	@echo "... ggml-viz"
+	@echo "... ggml_frontend"
 	@echo "... ggml_hook"
 	@echo "... ggml_utils"
+	@echo "... ggml_viz_hook"
+	@echo "... frontend/imgui_app.o"
+	@echo "... frontend/imgui_app.i"
+	@echo "... frontend/imgui_app.s"
+	@echo "... frontend/imgui_widgets.o"
+	@echo "... frontend/imgui_widgets.i"
+	@echo "... frontend/imgui_widgets.s"
 	@echo "... instrumentation/ggml_hook.o"
 	@echo "... instrumentation/ggml_hook.i"
 	@echo "... instrumentation/ggml_hook.s"
+	@echo "... instrumentation/ggml_viz_init.o"
+	@echo "... instrumentation/ggml_viz_init.i"
+	@echo "... instrumentation/ggml_viz_init.s"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 	@echo "... utils/config.o"
 	@echo "... utils/config.i"
 	@echo "... utils/config.s"
