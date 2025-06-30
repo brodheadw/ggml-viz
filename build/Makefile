@@ -341,6 +341,19 @@ ggml-blas/fast:
 .PHONY : ggml-blas/fast
 
 #=============================================================================
+# Target rules for targets named ggml_hook_test
+
+# Build rule for target.
+ggml_hook_test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ggml_hook_test
+.PHONY : ggml_hook_test
+
+# fast build rule for target.
+ggml_hook_test/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/ggml_hook_test.dir/build.make tests/CMakeFiles/ggml_hook_test.dir/build
+.PHONY : ggml_hook_test/fast
+
+#=============================================================================
 # Target rules for targets named test_ggml_hook
 
 # Build rule for target.
@@ -388,6 +401,7 @@ help:
 	@echo "... ggml-viz"
 	@echo "... ggml_frontend"
 	@echo "... ggml_hook"
+	@echo "... ggml_hook_test"
 	@echo "... ggml_utils"
 	@echo "... ggml_viz_hook"
 	@echo "... glfw"

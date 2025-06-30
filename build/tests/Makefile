@@ -172,6 +172,20 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+tests/CMakeFiles/ggml_hook_test.dir/rule:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/ggml_hook_test.dir/rule
+.PHONY : tests/CMakeFiles/ggml_hook_test.dir/rule
+
+# Convenience name for target.
+ggml_hook_test: tests/CMakeFiles/ggml_hook_test.dir/rule
+.PHONY : ggml_hook_test
+
+# fast build rule for target.
+ggml_hook_test/fast:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/ggml_hook_test.dir/build.make tests/CMakeFiles/ggml_hook_test.dir/build
+.PHONY : ggml_hook_test/fast
+
+# Convenience name for target.
 tests/CMakeFiles/test_ggml_hook.dir/rule:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_ggml_hook.dir/rule
 .PHONY : tests/CMakeFiles/test_ggml_hook.dir/rule
@@ -198,6 +212,30 @@ test_trace_reader: tests/CMakeFiles/test_trace_reader.dir/rule
 test_trace_reader/fast:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/build
 .PHONY : test_trace_reader/fast
+
+__/src/instrumentation/ggml_hook.o: __/src/instrumentation/ggml_hook.cpp.o
+.PHONY : __/src/instrumentation/ggml_hook.o
+
+# target to build an object file
+__/src/instrumentation/ggml_hook.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/ggml_hook_test.dir/build.make tests/CMakeFiles/ggml_hook_test.dir/__/src/instrumentation/ggml_hook.cpp.o
+.PHONY : __/src/instrumentation/ggml_hook.cpp.o
+
+__/src/instrumentation/ggml_hook.i: __/src/instrumentation/ggml_hook.cpp.i
+.PHONY : __/src/instrumentation/ggml_hook.i
+
+# target to preprocess a source file
+__/src/instrumentation/ggml_hook.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/ggml_hook_test.dir/build.make tests/CMakeFiles/ggml_hook_test.dir/__/src/instrumentation/ggml_hook.cpp.i
+.PHONY : __/src/instrumentation/ggml_hook.cpp.i
+
+__/src/instrumentation/ggml_hook.s: __/src/instrumentation/ggml_hook.cpp.s
+.PHONY : __/src/instrumentation/ggml_hook.s
+
+# target to generate assembly for a file
+__/src/instrumentation/ggml_hook.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/ggml_hook_test.dir/build.make tests/CMakeFiles/ggml_hook_test.dir/__/src/instrumentation/ggml_hook.cpp.s
+.PHONY : __/src/instrumentation/ggml_hook.cpp.s
 
 test_ggml_hook.o: test_ggml_hook.cpp.o
 .PHONY : test_ggml_hook.o
@@ -260,8 +298,12 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... test"
+	@echo "... ggml_hook_test"
 	@echo "... test_ggml_hook"
 	@echo "... test_trace_reader"
+	@echo "... __/src/instrumentation/ggml_hook.o"
+	@echo "... __/src/instrumentation/ggml_hook.i"
+	@echo "... __/src/instrumentation/ggml_hook.s"
 	@echo "... test_ggml_hook.o"
 	@echo "... test_ggml_hook.i"
 	@echo "... test_ggml_hook.s"

@@ -95,7 +95,7 @@ test_ggml_hook_EXTERNAL_OBJECTS =
 
 bin/test_ggml_hook: tests/CMakeFiles/test_ggml_hook.dir/test_ggml_hook.cpp.o
 bin/test_ggml_hook: tests/CMakeFiles/test_ggml_hook.dir/build.make
-bin/test_ggml_hook: src/libggml_hook.a
+bin/test_ggml_hook: tests/libggml_hook_test.a
 bin/test_ggml_hook: third_party/ggml/src/libggml.a
 bin/test_ggml_hook: third_party/ggml/src/libggml-cpu.a
 bin/test_ggml_hook: src/libggml_hook.a

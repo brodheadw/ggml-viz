@@ -74,6 +74,7 @@
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install/local.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/third_party/ggml/src/ggml-blas/CMakeFiles/install/strip.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/ggml_hook_test.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test_ggml_hook.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test_trace_reader.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test.dir

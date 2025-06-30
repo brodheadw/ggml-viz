@@ -1,6 +1,29 @@
 cmake_minimum_required(VERSION 3.15)
 project(ggml_viz_tests)
 
+# Create a test-specific version of ggml_hook without function overrides
+add_library(ggml_hook_test STATIC
+    ${CMAKE_SOURCE_DIR}/src/instrumentation/ggml_hook.cpp
+    ${CMAKE_SOURCE_DIR}/src/instrumentation/ggml_hook.hpp
+)
+
+target_include_directories(ggml_hook_test
+    PUBLIC
+      ${CMAKE_SOURCE_DIR}/src/instrumentation
+      ${CMAKE_SOURCE_DIR}/third_party/ggml/include
+      ${CMAKE_SOURCE_DIR}/third_party/ggml/src        # for ggml-impl.h
+)
+
+target_compile_definitions(ggml_hook_test
+    PUBLIC 
+      GGML_VIZ_ENABLE_HOOKS
+      GGML_VIZ_TEST_MODE  # This prevents function override compilation
+)
+
+target_link_libraries(ggml_hook_test
+    PUBLIC Threads::Threads
+)
+
 # test_ggml_hook
 add_executable(test_ggml_hook
     test_ggml_hook.cpp
@@ -8,7 +31,7 @@ add_executable(test_ggml_hook
 
 target_link_libraries(test_ggml_hook
     PRIVATE
-      ggml_hook        # from src/CMakeLists.txt
+      ggml_hook_test   # Use test-specific version without function overrides
       ggml             # the ggml submodule library
       Threads::Threads
 )
@@ -29,4 +52,4 @@ target_link_libraries(test_trace_reader
 )
 
 add_test(NAME trace_reader_basic
-         COMMAND test_trace_reader)
+         COMMAND test_trace_reader ${CMAKE_BINARY_DIR}/test_trace.ggmlviz)

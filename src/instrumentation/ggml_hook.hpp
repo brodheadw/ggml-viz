@@ -12,6 +12,17 @@ struct ggml_tensor;
 struct ggml_cgraph;
 struct ggml_compute_params;
 
+// Conditional compilation for function overrides
+#ifndef GGML_VIZ_TEST_MODE
+  #ifdef _WIN32
+    #define GGML_VIZ_API __declspec(dllexport)
+  #else
+    #define GGML_VIZ_API __attribute__((visibility("default")))
+  #endif
+#else
+  #define GGML_VIZ_API 
+#endif
+
 namespace ggml_viz {
 
 enum class EventType : uint8_t {
@@ -129,20 +140,7 @@ private:
     std::chrono::steady_clock::time_point start_time_;
 };
 
-// Visibility macros for shared library
-#ifdef GGML_VIZ_SHARED_BUILD
-    #if defined(_WIN32) || defined(__CYGWIN__)
-        #ifdef BUILDING_GGML_VIZ
-            #define GGML_VIZ_API __declspec(dllexport)
-        #else
-            #define GGML_VIZ_API __declspec(dllimport)
-        #endif
-    #else
-        #define GGML_VIZ_API __attribute__((visibility("default")))
-    #endif
-#else
-    #define GGML_VIZ_API
-#endif
+// Note: GGML_VIZ_API is defined at the top of the file
 
 extern "C" {
     GGML_VIZ_API void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph);

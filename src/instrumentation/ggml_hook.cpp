@@ -356,7 +356,8 @@ static enum ggml_status (*original_backend_graph_compute)(ggml_backend_t, struct
 static void (*original_graph_compute)(struct ggml_context*, struct ggml_cgraph*) = nullptr;
 static bool hooks_initialized = false;
 
-// Our intercepted functions
+// Our intercepted functions - only compile when not in test mode
+#ifndef GGML_VIZ_TEST_MODE
 extern "C" {
     // Override ggml_backend_graph_compute
     GGML_VIZ_API enum ggml_status ggml_backend_graph_compute(ggml_backend_t backend, struct ggml_cgraph* cgraph) {
@@ -448,6 +449,7 @@ extern "C" {
         }
     }
 }
+#endif // GGML_VIZ_TEST_MODE
 
 // Installation helpers
 bool install_ggml_hooks() {
@@ -467,6 +469,7 @@ bool install_ggml_hooks() {
             dlsym(handle, "ggml_graph_compute");
             
         // Only store if they're different from our overrides
+#ifndef GGML_VIZ_TEST_MODE
         if (backend_func && backend_func != ggml_backend_graph_compute) {
             original_backend_graph_compute = backend_func;
             printf("[GGML_VIZ] Found original ggml_backend_graph_compute\n");
@@ -475,6 +478,17 @@ bool install_ggml_hooks() {
             original_graph_compute = graph_func;
             printf("[GGML_VIZ] Found original ggml_graph_compute\n");
         }
+#else
+        // In test mode, just store the functions we find
+        if (backend_func) {
+            original_backend_graph_compute = backend_func;
+            printf("[GGML_VIZ] Found ggml_backend_graph_compute (test mode)\n");
+        }
+        if (graph_func) {
+            original_graph_compute = graph_func;
+            printf("[GGML_VIZ] Found ggml_graph_compute (test mode)\n");
+        }
+#endif
         
         dlclose(handle);
     }
