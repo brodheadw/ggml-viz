@@ -50,7 +50,7 @@ brew install cmake glfw
 ### 3.2 Build
 
 ```bash
-git clone --recursive https://github.com/your‑org/ggml‑visualizer.git
+git clone --recursive [REPOSITORY_URL_TBD]
 cd ggml‑visualizer
 mkdir build && cd build
 
@@ -120,9 +120,9 @@ graph TD
 
 | OS / Arch                  | CPU (AVX2 / AVX‑512 / NEON) | GPU (Metal / CUDA / Vulkan) | Status |
 | -------------------------- | --------------------------- | --------------------------- | ------ |
-| macOS 12+ (arm64, x86\_64) | ✔︎                          | Metal 2*                    | ✅      |
+| macOS 12+ (arm64, x86\_64) | ✔︎                          | CPU only*                   | ✅      |
 | Linux (x86\_64)            | ✔︎                          | CUDA 11+, Vulkan            | ✅      |
-| Windows 10+                | ✔︎                          | CUDA 11+, Vulkan (dxc)      | 🛠     |
+| Windows 10+                | ✔︎                          | Untested                     | ❌     |
 | Raspberry Pi 5             | ✔︎ (NEON)                   | —                           | 🛠     |
 
 *Metal backend disabled by default due to shader compilation issues
@@ -145,9 +145,9 @@ See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for granular history.
 ## 7 • Contributing
 
 1. **Pick an issue** tagged `good‑first‑issue` or `help‑wanted`.
-2. Fork → feature branch → PR. Run `./scripts/lint.sh` before pushing.
-3. Each PR must pass CI (clang‑tidy, unit tests, sanitizers).
-4. Sign the lightweight contributor agreement (in `docs/CLA.md`).
+2. Fork → feature branch → PR. Code formatting and linting TBD.
+3. Each PR must pass tests (CI setup TBD).
+4. Follow project guidelines (contributor agreement TBD).
 
 We especially welcome:
 
@@ -183,7 +183,7 @@ make -j4
 
 ## 9 • License
 
-`ggml‑visualizer` is licensed under the **Apache 2.0** license.  We use icons licensed under CC‑BY‑4.0; see `docs/THIRD_PARTY.md`.
+`ggml‑visualizer` is licensed under the **Apache 2.0** license. See `docs/THIRD_PARTY.md` for dependency licenses.
 
 ---
 

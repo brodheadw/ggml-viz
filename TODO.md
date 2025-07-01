@@ -16,6 +16,7 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 
 ### 📱 Essential Missing Components
 - [x] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz` ✅ **COMPLETE** (220 LOC)
+- [ ] **Performance benchmarking** - Measure actual overhead vs. fabricated claims in README
 - [ ] **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh`
 - [ ] **Basic logging system** - `src/utils/logger.cpp` for debugging
 - [ ] **Configuration management** - `src/utils/config.cpp` for settings
@@ -116,15 +117,16 @@ scripts/run_tests.sh                        (0 LOC)   - Test execution
 
 **Current Priority (High Impact, Low Effort):**
 
-1. **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh` (quick wins for development workflow)
-2. **LLaMA demo implementation** - `examples/llama_demo/run_llama_vis.cpp` (showcase real integration)
-3. **Configuration file loading** - Complete the `--config` CLI option (infrastructure exists)
-4. **Basic logging system** - `src/utils/logger.cpp` (improves debugging)
+1. **Performance benchmarking** - Create benchmarking infrastructure and measure actual overhead (critical for credibility)
+2. **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh` (quick wins for development workflow)
+3. **LLaMA demo implementation** - `examples/llama_demo/run_llama_vis.cpp` (showcase real integration)
+4. **Configuration file loading** - Complete the `--config` CLI option (infrastructure exists)
+5. **Basic logging system** - `src/utils/logger.cpp` (improves debugging)
 
 **Next Priority (Phase 2):**
-5. **Live mode backend** - Complete the `--live` CLI option functionality
-6. **IPC layer** - Cross-platform shared memory for live streaming
-7. **Advanced visualizations** - Timeline, tensor stats, memory tracking
+6. **Live mode backend** - Complete the `--live` CLI option functionality
+7. **IPC layer** - Cross-platform shared memory for live streaming
+8. **Advanced visualizations** - Timeline, tensor stats, memory tracking
 
 **Current Status**: Core functionality is **production-ready**. Focus should be on developer experience and example integrations before adding new features.
 
