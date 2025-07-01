@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Performance Benchmarking Infrastructure** - Complete benchmarking system with statistical analysis
+- **BENCHMARKING.md** - Comprehensive guide for performance measurement  
 - Comprehensive User Guide (USER_GUIDE.md) with llama.cpp integration examples
 - Updated project documentation with accurate feature status
 - Fixed macOS build instructions with Metal backend workaround
@@ -19,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - macOS Metal shader compilation issues (use -DGGML_METAL=OFF as workaround)
+
+### Critical Issues Discovered
+- **Broken Event Capture System** - Instrumentation hooks not recording GGML operations (0 events captured)
+- **Environment Variable Issues** - GGML_VIZ_OUTPUT not being respected by test applications
 
 ## [0.1.0] - 2025-07-01
 

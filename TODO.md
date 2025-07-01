@@ -15,8 +15,8 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 ## 🎯 **Phase 1: Core Functionality (High Priority)**
 
 ### 📱 Essential Missing Components
-- [x] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz` ✅ **COMPLETE** (220 LOC)
-- [ ] **Performance benchmarking** - Measure actual overhead vs. fabricated claims in README
+- [x] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz` ✅ **COMPLETE** (220 LOC)  
+- [x] **Performance benchmarking** - Measure actual overhead vs. fabricated claims in README ✅ **COMPLETE** (infrastructure built, critical issues discovered)
 - [ ] **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh`
 - [ ] **Basic logging system** - `src/utils/logger.cpp` for debugging
 - [ ] **Configuration management** - `src/utils/config.cpp` for settings
@@ -117,7 +117,7 @@ scripts/run_tests.sh                        (0 LOC)   - Test execution
 
 **Current Priority (High Impact, Low Effort):**
 
-1. **Performance benchmarking** - Create benchmarking infrastructure and measure actual overhead (critical for credibility)
+1. **Fix broken event capture** - Hooks not recording GGML operations (CRITICAL BUG discovered via benchmarking)
 2. **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh` (quick wins for development workflow)
 3. **LLaMA demo implementation** - `examples/llama_demo/run_llama_vis.cpp` (showcase real integration)
 4. **Configuration file loading** - Complete the `--config` CLI option (infrastructure exists)
