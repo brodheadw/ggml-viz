@@ -1,2 +1,0 @@
-/usr/bin/ar qc libggml_hook.a CMakeFiles/ggml_hook.dir/instrumentation/ggml_hook.cpp.o
-/usr/bin/ranlib libggml_hook.a

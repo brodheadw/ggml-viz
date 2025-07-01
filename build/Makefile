@@ -172,19 +172,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named test_minimal_hooks
-
-# Build rule for target.
-test_minimal_hooks: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_minimal_hooks
-.PHONY : test_minimal_hooks
-
-# fast build rule for target.
-test_minimal_hooks/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_minimal_hooks.dir/build.make CMakeFiles/test_minimal_hooks.dir/build
-.PHONY : test_minimal_hooks/fast
-
-#=============================================================================
 # Target rules for targets named imgui
 
 # Build rule for target.
@@ -392,30 +379,6 @@ test_trace_reader/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/build
 .PHONY : test_trace_reader/fast
 
-test_minimal_hooks.o: test_minimal_hooks.c.o
-.PHONY : test_minimal_hooks.o
-
-# target to build an object file
-test_minimal_hooks.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_minimal_hooks.dir/build.make CMakeFiles/test_minimal_hooks.dir/test_minimal_hooks.c.o
-.PHONY : test_minimal_hooks.c.o
-
-test_minimal_hooks.i: test_minimal_hooks.c.i
-.PHONY : test_minimal_hooks.i
-
-# target to preprocess a source file
-test_minimal_hooks.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_minimal_hooks.dir/build.make CMakeFiles/test_minimal_hooks.dir/test_minimal_hooks.c.i
-.PHONY : test_minimal_hooks.c.i
-
-test_minimal_hooks.s: test_minimal_hooks.c.s
-.PHONY : test_minimal_hooks.s
-
-# target to generate assembly for a file
-test_minimal_hooks.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_minimal_hooks.dir/build.make CMakeFiles/test_minimal_hooks.dir/test_minimal_hooks.c.s
-.PHONY : test_minimal_hooks.c.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -444,11 +407,7 @@ help:
 	@echo "... glfw"
 	@echo "... imgui"
 	@echo "... test_ggml_hook"
-	@echo "... test_minimal_hooks"
 	@echo "... test_trace_reader"
-	@echo "... test_minimal_hooks.o"
-	@echo "... test_minimal_hooks.i"
-	@echo "... test_minimal_hooks.s"
 .PHONY : help
 
 

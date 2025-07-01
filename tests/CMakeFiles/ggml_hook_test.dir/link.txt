@@ -1,2 +1,0 @@
-/usr/bin/ar qc libggml_hook_test.a CMakeFiles/ggml_hook_test.dir/__/src/instrumentation/ggml_hook.cpp.o
-/usr/bin/ranlib libggml_hook_test.a
