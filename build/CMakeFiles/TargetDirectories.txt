@@ -1,3 +1,4 @@
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/test_minimal_hooks.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/test.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/edit_cache.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/rebuild_cache.dir

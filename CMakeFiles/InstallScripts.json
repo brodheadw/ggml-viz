@@ -1,0 +1,16 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-blas/cmake_install.cmake",
+		"/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/tests/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

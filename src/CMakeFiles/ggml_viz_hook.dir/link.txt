@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -arch arm64 -dynamiclib -Wl,-headerpad_max_install_names -compatibility_version 1.0.0 -current_version 0.1.0 -o libggml_viz_hook.0.1.dylib -install_name @rpath/libggml_viz_hook.1.dylib CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_hook.cpp.o CMakeFiles/ggml_viz_hook.dir/instrumentation/ggml_viz_init.cpp.o  -Wl,-rpath,@rpath

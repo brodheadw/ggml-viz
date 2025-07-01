@@ -119,6 +119,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/test_minimal_hooks.dir/DependInfo.cmake"
   "third_party/CMakeFiles/imgui.dir/DependInfo.cmake"
   "third_party/glfw/CMakeFiles/uninstall.dir/DependInfo.cmake"
   "third_party/glfw/src/CMakeFiles/glfw.dir/DependInfo.cmake"

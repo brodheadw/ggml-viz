@@ -27,3 +27,14 @@ add_subdirectory(third_party/ggml EXCLUDE_FROM_ALL)
 enable_testing()
 add_subdirectory(tests)
 
+
+# Minimal test with real GGML computation (no hook library to avoid conflicts)
+add_executable(test_minimal_hooks test_minimal_hooks.c)
+target_link_libraries(test_minimal_hooks PRIVATE 
+    ggml
+    ggml-cpu
+    ggml-base
+)
+target_include_directories(test_minimal_hooks PRIVATE ${CMAKE_SOURCE_DIR})
+target_compile_definitions(test_minimal_hooks PRIVATE GGML_VIZ_ENABLE_HOOKS)
+

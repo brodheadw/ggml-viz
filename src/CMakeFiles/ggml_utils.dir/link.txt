@@ -1,0 +1,2 @@
+/usr/bin/ar qc libggml_utils.a CMakeFiles/ggml_utils.dir/utils/config.cpp.o CMakeFiles/ggml_utils.dir/utils/logger.cpp.o CMakeFiles/ggml_utils.dir/utils/trace_reader.cpp.o
+/usr/bin/ranlib libggml_utils.a

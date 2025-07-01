@@ -11,6 +11,7 @@
 struct ggml_tensor;
 struct ggml_cgraph;
 struct ggml_compute_params;
+struct ggml_backend;
 
 // Conditional compilation for function overrides
 #ifndef GGML_VIZ_TEST_MODE
@@ -47,12 +48,14 @@ struct Event {
             const void* tensor_ptr;
             uint32_t op_type;
             size_t op_size;
+            const void* backend_ptr;
         } op;
 
         struct {
             const void* graph_ptr;
             uint32_t n_nodes;
             uint32_t n_threads;
+            const void* backend_ptr;
         } graph;
 
         struct {
@@ -106,10 +109,10 @@ public:
     size_t get_current_write_pos() const { return write_pos_.load(std::memory_order_acquire); }
     size_t get_current_read_pos() const { return read_pos_.load(std::memory_order_acquire); }
 
-    void on_graph_compute_begin(const ggml_cgraph* graph);
-    void on_graph_compute_end(const ggml_cgraph* graph);
-    void on_op_compute_begin(const ggml_tensor* tensor);
-    void on_op_compute_end(const ggml_tensor* tensor);
+    void on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
+    void on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
+    void on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
+    void on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
 
     // Destructor flushes data
     ~GGMLHook();
@@ -143,10 +146,10 @@ private:
 // Note: GGML_VIZ_API is defined at the top of the file
 
 extern "C" {
-    GGML_VIZ_API void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph);
-    GGML_VIZ_API void ggml_viz_hook_graph_compute_end(const ggml_cgraph* graph);
-    GGML_VIZ_API void ggml_viz_hook_op_compute_begin(const ggml_tensor* tensor);
-    GGML_VIZ_API void ggml_viz_hook_op_compute_end(const ggml_tensor* tensor);
+    GGML_VIZ_API void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
+    GGML_VIZ_API void ggml_viz_hook_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
+    GGML_VIZ_API void ggml_viz_hook_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
+    GGML_VIZ_API void ggml_viz_hook_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
     
     // Status functions for debugging
     GGML_VIZ_API bool ggml_viz_is_initialized();

@@ -239,42 +239,44 @@ void GGMLHook::flush_to_file() {
     fflush(output_file_);
 }
 
-void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph) {
+void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
     printf("[DEBUG] on_graph_compute_begin called, active: %d, enable_op_timing: %d\n", 
            active_.load(), config_.enable_op_timing);
     
     if (!active_.load() || !config_.enable_op_timing) return;
 
-    std::cout << "[DEBUG] Graph compute begin, nodes: " << graph->n_nodes << "\n";
+    std::cout << "[DEBUG] Graph compute begin, nodes: " << graph->n_nodes << ", backend: " << (backend ? "yes" : "no") << "\n";
 
     Event event = {};
     event.type = EventType::GRAPH_COMPUTE_BEGIN;
     event.timestamp_ns = get_timestamp_ns();
     event.thread_id = get_thread_id();
-    event.data.graph.graph_ptr = graph; // Assuming ggml_cgraph has a pointer field
+    event.data.graph.graph_ptr = graph;
     event.data.graph.n_nodes = graph->n_nodes;
     event.data.graph.n_threads = 1; // TODO: Get actual thread count
+    event.data.graph.backend_ptr = backend;
     event.label = nullptr;
 
     record_event(event);
 }
 
-void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph) {
+void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend) {
     if (!active_.load() || !config_.enable_op_timing) return;
 
     Event event = {};
     event.type = EventType::GRAPH_COMPUTE_END;
     event.timestamp_ns = get_timestamp_ns();
     event.thread_id = get_thread_id();
-    event.data.graph.graph_ptr = graph; // Assuming ggml_cgraph has a pointer field
+    event.data.graph.graph_ptr = graph;
     event.data.graph.n_nodes = graph->n_nodes;
     event.data.graph.n_threads = 1; // TODO: Get actual thread count
+    event.data.graph.backend_ptr = backend;
     event.label = nullptr;
 
     record_event(event);
 }
 
-void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor) {
+void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend) {
     if (!active_.load() || !config_.enable_op_timing) return;
 
     if (!config_.op_types_to_trace.empty()) {
@@ -289,7 +291,7 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor) {
         if (!found) return;
     }
 
-    std::cout << "[DEBUG] Op compute begin: " << tensor->name << " type: " << tensor->op << "\n";
+    std::cout << "[DEBUG] Op compute begin: " << tensor->name << " type: " << tensor->op << ", backend: " << (backend ? "yes" : "no") << "\n";
         
     Event event = {};
     event.type = EventType::OP_COMPUTE_BEGIN;
@@ -298,12 +300,13 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor) {
     event.data.op.tensor_ptr = tensor;
     event.data.op.op_type = tensor->op;
     event.data.op.op_size = ggml_nbytes_simple(tensor);
+    event.data.op.backend_ptr = backend;
     event.label = config_.enable_tensor_names ? tensor->name : nullptr;
     
     record_event(event);
 }
 
-void GGMLHook::on_op_compute_end(const ggml_tensor* tensor) {
+void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend) {
     if (!active_.load() || !config_.enable_op_timing) return;
     
     // Same filtering as begin
@@ -325,6 +328,7 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor) {
     event.data.op.tensor_ptr = tensor;
     event.data.op.op_type = tensor->op;
     event.data.op.op_size = ggml_nbytes_simple(tensor);
+    event.data.op.backend_ptr = backend;
     event.label = config_.enable_tensor_names ? tensor->name : nullptr;
     
     record_event(event);
@@ -332,21 +336,21 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor) {
 
 // C-style hook functions that can be called from ggml
 extern "C" {
-    void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph) {
-        printf("[DEBUG] C wrapper called: ggml_viz_hook_graph_compute_begin\n");
-        GGMLHook::instance().on_graph_compute_begin(graph);
+    void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
+        printf("[DEBUG] C wrapper called: ggml_viz_hook_graph_compute_begin with backend\n");
+        GGMLHook::instance().on_graph_compute_begin(graph, backend);
     }
 
-    void ggml_viz_hook_graph_compute_end(const ggml_cgraph* graph) {
-        GGMLHook::instance().on_graph_compute_end(graph);
+    void ggml_viz_hook_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend) {
+        GGMLHook::instance().on_graph_compute_end(graph, backend);
     }
 
-    void ggml_viz_hook_op_compute_begin(const ggml_tensor* tensor) {
-        GGMLHook::instance().on_op_compute_begin(tensor);
+    void ggml_viz_hook_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend) {
+        GGMLHook::instance().on_op_compute_begin(tensor, backend);
     }
 
-    void ggml_viz_hook_op_compute_end(const ggml_tensor* tensor) {
-        GGMLHook::instance().on_op_compute_end(tensor);
+    void ggml_viz_hook_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend) {
+        GGMLHook::instance().on_op_compute_end(tensor, backend);
     }
 }
 
@@ -365,12 +369,12 @@ extern "C" {
         
         if (hook.is_active()) {
             printf("[DEBUG] Intercepted ggml_backend_graph_compute, nodes: %d\n", cgraph->n_nodes);
-            hook.on_graph_compute_begin(cgraph);
+            hook.on_graph_compute_begin(cgraph, backend);
             
             // Call each node's begin hook
             for (int i = 0; i < cgraph->n_nodes; i++) {
                 if (cgraph->nodes[i]) {
-                    hook.on_op_compute_begin(cgraph->nodes[i]);
+                    hook.on_op_compute_begin(cgraph->nodes[i], backend);
                 }
             }
         }
@@ -396,11 +400,11 @@ extern "C" {
             // Call each node's end hook
             for (int i = 0; i < cgraph->n_nodes; i++) {
                 if (cgraph->nodes[i]) {
-                    hook.on_op_compute_end(cgraph->nodes[i]);
+                    hook.on_op_compute_end(cgraph->nodes[i], backend);
                 }
             }
             
-            hook.on_graph_compute_end(cgraph);
+            hook.on_graph_compute_end(cgraph, backend);
         }
         
         return result;
@@ -412,12 +416,12 @@ extern "C" {
         
         if (hook.is_active()) {
             printf("[DEBUG] Intercepted ggml_graph_compute, nodes: %d\n", cgraph->n_nodes);
-            hook.on_graph_compute_begin(cgraph);
+            hook.on_graph_compute_begin(cgraph, nullptr);
             
             // Call each node's begin hook
             for (int i = 0; i < cgraph->n_nodes; i++) {
                 if (cgraph->nodes[i]) {
-                    hook.on_op_compute_begin(cgraph->nodes[i]);
+                    hook.on_op_compute_begin(cgraph->nodes[i], nullptr);
                 }
             }
         }
@@ -441,11 +445,11 @@ extern "C" {
             // Call each node's end hook
             for (int i = 0; i < cgraph->n_nodes; i++) {
                 if (cgraph->nodes[i]) {
-                    hook.on_op_compute_end(cgraph->nodes[i]);
+                    hook.on_op_compute_end(cgraph->nodes[i], nullptr);
                 }
             }
             
-            hook.on_graph_compute_end(cgraph);
+            hook.on_graph_compute_end(cgraph, nullptr);
         }
     }
 }
