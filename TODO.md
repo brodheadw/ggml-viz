@@ -15,7 +15,7 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 ## 🎯 **Phase 1: Core Functionality (High Priority)**
 
 ### 📱 Essential Missing Components
-- [ ] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz`
+- [x] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz` ✅ **COMPLETE** (220 LOC)
 - [ ] **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh`
 - [ ] **Basic logging system** - `src/utils/logger.cpp` for debugging
 - [ ] **Configuration management** - `src/utils/config.cpp` for settings
@@ -79,6 +79,7 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 ```
 src/instrumentation/ggml_hook.cpp           (498 LOC) - Core hook system
 src/instrumentation/ggml_viz_init.cpp       (169 LOC) - Auto-initialization
+src/main.cpp                                (220 LOC) - Full CLI with help, validation
 src/frontend/imgui_app.cpp                  (593 LOC) - Main UI application
 src/frontend/imgui_widgets.cpp              (786 LOC) - Custom widgets
 src/utils/trace_reader.cpp                  (134 LOC) - File parsing
@@ -88,9 +89,10 @@ src/server/live_data_collector.hpp          (199 LOC) - Real-time streaming
 
 ### 🛠 **Partially Implemented**
 ```
-src/main.cpp                                (25 LOC)  - Needs CLI parsing
 scripts/inject_macos.sh                     (92 LOC)  - Library injection
 scripts/inject_linux.sh                     (81 LOC)  - Library injection
+Live mode functionality                     (CLI)      - Option exists, backend missing
+Configuration file loading                  (CLI)      - Option exists, loader missing
 ```
 
 ### ❌ **Empty Stubs (Need Implementation)**
@@ -112,17 +114,25 @@ scripts/run_tests.sh                        (0 LOC)   - Test execution
 
 ## 🎯 **Recommended Next Steps**
 
-1. **Start with Phase 1** - Focus on making the existing functionality more robust
-2. **Implement CLI parsing** - Make the main executable user-friendly
-3. **Add development scripts** - Enable proper development workflow
-4. **Create example integrations** - Demonstrate real-world usage
-5. **Only then move to Phase 2** - Advanced features after core is solid
+**Current Priority (High Impact, Low Effort):**
+
+1. **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh` (quick wins for development workflow)
+2. **LLaMA demo implementation** - `examples/llama_demo/run_llama_vis.cpp` (showcase real integration)
+3. **Configuration file loading** - Complete the `--config` CLI option (infrastructure exists)
+4. **Basic logging system** - `src/utils/logger.cpp` (improves debugging)
+
+**Next Priority (Phase 2):**
+5. **Live mode backend** - Complete the `--live` CLI option functionality
+6. **IPC layer** - Cross-platform shared memory for live streaming
+7. **Advanced visualizations** - Timeline, tensor stats, memory tracking
+
+**Current Status**: Core functionality is **production-ready**. Focus should be on developer experience and example integrations before adding new features.
 
 ---
 
 ## 📈 **Current Project Health**
 
-**Lines of Code**: 2,463 LOC implemented, ~1,000 LOC remaining for full feature set
+**Lines of Code**: 2,699 LOC implemented (~2,300 core + 400 supporting), ~800 LOC remaining for full feature set
 **Usability**: ✅ Core functionality works and is production-ready
 **Architecture**: ✅ Well-designed, extensible foundation
 **Documentation**: 🛠 Good README, needs more integration guides
