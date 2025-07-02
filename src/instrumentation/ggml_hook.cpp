@@ -57,6 +57,32 @@ namespace {
     }
 }
 
+// Private constructor with environment variable initialization
+GGMLHook::GGMLHook() {
+    // Initialize config with defaults, then override with environment variables
+    config_.enable_op_timing = true;
+    config_.enable_memory_tracking = false;
+    config_.enable_thread_tracking = false;
+    config_.enable_tensor_names = true;
+    config_.write_to_file = true;
+    config_.output_filename = "ggml_trace.bin";
+    config_.max_events = 1000000;
+
+    // Override with environment variables if present
+    const char* output_env = getenv("GGML_VIZ_OUTPUT");
+    if (output_env) {
+        config_.output_filename = output_env;
+    }
+
+    const char* max_events_env = getenv("GGML_VIZ_MAX_EVENTS");
+    if (max_events_env) {
+        config_.max_events = atoi(max_events_env);
+    }
+
+    printf("[DEBUG] GGMLHook constructor: output_filename=%s, max_events=%zu\n", 
+           config_.output_filename.c_str(), config_.max_events);
+}
+
 // Singleton implementation
 GGMLHook& GGMLHook::instance() {
     static GGMLHook instance;
@@ -73,9 +99,34 @@ void GGMLHook::configure(const HookConfig& config) {
 }
 
 void GGMLHook::start() {
+    // Check if hooks are disabled by environment variable
+    const char* disable_env = getenv("GGML_VIZ_DISABLE");
+    if (disable_env && (strcmp(disable_env, "1") == 0 || strcmp(disable_env, "true") == 0)) {
+        std::cout << "GGML Viz hooks disabled by GGML_VIZ_DISABLE environment variable.\n";
+        return;
+    }
+
     if (active_.exchange(true)) {
         std::cerr << "Warning: GGMLHook is already active.\n";
         return; // Already active
+    }
+
+    // Override config with environment variables if set
+    const char* output_env = getenv("GGML_VIZ_OUTPUT");
+    if (output_env) {
+        config_.output_filename = output_env;
+        config_.write_to_file = true;
+    }
+
+    const char* max_events_env = getenv("GGML_VIZ_MAX_EVENTS");
+    if (max_events_env) {
+        config_.max_events = atoi(max_events_env);
+    }
+
+    const char* verbose_env = getenv("GGML_VIZ_VERBOSE");
+    if (verbose_env && (strcmp(verbose_env, "1") == 0 || strcmp(verbose_env, "true") == 0)) {
+        // Enable verbose logging (we can add this feature later)
+        std::cout << "GGML Viz verbose mode enabled.\n";
     }
 
     start_time_ = std::chrono::steady_clock::now();
@@ -360,12 +411,18 @@ static enum ggml_status (*original_backend_graph_compute)(ggml_backend_t, struct
 static void (*original_graph_compute)(struct ggml_context*, struct ggml_cgraph*) = nullptr;
 static bool hooks_initialized = false;
 
-// Our intercepted functions - only compile when not in test mode
+// Our intercepted functions - only for production (non-test) builds
 #ifndef GGML_VIZ_TEST_MODE
 extern "C" {
     // Override ggml_backend_graph_compute
     GGML_VIZ_API enum ggml_status ggml_backend_graph_compute(ggml_backend_t backend, struct ggml_cgraph* cgraph) {
         auto& hook = GGMLHook::instance();
+        
+        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
+        if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            hook.start();
+        }
         
         if (hook.is_active()) {
             printf("[DEBUG] Intercepted ggml_backend_graph_compute, nodes: %d\n", cgraph->n_nodes);
@@ -414,6 +471,12 @@ extern "C" {
     GGML_VIZ_API void ggml_graph_compute(struct ggml_context* ctx, struct ggml_cgraph* cgraph) {
         auto& hook = GGMLHook::instance();
         
+        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
+        if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            hook.start();
+        }
+        
         if (hook.is_active()) {
             printf("[DEBUG] Intercepted ggml_graph_compute, nodes: %d\n", cgraph->n_nodes);
             hook.on_graph_compute_begin(cgraph, nullptr);
@@ -453,7 +516,7 @@ extern "C" {
         }
     }
 }
-#endif // GGML_VIZ_TEST_MODE
+#endif // !GGML_VIZ_TEST_MODE
 
 // Installation helpers
 bool install_ggml_hooks() {
@@ -472,7 +535,7 @@ bool install_ggml_hooks() {
         auto graph_func = (void (*)(struct ggml_context*, struct ggml_cgraph*))
             dlsym(handle, "ggml_graph_compute");
             
-        // Only store if they're different from our overrides
+        // Only store if they're different from our overrides (production mode only)
 #ifndef GGML_VIZ_TEST_MODE
         if (backend_func && backend_func != ggml_backend_graph_compute) {
             original_backend_graph_compute = backend_func;

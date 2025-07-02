@@ -11,14 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive User Guide (USER_GUIDE.md) with llama.cpp integration examples
 - Updated project documentation with accurate feature status
 - Fixed macOS build instructions with Metal backend workaround
+- Auto-start functionality when `GGML_VIZ_OUTPUT` environment variable is set
 
 ### Changed
 - Updated README.md with accurate feature status (removed incorrect "Beta" labels)
 - Corrected CLI usage documentation to reflect actual environment variable approach
 - Updated CLAUDE.md with current build process and known issues
+- Modified test mode to use manual hook calling instead of function interposition
 
 ### Fixed
+- **CRITICAL BUG**: Zero event recording issue in hook instrumentation system
+  - Fixed `GGML_VIZ_TEST_MODE` preventing function overrides from being compiled
+  - Added proper environment variable parsing (`GGML_VIZ_OUTPUT`, `GGML_VIZ_DISABLE`, `GGML_VIZ_MAX_EVENTS`)
+  - Implemented auto-start functionality for hooks when environment variables are set
+  - Test now records 60 events instead of 0, trace files now 3.3KB instead of 12 bytes (header only)
+  - Fixed duplicate symbol linker errors in test builds
 - macOS Metal shader compilation issues (use -DGGML_METAL=OFF as workaround)
+- GUI dependencies properly linked with 9 macOS frameworks (Cocoa, OpenGL, AppKit, etc.)
 
 ## [0.1.0] - 2025-07-01
 

@@ -70,7 +70,27 @@ int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
     for (int i=0; i<10; i++) {
+        // Manually call hooks around computation since function interception is disabled in test mode
+        ggml_viz::GGMLHook::instance().on_graph_compute_begin(gf, nullptr);
+        
+        // Call hooks for each operation
+        for (int j = 0; j < gf->n_nodes; j++) {
+            if (gf->nodes[j]) {
+                ggml_viz::GGMLHook::instance().on_op_compute_begin(gf->nodes[j], nullptr);
+            }
+        }
+        
+        // Actual computation
         ggml_graph_compute_with_ctx(ctx, gf, 4);
+        
+        // End hooks for each operation
+        for (int j = 0; j < gf->n_nodes; j++) {
+            if (gf->nodes[j]) {
+                ggml_viz::GGMLHook::instance().on_op_compute_end(gf->nodes[j], nullptr);
+            }
+        }
+        
+        ggml_viz::GGMLHook::instance().on_graph_compute_end(gf, nullptr);
         std::cout << " Iteration " << i+1 << " complete\n";
     }
 
