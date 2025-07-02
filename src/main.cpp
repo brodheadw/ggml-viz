@@ -1,5 +1,6 @@
 // src/main.cpp
 #include "frontend/imgui_app.hpp"
+#include "server/live_data_collector.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -7,6 +8,11 @@
 #include <cstring>
 #include <cstdlib>
 #include <getopt.h>
+#include <memory>
+#include <signal.h>
+#include <thread>
+#include <chrono>
+#include <atomic>
 
 namespace {
     const char* VERSION = "0.1.0";
@@ -143,10 +149,11 @@ namespace {
             }
         }
         
-        // Warn about unimplemented features
-        if (config.live_mode) {
-            std::cerr << "Warning: Live mode is not yet fully implemented.\n";
-            std::cerr << "         Currently only supports trace file loading.\n";
+        // Live mode validation
+        if (config.live_mode && !config.trace_file.empty()) {
+            std::cerr << "Error: Cannot specify trace file in live mode.\n";
+            std::cerr << "       Live mode captures data in real-time.\n";
+            exit(1);
         }
         
         if (!config.config_file.empty()) {
@@ -196,21 +203,64 @@ int main(int argc, char* argv[]) {
         // Setup environment based on config
         setup_environment(config);
         
-        // Create and configure the application
-        ggml_viz::ImGuiApp app;
-        
-        // Load trace file if specified
-        if (!config.trace_file.empty()) {
+        // Handle live mode vs regular mode
+        if (config.live_mode) {
+            // Live mode: Start server and run live visualization
             if (config.verbose) {
-                std::cout << "Loading trace file: " << config.trace_file << "\n";
+                std::cout << "Starting live mode on port " << config.port << "\n";
             }
-            app.load_trace_file(config.trace_file);
-        } else if (config.verbose) {
-            std::cout << "Starting with empty dashboard.\n";
+            
+            // Create live stream server
+            ggml_viz::LiveStreamServer::StreamConfig stream_config;
+            stream_config.port = config.port;
+            stream_config.host = "localhost";
+            
+            auto live_server = std::make_unique<ggml_viz::LiveStreamServer>(stream_config);
+            
+            // Setup signal handler for graceful shutdown
+            std::atomic<bool> shutdown_requested{false};
+            signal(SIGINT, [](int) { 
+                printf("\nShutdown requested...\n");
+                exit(0);
+            });
+            
+            // Start the live server
+            live_server->start();
+            
+            std::cout << "GGML Visualizer Live Mode Started\n";
+            std::cout << "================================\n";
+            std::cout << "Web Dashboard: http://localhost:" << config.port << "\n";
+            std::cout << "Event Stream:  http://localhost:" << config.port << "/events\n";
+            std::cout << "Status API:    http://localhost:" << config.port << "/status\n";
+            std::cout << "Press Ctrl+C to stop\n\n";
+            
+            // Keep server running until interrupted
+            while (live_server->is_running()) {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                
+                if (config.verbose && live_server->client_count() > 0) {
+                    std::cout << "Active clients: " << live_server->client_count() << "\n";
+                }
+            }
+            
+            live_server->stop();
+            return 0;
+            
+        } else {
+            // Regular mode: Load trace file and run ImGui application
+            ggml_viz::ImGuiApp app;
+            
+            if (!config.trace_file.empty()) {
+                if (config.verbose) {
+                    std::cout << "Loading trace file: " << config.trace_file << "\n";
+                }
+                app.load_trace_file(config.trace_file);
+            } else if (config.verbose) {
+                std::cout << "Starting with empty dashboard.\n";
+            }
+            
+            return app.run();
         }
-        
-        // Run the application
-        return app.run();
         
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
