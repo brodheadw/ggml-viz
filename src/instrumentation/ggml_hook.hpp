@@ -118,7 +118,7 @@ public:
     ~GGMLHook();
 
 private:
-    GGMLHook() = default;
+    GGMLHook(); // Constructor with environment variable initialization
     GGMLHook(const GGMLHook&) = delete;
     GGMLHook& operator=(const GGMLHook&) = delete;
 

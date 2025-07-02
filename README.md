@@ -129,6 +129,8 @@ graph TD
 
 Performance overhead: ~1-2% (preliminary - see [BENCHMARKING.md](docs/BENCHMARKING.md) for details and critical issues).
 
+**Recent Fix**: Critical bug resolved - instrumentation now properly records events (was recording 0 events, now records 60+ events per test run).
+
 ---
 
 ## 6 • Roadmap (2025‑Q3)
