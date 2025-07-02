@@ -127,7 +127,7 @@ graph TD
 
 *Metal backend disabled by default due to shader compilation issues
 
-Performance overhead has not yet been benchmarked. Measurements needed for production use.
+Performance overhead: ~1-2% (preliminary - see [BENCHMARKING.md](docs/BENCHMARKING.md) for details and critical issues).
 
 **Recent Fix**: Critical bug resolved - instrumentation now properly records events (was recording 0 events, now records 60+ events per test run).
 
@@ -180,6 +180,15 @@ make -j4
 - `GGML_VIZ_OUTPUT`: Output trace file (required for capture)
 - `GGML_VIZ_VERBOSE`: Enable verbose logging
 - `GGML_VIZ_DISABLE`: Disable instrumentation entirely
+
+### Performance benchmarking:
+```bash
+# Quick performance check
+./scripts/simple_benchmark.sh
+
+# Comprehensive analysis
+./scripts/benchmark.sh
+```
 
 ---
 
