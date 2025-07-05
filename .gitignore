@@ -16,4 +16,13 @@ imgui.ini
 # GGML visualization files
 *.ggmlviz
 
+METAL_BACKEND_PLAN.md
+METAL_HOOKS_WORKING_DEMO.md
+METAL_HOOKS_SUCCESS.md
+FINAL_VERIFICATION.md
+LIVE_MODE_STATUS.md
+
+*/models/
+models/
+
 .gitignore

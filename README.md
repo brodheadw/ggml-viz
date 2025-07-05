@@ -233,3 +233,35 @@ make -j4
 
 ### 🚀 **Current Usability**
 The instrumentation core is production-ready! You can instrument any GGML application by setting `GGML_VIZ_OUTPUT`, generate .ggmlviz trace files, and visualize them in the desktop UI. The CLI is fully functional with comprehensive help and validation.
+
+### 📦 **Project Structure & Submodules**
+
+The project is organized with a modular architecture using git submodules for external dependencies:
+
+#### **Core Directory Structure**
+```
+ggml-viz/
+├── src/                    # Main application source
+│   ├── instrumentation/    # Hook system & event capture
+│   ├── frontend/          # ImGui desktop interface  
+│   ├── server/            # Data collection & live streaming
+│   └── utils/             # Configuration & trace reading
+├── tests/                 # Unit tests & integration demos
+│   ├── assets/           # Sample trace files
+│   ├── demo/             # Working demonstrations
+│   └── integration/      # External tool integration
+└── third_party/          # Git submodules (see below)
+```
+
+#### **Git Submodules**
+- **`third_party/ggml`** - Fork of GGML tensor library with backend hooks ([brodheadw/willb-ggml](https://github.com/brodheadw/willb-ggml))
+- **`third_party/llama.cpp`** - Fork with Metal backend hooks ([brodheadw/llama.cpp](https://github.com/brodheadw/llama.cpp))
+- **`third_party/glfw`** - OpenGL window management (upstream)
+- **`third_party/imgui`** - Immediate mode GUI framework (upstream)
+
+#### **Metal Backend Integration**
+The llama.cpp submodule uses a custom fork with visualization hooks:
+- **Branch**: `ggml-viz-hooks` 
+- **Modifications**: Universal backend interception at `ggml_backend_graph_compute()`
+- **Coverage**: All backends (Metal, CPU, CUDA, Vulkan) through single integration point
+- **Compatibility**: Weak symbols allow dynamic library injection without code changes

@@ -86,7 +86,11 @@ GGMLHook::GGMLHook() {
 // Singleton implementation
 GGMLHook& GGMLHook::instance() {
     static GGMLHook instance;
-    printf("[DEBUG] GGMLHook::instance() called, returning %p\n", &instance);
+    static bool debug_printed = false;
+    if (!debug_printed) {
+        printf("[DEBUG] GGMLHook::instance() called, returning %p\n", &instance);
+        debug_printed = true;
+    }
     return instance;
 }
 
@@ -409,6 +413,7 @@ extern "C" {
 // Function pointers to original implementations
 static enum ggml_status (*original_backend_graph_compute)(ggml_backend_t, struct ggml_cgraph*) = nullptr;
 static void (*original_graph_compute)(struct ggml_context*, struct ggml_cgraph*) = nullptr;
+static enum ggml_status (*original_graph_compute_with_ctx)(struct ggml_context*, struct ggml_cgraph*, int) = nullptr;
 static bool hooks_initialized = false;
 
 // Our intercepted functions - only for production (non-test) builds
@@ -515,6 +520,52 @@ extern "C" {
             hook.on_graph_compute_end(cgraph, nullptr);
         }
     }
+    
+    // Override for ggml_graph_compute_with_ctx (commonly used in tests)
+    GGML_VIZ_API enum ggml_status ggml_graph_compute_with_ctx(struct ggml_context* ctx, struct ggml_cgraph* cgraph, int n_threads) {
+        auto& hook = GGMLHook::instance();
+        
+        if (hook.is_active()) {
+            printf("[DEBUG] Intercepted ggml_graph_compute_with_ctx, nodes: %d\n", cgraph->n_nodes);
+            hook.on_graph_compute_begin(cgraph, nullptr);
+            
+            // Call each node's begin hook
+            for (int i = 0; i < cgraph->n_nodes; i++) {
+                if (cgraph->nodes[i]) {
+                    hook.on_op_compute_begin(cgraph->nodes[i], nullptr);
+                }
+            }
+        }
+        
+        // Call the original function
+        enum ggml_status result = GGML_STATUS_SUCCESS;
+        
+        // Initialize function pointers if needed
+        if (!hooks_initialized) {
+            install_ggml_hooks();
+            hooks_initialized = true;
+        }
+        
+        if (original_graph_compute_with_ctx) {
+            result = original_graph_compute_with_ctx(ctx, cgraph, n_threads);
+        } else {
+            printf("[GGML_VIZ] Warning: No original ggml_graph_compute_with_ctx function found\n");
+            // Continue without calling original - this allows pure instrumentation mode
+        }
+        
+        if (hook.is_active()) {
+            // Call each node's end hook
+            for (int i = 0; i < cgraph->n_nodes; i++) {
+                if (cgraph->nodes[i]) {
+                    hook.on_op_compute_end(cgraph->nodes[i], nullptr);
+                }
+            }
+            
+            hook.on_graph_compute_end(cgraph, nullptr);
+        }
+        
+        return result;
+    }
 }
 #endif // !GGML_VIZ_TEST_MODE
 
@@ -534,6 +585,8 @@ bool install_ggml_hooks() {
             dlsym(handle, "ggml_backend_graph_compute");
         auto graph_func = (void (*)(struct ggml_context*, struct ggml_cgraph*))
             dlsym(handle, "ggml_graph_compute");
+        auto graph_with_ctx_func = (enum ggml_status (*)(struct ggml_context*, struct ggml_cgraph*, int))
+            dlsym(handle, "ggml_graph_compute_with_ctx");
             
         // Only store if they're different from our overrides (production mode only)
 #ifndef GGML_VIZ_TEST_MODE
@@ -545,6 +598,10 @@ bool install_ggml_hooks() {
             original_graph_compute = graph_func;
             printf("[GGML_VIZ] Found original ggml_graph_compute\n");
         }
+        if (graph_with_ctx_func && graph_with_ctx_func != ggml_graph_compute_with_ctx) {
+            original_graph_compute_with_ctx = graph_with_ctx_func;
+            printf("[GGML_VIZ] Found original ggml_graph_compute_with_ctx\n");
+        }
 #else
         // In test mode, just store the functions we find
         if (backend_func) {
@@ -554,6 +611,10 @@ bool install_ggml_hooks() {
         if (graph_func) {
             original_graph_compute = graph_func;
             printf("[GGML_VIZ] Found ggml_graph_compute (test mode)\n");
+        }
+        if (graph_with_ctx_func) {
+            original_graph_compute_with_ctx = graph_with_ctx_func;
+            printf("[GGML_VIZ] Found ggml_graph_compute_with_ctx (test mode)\n");
         }
 #endif
         
