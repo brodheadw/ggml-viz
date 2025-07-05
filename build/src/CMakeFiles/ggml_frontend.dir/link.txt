@@ -1,2 +1,0 @@
-/usr/bin/ar qc libggml_frontend.a CMakeFiles/ggml_frontend.dir/frontend/imgui_app.cpp.o CMakeFiles/ggml_frontend.dir/frontend/imgui_widgets.cpp.o
-/usr/bin/ranlib libggml_frontend.a
