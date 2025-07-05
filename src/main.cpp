@@ -22,6 +22,7 @@ namespace {
         std::string trace_file;
         std::string config_file;
         bool live_mode = false;
+        bool web_mode = false;
         bool verbose = false;
         bool show_help = false;
         bool show_version = false;
@@ -37,13 +38,15 @@ namespace {
                   << "  -h, --help              Show this help message and exit\n"
                   << "  -V, --version           Show version information and exit\n"
                   << "  -v, --verbose           Enable verbose logging output\n"
-                  << "  -l, --live              Enable live mode (capture real-time data)\n"
-                  << "  -p, --port PORT         Port for live data server (default: 8080)\n"
+                  << "  -l, --live              Enable live mode (real-time GUI updates)\n"
+                  << "  -w, --web               Enable web server mode (browser interface)\n"
+                  << "  -p, --port PORT         Port for web server (default: 8080)\n"
                   << "  -c, --config FILE       Load configuration from file\n\n"
                   << "Examples:\n"
                   << "  " << program_name << "                          # Open empty dashboard\n"
                   << "  " << program_name << " trace.ggmlviz           # Load specific trace file\n"
-                  << "  " << program_name << " --live --port 9000      # Live mode on port 9000\n"
+                  << "  " << program_name << " --live                   # Live mode with GUI\n"
+                  << "  " << program_name << " --web --port 9000       # Web server on port 9000\n"
                   << "  " << program_name << " --verbose trace.ggmlviz # Load with verbose output\n\n"
                   << "Environment Variables:\n"
                   << "  GGML_VIZ_OUTPUT         Output file for trace recording\n"
@@ -68,6 +71,7 @@ namespace {
             {"version", no_argument,       0, 'V'},
             {"verbose", no_argument,       0, 'v'},
             {"live",    no_argument,       0, 'l'},
+            {"web",     no_argument,       0, 'w'},
             {"port",    required_argument, 0, 'p'},
             {"config",  required_argument, 0, 'c'},
             {0, 0, 0, 0}
@@ -77,7 +81,7 @@ namespace {
         int c;
         
         // Parse options
-        while ((c = getopt_long(argc, argv, "hVvlp:c:", long_options, &option_index)) != -1) {
+        while ((c = getopt_long(argc, argv, "hVvlwp:c:", long_options, &option_index)) != -1) {
             switch (c) {
                 case 'h':
                     config.show_help = true;
@@ -90,6 +94,9 @@ namespace {
                     break;
                 case 'l':
                     config.live_mode = true;
+                    break;
+                case 'w':
+                    config.web_mode = true;
                     break;
                 case 'p':
                     try {
@@ -203,11 +210,14 @@ int main(int argc, char* argv[]) {
         // Setup environment based on config
         setup_environment(config);
         
-        // Handle live mode vs regular mode
-        if (config.live_mode) {
-            // Live mode: Start server and run live visualization
+        // Create and configure the application
+        ggml_viz::ImGuiApp app;
+        
+        // Handle different modes
+        if (config.web_mode) {
+            // Web server mode: Start HTTP server for browser interface
             if (config.verbose) {
-                std::cout << "Starting live mode on port " << config.port << "\n";
+                std::cout << "Starting web server mode on port " << config.port << "\n";
             }
             
             // Create live stream server
@@ -227,11 +237,11 @@ int main(int argc, char* argv[]) {
             // Start the live server
             live_server->start();
             
-            std::cout << "GGML Visualizer Live Mode Started\n";
-            std::cout << "================================\n";
-            std::cout << "Web Dashboard: http://localhost:" << config.port << "\n";
-            std::cout << "Event Stream:  http://localhost:" << config.port << "/events\n";
-            std::cout << "Status API:    http://localhost:" << config.port << "/status\n";
+            std::cout << "GGML Visualizer Web Server Started\n";
+            std::cout << "==================================\n";
+            std::cout << "🌐 Web Dashboard: http://localhost:" << config.port << "\n";
+            std::cout << "📡 Event Stream:  http://localhost:" << config.port << "/events\n";
+            std::cout << "📊 Status API:    http://localhost:" << config.port << "/status\n";
             std::cout << "Press Ctrl+C to stop\n\n";
             
             // Keep server running until interrupted
@@ -246,10 +256,24 @@ int main(int argc, char* argv[]) {
             live_server->stop();
             return 0;
             
-        } else {
-            // Regular mode: Load trace file and run ImGui application
-            ggml_viz::ImGuiApp app;
+        } else if (config.live_mode) {
+            // Live GUI mode: Enable real-time updates in ImGui
+            if (config.verbose) {
+                std::cout << "Starting live mode GUI...\n";
+                std::cout << "The GUI will automatically update with live GGML events.\n";
+                std::cout << "Run GGML applications with GGML_VIZ_OUTPUT=trace.ggmlviz\n";
+            }
             
+            app.enable_live_mode();
+            std::cout << "GGML Visualizer Live Mode (GUI)\n";
+            std::cout << "===============================\n";
+            std::cout << "✅ Live mode enabled in GUI\n";
+            std::cout << "🔧 Set environment: export GGML_VIZ_OUTPUT=trace.ggmlviz\n";
+            std::cout << "🦙 Run inference: ollama run model \"prompt\" or llama.cpp\n";
+            std::cout << "👁️  Watch real-time events in the GUI timeline and graph views\n\n";
+            
+        } else {
+            // Regular mode: Load trace file
             if (!config.trace_file.empty()) {
                 if (config.verbose) {
                     std::cout << "Loading trace file: " << config.trace_file << "\n";
@@ -258,9 +282,10 @@ int main(int argc, char* argv[]) {
             } else if (config.verbose) {
                 std::cout << "Starting with empty dashboard.\n";
             }
-            
-            return app.run();
         }
+        
+        // Run the GUI application
+        return app.run();
         
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

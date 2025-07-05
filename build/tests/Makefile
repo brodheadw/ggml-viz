@@ -213,6 +213,20 @@ test_trace_reader/fast:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/build
 .PHONY : test_trace_reader/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_metal_hooks.dir/rule:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_metal_hooks.dir/rule
+.PHONY : tests/CMakeFiles/test_metal_hooks.dir/rule
+
+# Convenience name for target.
+test_metal_hooks: tests/CMakeFiles/test_metal_hooks.dir/rule
+.PHONY : test_metal_hooks
+
+# fast build rule for target.
+test_metal_hooks/fast:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_metal_hooks.dir/build.make tests/CMakeFiles/test_metal_hooks.dir/build
+.PHONY : test_metal_hooks/fast
+
 __/src/instrumentation/ggml_hook.o: __/src/instrumentation/ggml_hook.cpp.o
 .PHONY : __/src/instrumentation/ggml_hook.o
 
@@ -236,6 +250,30 @@ __/src/instrumentation/ggml_hook.s: __/src/instrumentation/ggml_hook.cpp.s
 __/src/instrumentation/ggml_hook.cpp.s:
 	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/ggml_hook_test.dir/build.make tests/CMakeFiles/ggml_hook_test.dir/__/src/instrumentation/ggml_hook.cpp.s
 .PHONY : __/src/instrumentation/ggml_hook.cpp.s
+
+__/test_metal_hooks.o: __/test_metal_hooks.cpp.o
+.PHONY : __/test_metal_hooks.o
+
+# target to build an object file
+__/test_metal_hooks.cpp.o:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_metal_hooks.dir/build.make tests/CMakeFiles/test_metal_hooks.dir/__/test_metal_hooks.cpp.o
+.PHONY : __/test_metal_hooks.cpp.o
+
+__/test_metal_hooks.i: __/test_metal_hooks.cpp.i
+.PHONY : __/test_metal_hooks.i
+
+# target to preprocess a source file
+__/test_metal_hooks.cpp.i:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_metal_hooks.dir/build.make tests/CMakeFiles/test_metal_hooks.dir/__/test_metal_hooks.cpp.i
+.PHONY : __/test_metal_hooks.cpp.i
+
+__/test_metal_hooks.s: __/test_metal_hooks.cpp.s
+.PHONY : __/test_metal_hooks.s
+
+# target to generate assembly for a file
+__/test_metal_hooks.cpp.s:
+	cd /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_metal_hooks.dir/build.make tests/CMakeFiles/test_metal_hooks.dir/__/test_metal_hooks.cpp.s
+.PHONY : __/test_metal_hooks.cpp.s
 
 test_ggml_hook.o: test_ggml_hook.cpp.o
 .PHONY : test_ggml_hook.o
@@ -300,10 +338,14 @@ help:
 	@echo "... test"
 	@echo "... ggml_hook_test"
 	@echo "... test_ggml_hook"
+	@echo "... test_metal_hooks"
 	@echo "... test_trace_reader"
 	@echo "... __/src/instrumentation/ggml_hook.o"
 	@echo "... __/src/instrumentation/ggml_hook.i"
 	@echo "... __/src/instrumentation/ggml_hook.s"
+	@echo "... __/test_metal_hooks.o"
+	@echo "... __/test_metal_hooks.i"
+	@echo "... __/test_metal_hooks.s"
 	@echo "... test_ggml_hook.o"
 	@echo "... test_ggml_hook.i"
 	@echo "... test_ggml_hook.s"

@@ -1298,3 +1298,231 @@ events:
         
       exitCode: 2
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:250 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:557 (_OPENMP_GET_FLAGS)"
+      - "third_party/ggml/src/ggml-cpu/CMakeLists.txt:82 (find_package)"
+      - "third_party/ggml/src/CMakeLists.txt:365 (ggml_add_cpu_backend_variant_impl)"
+    description: "Detecting C OpenMP compiler info"
+    directories:
+      source: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-jU099R"
+      binary: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-jU099R"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: ""
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_C_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-jU099R'
+        
+        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_d9867/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_d9867.dir/build.make CMakeFiles/cmTC_d9867.dir/build
+        Building C object CMakeFiles/cmTC_d9867.dir/OpenMPTryFlag.c.o
+        /usr/bin/cc   -Xclang -fopenmp -std=gnu11 -arch arm64 -MD -MT CMakeFiles/cmTC_d9867.dir/OpenMPTryFlag.c.o -MF CMakeFiles/cmTC_d9867.dir/OpenMPTryFlag.c.o.d -o CMakeFiles/cmTC_d9867.dir/OpenMPTryFlag.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-jU099R/OpenMPTryFlag.c
+        /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-jU099R/OpenMPTryFlag.c:2:10: fatal error: 'omp.h' file not found
+            2 | #include <omp.h>
+              |          ^~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_d9867.dir/OpenMPTryFlag.c.o] Error 1
+        make: *** [cmTC_d9867/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:250 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:557 (_OPENMP_GET_FLAGS)"
+      - "third_party/ggml/src/ggml-cpu/CMakeLists.txt:82 (find_package)"
+      - "third_party/ggml/src/CMakeLists.txt:365 (ggml_add_cpu_backend_variant_impl)"
+    description: "Detecting CXX OpenMP compiler info"
+    directories:
+      source: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-eceNNT"
+      binary: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-eceNNT"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: ""
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_CXX_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-eceNNT'
+        
+        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_e5dd5/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_e5dd5.dir/build.make CMakeFiles/cmTC_e5dd5.dir/build
+        Building CXX object CMakeFiles/cmTC_e5dd5.dir/OpenMPTryFlag.cpp.o
+        /usr/bin/c++   -Xclang -fopenmp -std=c++17 -arch arm64 -MD -MT CMakeFiles/cmTC_e5dd5.dir/OpenMPTryFlag.cpp.o -MF CMakeFiles/cmTC_e5dd5.dir/OpenMPTryFlag.cpp.o.d -o CMakeFiles/cmTC_e5dd5.dir/OpenMPTryFlag.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-eceNNT/OpenMPTryFlag.cpp
+        /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-eceNNT/OpenMPTryFlag.cpp:2:10: fatal error: 'omp.h' file not found
+            2 | #include <omp.h>
+              |          ^~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_e5dd5.dir/OpenMPTryFlag.cpp.o] Error 1
+        make: *** [cmTC_e5dd5/fast] Error 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:250 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:557 (_OPENMP_GET_FLAGS)"
+      - "third_party/ggml/src/ggml-cpu/CMakeLists.txt:82 (find_package)"
+      - "third_party/ggml/src/CMakeLists.txt:365 (ggml_add_cpu_backend_variant_impl)"
+    description: "Detecting C OpenMP compiler info"
+    directories:
+      source: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-uT83kY"
+      binary: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-uT83kY"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: ""
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_C_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-uT83kY'
+        
+        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_e6f5d/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_e6f5d.dir/build.make CMakeFiles/cmTC_e6f5d.dir/build
+        Building C object CMakeFiles/cmTC_e6f5d.dir/OpenMPTryFlag.c.o
+        /usr/bin/cc   -Xclang -fopenmp -std=gnu11 -arch arm64 -MD -MT CMakeFiles/cmTC_e6f5d.dir/OpenMPTryFlag.c.o -MF CMakeFiles/cmTC_e6f5d.dir/OpenMPTryFlag.c.o.d -o CMakeFiles/cmTC_e6f5d.dir/OpenMPTryFlag.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-uT83kY/OpenMPTryFlag.c
+        /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-uT83kY/OpenMPTryFlag.c:2:10: fatal error: 'omp.h' file not found
+            2 | #include <omp.h>
+              |          ^~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_e6f5d.dir/OpenMPTryFlag.c.o] Error 1
+        make: *** [cmTC_e6f5d/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:250 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:557 (_OPENMP_GET_FLAGS)"
+      - "third_party/ggml/src/ggml-cpu/CMakeLists.txt:82 (find_package)"
+      - "third_party/ggml/src/CMakeLists.txt:365 (ggml_add_cpu_backend_variant_impl)"
+    description: "Detecting CXX OpenMP compiler info"
+    directories:
+      source: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-wG2Hes"
+      binary: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-wG2Hes"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: ""
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_CXX_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-wG2Hes'
+        
+        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_a5606/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_a5606.dir/build.make CMakeFiles/cmTC_a5606.dir/build
+        Building CXX object CMakeFiles/cmTC_a5606.dir/OpenMPTryFlag.cpp.o
+        /usr/bin/c++   -Xclang -fopenmp -std=c++17 -arch arm64 -MD -MT CMakeFiles/cmTC_a5606.dir/OpenMPTryFlag.cpp.o -MF CMakeFiles/cmTC_a5606.dir/OpenMPTryFlag.cpp.o.d -o CMakeFiles/cmTC_a5606.dir/OpenMPTryFlag.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-wG2Hes/OpenMPTryFlag.cpp
+        /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-wG2Hes/OpenMPTryFlag.cpp:2:10: fatal error: 'omp.h' file not found
+            2 | #include <omp.h>
+              |          ^~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_a5606.dir/OpenMPTryFlag.cpp.o] Error 1
+        make: *** [cmTC_a5606/fast] Error 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:250 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:557 (_OPENMP_GET_FLAGS)"
+      - "third_party/ggml/src/ggml-cpu/CMakeLists.txt:82 (find_package)"
+      - "third_party/ggml/src/CMakeLists.txt:365 (ggml_add_cpu_backend_variant_impl)"
+    description: "Detecting C OpenMP compiler info"
+    directories:
+      source: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-CVRg6v"
+      binary: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-CVRg6v"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: ""
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_C_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-CVRg6v'
+        
+        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_5713c/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_5713c.dir/build.make CMakeFiles/cmTC_5713c.dir/build
+        Building C object CMakeFiles/cmTC_5713c.dir/OpenMPTryFlag.c.o
+        /usr/bin/cc   -Xclang -fopenmp -std=gnu11 -arch arm64 -MD -MT CMakeFiles/cmTC_5713c.dir/OpenMPTryFlag.c.o -MF CMakeFiles/cmTC_5713c.dir/OpenMPTryFlag.c.o.d -o CMakeFiles/cmTC_5713c.dir/OpenMPTryFlag.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-CVRg6v/OpenMPTryFlag.c
+        /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-CVRg6v/OpenMPTryFlag.c:2:10: fatal error: 'omp.h' file not found
+            2 | #include <omp.h>
+              |          ^~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_5713c.dir/OpenMPTryFlag.c.o] Error 1
+        make: *** [cmTC_5713c/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:250 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:557 (_OPENMP_GET_FLAGS)"
+      - "third_party/ggml/src/ggml-cpu/CMakeLists.txt:82 (find_package)"
+      - "third_party/ggml/src/CMakeLists.txt:365 (ggml_add_cpu_backend_variant_impl)"
+    description: "Detecting CXX OpenMP compiler info"
+    directories:
+      source: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-aONnma"
+      binary: "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-aONnma"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: ""
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_CXX_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-aONnma'
+        
+        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_8b9e8/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_8b9e8.dir/build.make CMakeFiles/cmTC_8b9e8.dir/build
+        Building CXX object CMakeFiles/cmTC_8b9e8.dir/OpenMPTryFlag.cpp.o
+        /usr/bin/c++   -Xclang -fopenmp -std=c++17 -arch arm64 -MD -MT CMakeFiles/cmTC_8b9e8.dir/OpenMPTryFlag.cpp.o -MF CMakeFiles/cmTC_8b9e8.dir/OpenMPTryFlag.cpp.o.d -o CMakeFiles/cmTC_8b9e8.dir/OpenMPTryFlag.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-aONnma/OpenMPTryFlag.cpp
+        /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/CMakeFiles/CMakeScratch/TryCompile-aONnma/OpenMPTryFlag.cpp:2:10: fatal error: 'omp.h' file not found
+            2 | #include <omp.h>
+              |          ^~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_8b9e8.dir/OpenMPTryFlag.cpp.o] Error 1
+        make: *** [cmTC_8b9e8/fast] Error 2
+        
+      exitCode: 2
+...

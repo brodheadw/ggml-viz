@@ -77,6 +77,7 @@
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/ggml_hook_test.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test_ggml_hook.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test_trace_reader.dir
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test_metal_hooks.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/test.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/edit_cache.dir
 /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build/tests/CMakeFiles/rebuild_cache.dir

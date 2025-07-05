@@ -379,6 +379,19 @@ test_trace_reader/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_trace_reader.dir/build.make tests/CMakeFiles/test_trace_reader.dir/build
 .PHONY : test_trace_reader/fast
 
+#=============================================================================
+# Target rules for targets named test_metal_hooks
+
+# Build rule for target.
+test_metal_hooks: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_metal_hooks
+.PHONY : test_metal_hooks
+
+# fast build rule for target.
+test_metal_hooks/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_metal_hooks.dir/build.make tests/CMakeFiles/test_metal_hooks.dir/build
+.PHONY : test_metal_hooks/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -407,6 +420,7 @@ help:
 	@echo "... glfw"
 	@echo "... imgui"
 	@echo "... test_ggml_hook"
+	@echo "... test_metal_hooks"
 	@echo "... test_trace_reader"
 .PHONY : help
 

@@ -9,6 +9,8 @@
 #include <iostream>
 #include <memory>
 #include <chrono>
+#include <ctime>
+#include <sys/stat.h>
 
 namespace ggml_viz {
 
@@ -27,6 +29,12 @@ struct ImGuiApp::AppData {
     std::vector<Event> live_events;
     std::chrono::steady_clock::time_point last_live_update;
     std::atomic<bool> live_data_available{false};
+    
+    // File monitoring for external processes
+    std::string live_file_path;
+    std::time_t last_file_mod_time = 0;
+    size_t last_file_size = 0;
+    std::unique_ptr<TraceReader> live_trace_reader;
     
     // File browser state
     char file_path_buffer[512] = {0};
@@ -102,13 +110,65 @@ void ImGuiApp::enable_live_mode() {
     data_->live_events.clear();
     data_->last_live_update = std::chrono::steady_clock::now();
     data_->current_filename = "[Live Mode]";
-    std::cout << "[ImGuiApp] Live mode enabled" << std::endl;
+    
+    // Initialize and start the GGML hook
+    try {
+        auto& hook = GGMLHook::instance();
+        
+        // Configure the hook
+        HookConfig config;
+        config.enable_op_timing = true;
+        config.enable_memory_tracking = false;
+        config.enable_thread_tracking = false;
+        config.enable_tensor_names = true;
+        config.write_to_file = false;  // Don't write to file in live mode
+        config.max_events = 100000;   // Buffer for live events
+        
+        hook.configure(config);
+        hook.start();
+        
+        std::cout << "[ImGuiApp] Live mode enabled and GGML hook started" << std::endl;
+        std::cout << "[ImGuiApp] Hook active: " << (hook.is_active() ? "YES" : "NO") << std::endl;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "[ImGuiApp] Error starting GGML hook: " << e.what() << std::endl;
+    }
+    
+    // Set up file monitoring for external processes
+    // Look for GGML_VIZ_OUTPUT environment variable or check common paths
+    const char* env_output = std::getenv("GGML_VIZ_OUTPUT");
+    if (env_output) {
+        data_->live_file_path = env_output;
+        std::cout << "[ImGuiApp] Monitoring external trace file: " << data_->live_file_path << std::endl;
+    } else {
+        // Default to monitoring a temporary file
+        data_->live_file_path = "/tmp/ggml_viz_live.ggmlviz";
+        std::cout << "[ImGuiApp] No GGML_VIZ_OUTPUT set, monitoring default: " << data_->live_file_path << std::endl;
+    }
+    
+    // Initialize file monitoring state
+    data_->last_file_mod_time = 0;
+    data_->last_file_size = 0;
 }
 
 void ImGuiApp::disable_live_mode() {
     data_->live_mode = false;
     data_->live_events.clear();
-    std::cout << "[ImGuiApp] Live mode disabled" << std::endl;
+    
+    // Stop the GGML hook
+    try {
+        auto& hook = GGMLHook::instance();
+        hook.stop();
+        std::cout << "[ImGuiApp] Live mode disabled and GGML hook stopped" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "[ImGuiApp] Error stopping GGML hook: " << e.what() << std::endl;
+    }
+    
+    // Clean up file monitoring
+    data_->live_file_path.clear();
+    data_->last_file_mod_time = 0;
+    data_->last_file_size = 0;
+    data_->live_trace_reader.reset();
 }
 
 bool ImGuiApp::is_live_mode() const {
@@ -118,7 +178,7 @@ bool ImGuiApp::is_live_mode() const {
 void ImGuiApp::update_live_data() {
     if (!data_->live_mode) return;
     
-    // Try to get live events from GGMLHook
+    // Try to get live events from GGMLHook (in-process events)
     try {
         auto& hook = GGMLHook::instance();
         if (hook.is_active()) {
@@ -138,7 +198,61 @@ void ImGuiApp::update_live_data() {
             }
         }
     } catch (const std::exception& e) {
-        std::cerr << "[ImGuiApp] Error updating live data: " << e.what() << std::endl;
+        std::cerr << "[ImGuiApp] Error updating live data from hook: " << e.what() << std::endl;
+    }
+    
+    // Also monitor external trace file for events from external processes
+    // Only check file every 100ms to avoid too frequent polling
+    static auto last_file_check = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now();
+    auto time_since_last_check = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_file_check);
+    
+    if (!data_->live_file_path.empty() && time_since_last_check.count() > 100) {
+        last_file_check = now;
+        
+        try {
+            struct stat file_stat;
+            if (stat(data_->live_file_path.c_str(), &file_stat) == 0) {
+                // Check if file has been modified
+                if (file_stat.st_mtime > data_->last_file_mod_time || 
+                    static_cast<size_t>(file_stat.st_size) > data_->last_file_size) {
+                    
+                    // File has been updated, reload it
+                    auto new_trace_reader = std::make_unique<TraceReader>(data_->live_file_path);
+                    if (new_trace_reader->is_valid()) {
+                        const auto& events = new_trace_reader->events();
+                        
+                        // Only add new events (events beyond what we've already processed)
+                        size_t previous_event_count = data_->live_events.size();
+                        size_t start_idx = data_->live_trace_reader ? previous_event_count : 0;
+                        
+                        if (events.size() > start_idx) {
+                            data_->live_events.insert(data_->live_events.end(), 
+                                                     events.begin() + start_idx, events.end());
+                            data_->last_live_update = std::chrono::steady_clock::now();
+                            data_->live_data_available = true;
+                            
+                            std::cout << "[ImGuiApp] Loaded " << (events.size() - start_idx) 
+                                      << " new events from external file" << std::endl;
+                        }
+                        
+                        // Update file monitoring state
+                        data_->last_file_mod_time = file_stat.st_mtime;
+                        data_->last_file_size = file_stat.st_size;
+                        data_->live_trace_reader = std::move(new_trace_reader);
+                        
+                        // Limit buffer size
+                        const size_t max_events = 50000;
+                        if (data_->live_events.size() > max_events) {
+                            data_->live_events.erase(data_->live_events.begin(), 
+                                                   data_->live_events.begin() + (data_->live_events.size() - max_events));
+                        }
+                    }
+                }
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "[ImGuiApp] Error monitoring external file: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -173,7 +287,7 @@ void ImGuiApp::render_frame() {
         render_file_browser();
     }
     
-    if (data_->trace_loaded && data_->trace_reader) {
+    if ((data_->trace_loaded && data_->trace_reader) || data_->live_mode) {
         if (show_timeline_) {
             render_timeline_view();
         }
@@ -389,19 +503,57 @@ bool ImGuiApp::load_trace_file(const std::string& filename) {
 
 void ImGuiApp::render_timeline_view() {
     if (ImGui::Begin("Timeline View")) {
-        if (!data_->trace_reader) {
-            ImGui::Text("No trace loaded");
+        // Handle both live mode and loaded traces
+        const std::vector<Event>* events_ptr = nullptr;
+        size_t event_count = 0;
+        std::string mode_info;
+        
+        if (data_->live_mode) {
+            events_ptr = &data_->live_events;
+            event_count = data_->live_events.size();
+            mode_info = "[LIVE MODE]";
+            
+            // Show live mode status
+            auto& hook = GGMLHook::instance();
+            ImGui::Text("🔴 LIVE MODE - Hook Active: %s", hook.is_active() ? "YES" : "NO");
+            ImGui::Text("Live Events: %zu", event_count);
+            
+            if (event_count > 0) {
+                auto time_since_last = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - data_->last_live_update).count();
+                ImGui::Text("Last Update: %lld ms ago", time_since_last);
+            }
+            
+        } else if (data_->trace_reader) {
+            events_ptr = &data_->trace_reader->events();
+            event_count = data_->trace_reader->events().size();
+            mode_info = "[LOADED TRACE]";
+        } else {
+            ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
             return;
         }
         
-        const auto& events = data_->trace_reader->events();
-        auto op_timings = data_->trace_reader->get_op_timings();
+        const auto& events = *events_ptr;
         
         // Summary information
+        ImGui::Text("%s", mode_info.c_str());
         ImGui::Text("Total Events: %zu", events.size());
-        ImGui::Text("Total Duration: %.2f ms", data_->trace_reader->get_total_duration_ns() / 1e6);
-        ImGui::Text("Operations: %zu", op_timings.size());
+        
+        if (data_->live_mode) {
+            // Calculate duration from live events
+            if (events.size() >= 2) {
+                uint64_t duration_ns = events.back().timestamp_ns - events.front().timestamp_ns;
+                ImGui::Text("Duration: %.2f ms", duration_ns / 1e6);
+            } else {
+                ImGui::Text("Duration: N/A");
+            }
+            ImGui::Text("Operations: Live counting...");
+        } else if (data_->trace_reader) {
+            auto op_timings = data_->trace_reader->get_op_timings();
+            ImGui::Text("Total Duration: %.2f ms", data_->trace_reader->get_total_duration_ns() / 1e6);
+            ImGui::Text("Operations: %zu", op_timings.size());
+        }
         
         ImGui::Separator();
         
@@ -483,33 +635,39 @@ void ImGuiApp::render_timeline_view() {
             // Operation timings tab
             if (ImGui::BeginTabItem("Op Timings")) {
                 if (ImGui::BeginChild("OpTimings")) {
-                    ImGui::Columns(3, "OpTimingsColumns");
-                    ImGui::Text("Operation");
-                    ImGui::NextColumn();
-                    ImGui::Text("Duration");
-                    ImGui::NextColumn();
-                    ImGui::Text("%% of Total");
-                    ImGui::NextColumn();
-                    ImGui::Separator();
-                    
-                    uint64_t total_duration = data_->trace_reader->get_total_duration_ns();
-                    
-                    for (size_t i = 0; i < op_timings.size(); i++) {
-                        const auto& timing = op_timings[i];
+                    if (data_->live_mode) {
+                        ImGui::Text("Live mode: Operation timings calculated on-the-fly");
+                        ImGui::Text("Events collected: %zu", events.size());
+                        // TODO: Calculate live operation timings from events
+                    } else if (data_->trace_reader) {
+                        auto op_timings = data_->trace_reader->get_op_timings();
+                        uint64_t total_duration = data_->trace_reader->get_total_duration_ns();
                         
-                        ImGui::Text("%s", timing.name.c_str());
+                        ImGui::Columns(3, "OpTimingsColumns");
+                        ImGui::Text("Operation");
                         ImGui::NextColumn();
-                        ImGui::Text("%.3f ms", timing.duration_ns / 1e6);
+                        ImGui::Text("Duration");
                         ImGui::NextColumn();
-                        if (total_duration > 0) {
-                            ImGui::Text("%.1f%%", (timing.duration_ns * 100.0) / total_duration);
-                        } else {
-                            ImGui::Text("N/A");
+                        ImGui::Text("%% of Total");
+                        ImGui::NextColumn();
+                        ImGui::Separator();
+                        
+                        for (size_t i = 0; i < op_timings.size(); i++) {
+                            const auto& timing = op_timings[i];
+                            
+                            ImGui::Text("%s", timing.name.c_str());
+                            ImGui::NextColumn();
+                            ImGui::Text("%.3f ms", timing.duration_ns / 1e6);
+                            ImGui::NextColumn();
+                            if (total_duration > 0) {
+                                ImGui::Text("%.1f%%", (timing.duration_ns * 100.0) / total_duration);
+                            } else {
+                                ImGui::Text("N/A");
+                            }
+                            ImGui::NextColumn();
                         }
-                        ImGui::NextColumn();
+                        ImGui::Columns(1);
                     }
-                    
-                    ImGui::Columns(1);
                 }
                 ImGui::EndChild();
                 ImGui::EndTabItem();
@@ -523,26 +681,43 @@ void ImGuiApp::render_timeline_view() {
 
 void ImGuiApp::render_graph_view() {
     if (ImGui::Begin("Graph View")) {
-        if (!data_->trace_reader) {
-            ImGui::Text("No trace loaded");
+        if (!data_->trace_reader && !data_->live_mode) {
+            ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
             return;
         }
         
-        auto graph_events = data_->trace_reader->get_graph_events();
-        ImGui::Text("Graph Events: %zu", graph_events.size());
-        
-        ImGui::Separator();
-        
-        // Render the graph widget
-        graph_widget_.render("##compute_graph", data_->trace_reader.get(), graph_config_);
-        
-        // Sync selection between graph widget and other views
-        int selected_node = graph_widget_.get_selected_node();
-        if (selected_node >= 0) {
-            // In a complete implementation, we would map node selection back to events
-            // For now, just show that a node is selected
-            ImGui::Text("Selected Node: %d", selected_node);
+        if (data_->live_mode) {
+            ImGui::Text("🔴 LIVE MODE - Graph View");
+            ImGui::Text("Live events: %zu", data_->live_events.size());
+            
+            // Count graph events in live mode
+            size_t graph_begin_count = 0;
+            size_t graph_end_count = 0;
+            for (const auto& event : data_->live_events) {
+                if (event.type == EventType::GRAPH_COMPUTE_BEGIN) graph_begin_count++;
+                if (event.type == EventType::GRAPH_COMPUTE_END) graph_end_count++;
+            }
+            ImGui::Text("Graph Begin Events: %zu", graph_begin_count);
+            ImGui::Text("Graph End Events: %zu", graph_end_count);
+            ImGui::Text("Graph visualization for live mode coming soon...");
+            
+        } else if (data_->trace_reader) {
+            auto graph_events = data_->trace_reader->get_graph_events();
+            ImGui::Text("Graph Events: %zu", graph_events.size());
+            
+            ImGui::Separator();
+            
+            // Render the graph widget
+            graph_widget_.render("##compute_graph", data_->trace_reader.get(), graph_config_);
+            
+            // Sync selection between graph widget and other views
+            int selected_node = graph_widget_.get_selected_node();
+            if (selected_node >= 0) {
+                // In a complete implementation, we would map node selection back to events
+                // For now, just show that a node is selected
+                ImGui::Text("Selected Node: %d", selected_node);
+            }
         }
     }
     ImGui::End();
@@ -550,28 +725,51 @@ void ImGuiApp::render_graph_view() {
 
 void ImGuiApp::render_tensor_inspector() {
     if (ImGui::Begin("Tensor Inspector")) {
-        if (!data_->trace_reader) {
-            ImGui::Text("No trace loaded");
+        if (!data_->trace_reader && !data_->live_mode) {
+            ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
             return;
         }
         
-        if (data_->selected_event >= 0 && 
-            data_->selected_event < static_cast<int>(data_->trace_reader->events().size())) {
-            const auto& event = data_->trace_reader->events()[data_->selected_event];
+        if (data_->live_mode) {
+            ImGui::Text("🔴 LIVE MODE - Tensor Inspector");
+            ImGui::Text("Live events: %zu", data_->live_events.size());
             
-            ImGui::Text("Selected Event Details:");
-            ImGui::Text("Type: %d", static_cast<int>(event.type));
-            ImGui::Text("Timestamp: %llu ns", event.timestamp_ns);
-            ImGui::Text("Thread ID: %d", event.thread_id);
-            
-            if (event.label) {
-                ImGui::Text("Label: %s", event.label);
+            if (data_->selected_event >= 0 && 
+                data_->selected_event < static_cast<int>(data_->live_events.size())) {
+                const auto& event = data_->live_events[data_->selected_event];
+                
+                ImGui::Separator();
+                ImGui::Text("Selected Live Event Details:");
+                ImGui::Text("Type: %d", static_cast<int>(event.type));
+                ImGui::Text("Timestamp: %llu ns", event.timestamp_ns);
+                ImGui::Text("Thread ID: %d", event.thread_id);
+                
+                if (event.label) {
+                    ImGui::Text("Label: %s", event.label);
+                }
+            } else {
+                ImGui::Text("Select an event from the timeline to inspect");
             }
             
-            // TODO: Add tensor-specific inspection
-        } else {
-            ImGui::Text("Select an event from the timeline to inspect");
+        } else if (data_->trace_reader) {
+            if (data_->selected_event >= 0 && 
+                data_->selected_event < static_cast<int>(data_->trace_reader->events().size())) {
+                const auto& event = data_->trace_reader->events()[data_->selected_event];
+                
+                ImGui::Text("Selected Event Details:");
+                ImGui::Text("Type: %d", static_cast<int>(event.type));
+                ImGui::Text("Timestamp: %llu ns", event.timestamp_ns);
+                ImGui::Text("Thread ID: %d", event.thread_id);
+                
+                if (event.label) {
+                    ImGui::Text("Label: %s", event.label);
+                }
+                
+                // TODO: Add tensor-specific inspection
+            } else {
+                ImGui::Text("Select an event from the timeline to inspect");
+            }
         }
     }
     ImGui::End();
@@ -579,14 +777,19 @@ void ImGuiApp::render_tensor_inspector() {
 
 void ImGuiApp::render_memory_view() {
     if (ImGui::Begin("Memory View")) {
-        if (!data_->trace_reader) {
-            ImGui::Text("No trace loaded");
+        if (!data_->trace_reader && !data_->live_mode) {
+            ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
             return;
         }
         
-        // TODO: Implement memory visualization
-        ImGui::Text("Memory visualization coming soon...");
+        if (data_->live_mode) {
+            ImGui::Text("🔴 LIVE MODE - Memory View");
+            ImGui::Text("Live events: %zu", data_->live_events.size());
+            ImGui::Text("Memory visualization for live mode coming soon...");
+        } else {
+            ImGui::Text("Memory visualization coming soon...");
+        }
     }
     ImGui::End();
 }

@@ -135,4 +135,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "tests/CMakeFiles/ggml_hook_test.dir/DependInfo.cmake"
   "tests/CMakeFiles/test_ggml_hook.dir/DependInfo.cmake"
   "tests/CMakeFiles/test_trace_reader.dir/DependInfo.cmake"
+  "tests/CMakeFiles/test_metal_hooks.dir/DependInfo.cmake"
   )
