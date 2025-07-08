@@ -70,11 +70,15 @@ Copyright (c) 2014-2024 Omar Cornut
 ### GLFW
 This software uses GLFW, which is licensed under the zlib/libpng License.
 Copyright (c) 2002-2006 Marcus Geelnard
-Copyright (c) 2006-2019 Camilla Löwy
-
+Copyright (c) 2006-2019 Camilla Lï¿½wy
+Di
 ### GGML
 This software uses GGML, which is licensed under the MIT License.
 Copyright (c) 2022-2024 Georgi Gerganov
+
+### Llama.cpp
+This software uses llama.cpp, which is licensed under the MIT License.
+Copyright (c) 2023 Georgi Gerganov
 
 ---
 

@@ -9,6 +9,7 @@
 #include <iomanip>
 #ifndef _WIN32
 #include <dlfcn.h>  // for dlopen, dlsym, dlclose
+#include <unistd.h> // for fsync
 #endif
 
 namespace ggml_viz {
@@ -150,6 +151,10 @@ void GGMLHook::start() {
         fwrite(magic, 1, 8, output_file_);
         uint32_t version = 1;
         fwrite(&version, sizeof(version), 1, output_file_);
+        
+        // Ensure header is written to disk immediately
+        fflush(output_file_);
+        fsync(fileno(output_file_));
     }
 
     std::cout << "GGML Hook started. Output: " << config_.output_filename << "\n";
@@ -234,6 +239,8 @@ GGMLHook::~GGMLHook() {
 }
 
 void GGMLHook::record_event(const Event& event) {
+    printf("[DEBUG] record_event: START, active=%d\n", active_.load());
+    
     if (!active_.load()) {
         printf("[DEBUG] record_event: not active\n");
         return;
@@ -247,7 +254,9 @@ void GGMLHook::record_event(const Event& event) {
         return;
     }
 
+    printf("[DEBUG] record_event: About to get buffer position\n");
     const size_t pos = write_pos_.fetch_add(1, std::memory_order_relaxed) & (BUFFER_SIZE - 1);
+    printf("[DEBUG] record_event: Got buffer position %zu\n", pos);
     {
         std::lock_guard<std::mutex> lock(buffer_mutex_);
         event_buffer_[pos] = event;
@@ -300,14 +309,16 @@ void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backe
     
     if (!active_.load() || !config_.enable_op_timing) return;
 
-    std::cout << "[DEBUG] Graph compute begin, nodes: " << graph->n_nodes << ", backend: " << (backend ? "yes" : "no") << "\n";
+    // Add NULL check for graph pointer
+    int n_nodes = (graph != nullptr) ? graph->n_nodes : 0;
+    std::cout << "[DEBUG] Graph compute begin, nodes: " << n_nodes << ", backend: " << (backend ? "yes" : "no") << "\n";
 
     Event event = {};
     event.type = EventType::GRAPH_COMPUTE_BEGIN;
     event.timestamp_ns = get_timestamp_ns();
     event.thread_id = get_thread_id();
     event.data.graph.graph_ptr = graph;
-    event.data.graph.n_nodes = graph->n_nodes;
+    event.data.graph.n_nodes = n_nodes;
     event.data.graph.n_threads = 1; // TODO: Get actual thread count
     event.data.graph.backend_ptr = backend;
     event.label = nullptr;
@@ -318,12 +329,15 @@ void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backe
 void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend) {
     if (!active_.load() || !config_.enable_op_timing) return;
 
+    // Add NULL check for graph pointer
+    int n_nodes = (graph != nullptr) ? graph->n_nodes : 0;
+
     Event event = {};
     event.type = EventType::GRAPH_COMPUTE_END;
     event.timestamp_ns = get_timestamp_ns();
     event.thread_id = get_thread_id();
     event.data.graph.graph_ptr = graph;
-    event.data.graph.n_nodes = graph->n_nodes;
+    event.data.graph.n_nodes = n_nodes;
     event.data.graph.n_threads = 1; // TODO: Get actual thread count
     event.data.graph.backend_ptr = backend;
     event.label = nullptr;
@@ -333,6 +347,9 @@ void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend
 
 void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend) {
     if (!active_.load() || !config_.enable_op_timing) return;
+
+    // Add NULL check for tensor pointer
+    if (tensor == nullptr) return;
 
     if (!config_.op_types_to_trace.empty()) {
         // Check if this op type is in the filter list
@@ -363,6 +380,9 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend
 
 void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend) {
     if (!active_.load() || !config_.enable_op_timing) return;
+    
+    // Add NULL check for tensor pointer
+    if (tensor == nullptr) return;
     
     // Same filtering as begin
     if (!config_.op_types_to_trace.empty()) {
@@ -409,11 +429,11 @@ extern "C" {
     }
 }
 
-
 // Function pointers to original implementations
 static enum ggml_status (*original_backend_graph_compute)(ggml_backend_t, struct ggml_cgraph*) = nullptr;
 static void (*original_graph_compute)(struct ggml_context*, struct ggml_cgraph*) = nullptr;
 static enum ggml_status (*original_graph_compute_with_ctx)(struct ggml_context*, struct ggml_cgraph*, int) = nullptr;
+static enum ggml_status (*original_metal_graph_compute)(ggml_backend_t, struct ggml_cgraph*) = nullptr;
 static bool hooks_initialized = false;
 
 // Our intercepted functions - only for production (non-test) builds
@@ -566,6 +586,58 @@ extern "C" {
         
         return result;
     }
+    
+    // Override ggml_backend_metal_graph_compute for Metal backend GPU work
+    GGML_VIZ_API enum ggml_status ggml_backend_metal_graph_compute(ggml_backend_t backend, struct ggml_cgraph* cgraph) {
+        auto& hook = GGMLHook::instance();
+        
+        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
+        if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            hook.start();
+        }
+        
+        if (hook.is_active()) {
+            printf("[DEBUG] Intercepted ggml_backend_metal_graph_compute, nodes: %d\n", cgraph->n_nodes);
+            hook.on_graph_compute_begin(cgraph, backend);
+            
+            // Call each node's begin hook
+            for (int i = 0; i < cgraph->n_nodes; i++) {
+                if (cgraph->nodes[i]) {
+                    hook.on_op_compute_begin(cgraph->nodes[i], backend);
+                }
+            }
+        }
+        
+        // Call the original function
+        enum ggml_status result = GGML_STATUS_SUCCESS; // Default success
+        
+        // Initialize function pointers if needed
+        if (!hooks_initialized) {
+            install_ggml_hooks();
+            hooks_initialized = true;
+        }
+        
+        if (original_metal_graph_compute) {
+            result = original_metal_graph_compute(backend, cgraph);
+        } else {
+            printf("[GGML_VIZ] Warning: No original ggml_backend_metal_graph_compute function found\n");
+            // Continue without calling original - this allows pure instrumentation mode
+        }
+        
+        if (hook.is_active()) {
+            // Call each node's end hook
+            for (int i = 0; i < cgraph->n_nodes; i++) {
+                if (cgraph->nodes[i]) {
+                    hook.on_op_compute_end(cgraph->nodes[i], backend);
+                }
+            }
+            
+            hook.on_graph_compute_end(cgraph, backend);
+        }
+        
+        return result;
+    }
 }
 #endif // !GGML_VIZ_TEST_MODE
 
@@ -587,6 +659,8 @@ bool install_ggml_hooks() {
             dlsym(handle, "ggml_graph_compute");
         auto graph_with_ctx_func = (enum ggml_status (*)(struct ggml_context*, struct ggml_cgraph*, int))
             dlsym(handle, "ggml_graph_compute_with_ctx");
+        auto metal_func = (enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*))
+            dlsym(handle, "ggml_backend_metal_graph_compute");
             
         // Only store if they're different from our overrides (production mode only)
 #ifndef GGML_VIZ_TEST_MODE
@@ -602,6 +676,10 @@ bool install_ggml_hooks() {
             original_graph_compute_with_ctx = graph_with_ctx_func;
             printf("[GGML_VIZ] Found original ggml_graph_compute_with_ctx\n");
         }
+        if (metal_func && metal_func != ggml_backend_metal_graph_compute) {
+            original_metal_graph_compute = metal_func;
+            printf("[GGML_VIZ] Found original ggml_backend_metal_graph_compute\n");
+        }
 #else
         // In test mode, just store the functions we find
         if (backend_func) {
@@ -615,6 +693,10 @@ bool install_ggml_hooks() {
         if (graph_with_ctx_func) {
             original_graph_compute_with_ctx = graph_with_ctx_func;
             printf("[GGML_VIZ] Found ggml_graph_compute_with_ctx (test mode)\n");
+        }
+        if (metal_func) {
+            original_metal_graph_compute = metal_func;
+            printf("[GGML_VIZ] Found ggml_backend_metal_graph_compute (test mode)\n");
         }
 #endif
         
@@ -638,3 +720,26 @@ bool uninstall_ggml_hooks() {
 }
 
 } // namespace ggml_viz
+
+// C wrapper functions for Objective-C interposer
+extern "C" {
+    void* ggml_viz_get_hook_instance(void) {
+        return &ggml_viz::GGMLHook::instance();
+    }
+    
+    int ggml_viz_hook_is_active(void* hook) {
+        return static_cast<ggml_viz::GGMLHook*>(hook)->is_active() ? 1 : 0;
+    }
+    
+    void ggml_viz_hook_start(void* hook) {
+        static_cast<ggml_viz::GGMLHook*>(hook)->start();
+    }
+    
+    void ggml_viz_hook_on_graph_compute_begin(void* hook, const struct ggml_cgraph* graph, const void* backend) {
+        static_cast<ggml_viz::GGMLHook*>(hook)->on_graph_compute_begin(graph, static_cast<const ggml_backend*>(backend));
+    }
+    
+    void ggml_viz_hook_on_graph_compute_end(void* hook, const struct ggml_cgraph* graph, const void* backend) {
+        static_cast<ggml_viz::GGMLHook*>(hook)->on_graph_compute_end(graph, static_cast<const ggml_backend*>(backend));
+    }
+}

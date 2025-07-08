@@ -26,6 +26,7 @@ namespace {
         bool verbose = false;
         bool show_help = false;
         bool show_version = false;
+        bool no_hook = false;
         int port = 8080;
     };
     
@@ -41,7 +42,8 @@ namespace {
                   << "  -l, --live              Enable live mode (real-time GUI updates)\n"
                   << "  -w, --web               Enable web server mode (browser interface)\n"
                   << "  -p, --port PORT         Port for web server (default: 8080)\n"
-                  << "  -c, --config FILE       Load configuration from file\n\n"
+                  << "  -c, --config FILE       Load configuration from file\n"
+                  << "      --no-hook           Disable built-in hook (for external hook usage)\n\n"
                   << "Examples:\n"
                   << "  " << program_name << "                          # Open empty dashboard\n"
                   << "  " << program_name << " trace.ggmlviz           # Load specific trace file\n"
@@ -74,6 +76,7 @@ namespace {
             {"web",     no_argument,       0, 'w'},
             {"port",    required_argument, 0, 'p'},
             {"config",  required_argument, 0, 'c'},
+            {"no-hook", no_argument,       0, 1000},
             {0, 0, 0, 0}
         };
         
@@ -112,6 +115,9 @@ namespace {
                     break;
                 case 'c':
                     config.config_file = optarg;
+                    break;
+                case 1000:  // --no-hook
+                    config.no_hook = true;
                     break;
                 case '?':
                     // getopt_long already printed an error message
@@ -157,9 +163,10 @@ namespace {
         }
         
         // Live mode validation
-        if (config.live_mode && !config.trace_file.empty()) {
-            std::cerr << "Error: Cannot specify trace file in live mode.\n";
+        if (config.live_mode && !config.trace_file.empty() && !config.no_hook) {
+            std::cerr << "Error: Cannot specify trace file in live mode without --no-hook.\n";
             std::cerr << "       Live mode captures data in real-time.\n";
+            std::cerr << "       Use --no-hook to monitor an external trace file.\n";
             exit(1);
         }
         
@@ -264,7 +271,7 @@ int main(int argc, char* argv[]) {
                 std::cout << "Run GGML applications with GGML_VIZ_OUTPUT=trace.ggmlviz\n";
             }
             
-            app.enable_live_mode();
+            app.enable_live_mode(config.no_hook, config.trace_file);
             std::cout << "GGML Visualizer Live Mode (GUI)\n";
             std::cout << "===============================\n";
             std::cout << "✅ Live mode enabled in GUI\n";

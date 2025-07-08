@@ -1,0 +1,13 @@
+digraph G {
+  newrank = true;
+  rankdir = TB;
+  "0x149400470" [ style = filled; fillcolor = white; shape = record; label="matmul_AB (f32)|0 [1024, 1024] | <x>X*Y"; ]
+  "0x1498005e0" [ style = filled; fillcolor = white; shape = record; label="final_result (f32)|1 [1024, 1024] | <x>x+y"; ]
+  "0x148800020" [ style = filled; fillcolor = pink; shape = record; label="<x>matrix_A (f32)|CONST 0 [1024, 1024]"; ]
+  "0x148c00190" [ style = filled; fillcolor = pink; shape = record; label="<x>matrix_B (f32)|CONST 1 [1024, 1024]"; ]
+  "0x149000300" [ style = filled; fillcolor = pink; shape = record; label="<x>matrix_C (f32)|CONST 2 [1024, 1024]"; ]
+  "0x148800020":x -> "0x149400470":x [ arrowhead = vee; style = solid; label = "src 0"; ]
+  "0x148c00190":x -> "0x149400470":x [ arrowhead = vee; style = solid; label = "src 1"; ]
+  "0x149400470":x -> "0x1498005e0":x [ arrowhead = vee; style = solid; label = "src 0"; ]
+  "0x149000300":x -> "0x1498005e0":x [ arrowhead = vee; style = solid; label = "src 1"; ]
+}

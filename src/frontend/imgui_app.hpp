@@ -21,7 +21,7 @@ public:
     bool load_trace_file(const std::string& filename);
     
     // Enable live mode - reads from running GGML applications
-    void enable_live_mode();
+    void enable_live_mode(bool no_hook = false, const std::string& trace_file = "");
     void disable_live_mode();
     bool is_live_mode() const;
 

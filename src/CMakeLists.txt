@@ -78,6 +78,8 @@ add_library(ggml_viz_hook SHARED
     instrumentation/ggml_hook.cpp
     instrumentation/ggml_hook.hpp
     instrumentation/ggml_viz_init.cpp
+    instrumentation/dyld_interpose_simple.cpp
+    instrumentation/sched_interpose.mm
 )
 
 target_include_directories(ggml_viz_hook
@@ -100,6 +102,10 @@ target_link_libraries(ggml_viz_hook
       Threads::Threads
       # Note: We intentionally don't link ggml-base to allow function interception
 )
+
+# Allow unresolved symbols for scheduler interposition
+target_link_options(ggml_viz_hook PRIVATE
+    "-undefined" "dynamic_lookup")
 
 # Set shared library properties
 # Hide all symbols by default, only export what we explicitly mark

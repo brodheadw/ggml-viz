@@ -105,45 +105,54 @@ bool ImGuiApp::initialize() {
     return true;
 }
 
-void ImGuiApp::enable_live_mode() {
+void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
     data_->live_mode = true;
     data_->live_events.clear();
     data_->last_live_update = std::chrono::steady_clock::now();
     data_->current_filename = "[Live Mode]";
     
-    // Initialize and start the GGML hook
-    try {
-        auto& hook = GGMLHook::instance();
-        
-        // Configure the hook
-        HookConfig config;
-        config.enable_op_timing = true;
-        config.enable_memory_tracking = false;
-        config.enable_thread_tracking = false;
-        config.enable_tensor_names = true;
-        config.write_to_file = false;  // Don't write to file in live mode
-        config.max_events = 100000;   // Buffer for live events
-        
-        hook.configure(config);
-        hook.start();
-        
-        std::cout << "[ImGuiApp] Live mode enabled and GGML hook started" << std::endl;
-        std::cout << "[ImGuiApp] Hook active: " << (hook.is_active() ? "YES" : "NO") << std::endl;
-        
-    } catch (const std::exception& e) {
-        std::cerr << "[ImGuiApp] Error starting GGML hook: " << e.what() << std::endl;
+    // Initialize and start the GGML hook (unless disabled)
+    if (!no_hook) {
+        try {
+            auto& hook = GGMLHook::instance();
+            
+            // Configure the hook
+            HookConfig config;
+            config.enable_op_timing = true;
+            config.enable_memory_tracking = false;
+            config.enable_thread_tracking = false;
+            config.enable_tensor_names = true;
+            config.write_to_file = false;  // Don't write to file in live mode
+            config.max_events = 100000;   // Buffer for live events
+            
+            hook.configure(config);
+            hook.start();
+            
+            std::cout << "[ImGuiApp] Live mode enabled and GGML hook started" << std::endl;
+            std::cout << "[ImGuiApp] Hook active: " << (hook.is_active() ? "YES" : "NO") << std::endl;
+            
+        } catch (const std::exception& e) {
+            std::cerr << "[ImGuiApp] Error starting GGML hook: " << e.what() << std::endl;
+        }
+    } else {
+        std::cout << "[ImGuiApp] Live mode enabled with built-in hook disabled (--no-hook)" << std::endl;
     }
     
     // Set up file monitoring for external processes
-    // Look for GGML_VIZ_OUTPUT environment variable or check common paths
-    const char* env_output = std::getenv("GGML_VIZ_OUTPUT");
-    if (env_output) {
-        data_->live_file_path = env_output;
-        std::cout << "[ImGuiApp] Monitoring external trace file: " << data_->live_file_path << std::endl;
+    // Priority: 1) command line argument, 2) environment variable, 3) default
+    if (!trace_file.empty()) {
+        data_->live_file_path = trace_file;
+        std::cout << "[ImGuiApp] Monitoring specified trace file: " << data_->live_file_path << std::endl;
     } else {
-        // Default to monitoring a temporary file
-        data_->live_file_path = "/tmp/ggml_viz_live.ggmlviz";
-        std::cout << "[ImGuiApp] No GGML_VIZ_OUTPUT set, monitoring default: " << data_->live_file_path << std::endl;
+        const char* env_output = std::getenv("GGML_VIZ_OUTPUT");
+        if (env_output) {
+            data_->live_file_path = env_output;
+            std::cout << "[ImGuiApp] Monitoring external trace file: " << data_->live_file_path << std::endl;
+        } else {
+            // Default to monitoring a temporary file
+            data_->live_file_path = "test.ggmlviz";
+            std::cout << "[ImGuiApp] No GGML_VIZ_OUTPUT set, monitoring default: " << data_->live_file_path << std::endl;
+        }
     }
     
     // Initialize file monitoring state
@@ -155,11 +164,15 @@ void ImGuiApp::disable_live_mode() {
     data_->live_mode = false;
     data_->live_events.clear();
     
-    // Stop the GGML hook
+    // Stop the GGML hook (if it was started)
     try {
         auto& hook = GGMLHook::instance();
-        hook.stop();
-        std::cout << "[ImGuiApp] Live mode disabled and GGML hook stopped" << std::endl;
+        if (hook.is_active()) {
+            hook.stop();
+            std::cout << "[ImGuiApp] Live mode disabled and GGML hook stopped" << std::endl;
+        } else {
+            std::cout << "[ImGuiApp] Live mode disabled (hook was not active)" << std::endl;
+        }
     } catch (const std::exception& e) {
         std::cerr << "[ImGuiApp] Error stopping GGML hook: " << e.what() << std::endl;
     }

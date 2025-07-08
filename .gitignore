@@ -2,27 +2,59 @@ CLAUDE.md
 .DS_Store
 */build
 
-# Test executables
-test_*
-simple_*
-*_test
-*.o
-
 # Build artifacts
 bin/
 build/
+*.o
+*.a
+*.so
+*.dylib
+
+# Runtime files
 imgui.ini
+core.*
 
-# GGML visualization files
-*.ggmlviz
+# Test traces and temporary files (organized in tests/ subdirectories)
+# But keep the test structure itself
+tests/traces/*.ggmlviz
+tests/temp/*
+!tests/traces/.gitkeep
+!tests/temp/.gitkeep
 
+# Root directory should not contain test files
+/*.ggmlviz
+/test_*
+/simple_*
+/*_test
+/*.dot
+/controlled_test*
+/minimal_test*
+
+# Documentation files (keep organized ones)
 METAL_BACKEND_PLAN.md
 METAL_HOOKS_WORKING_DEMO.md
 METAL_HOOKS_SUCCESS.md
 FINAL_VERIFICATION.md
 LIVE_MODE_STATUS.md
 
+# Models (large files)
 */models/
 models/
+
+# Mac specific
+.DS_Store
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
 
 .gitignore

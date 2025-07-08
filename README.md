@@ -14,8 +14,6 @@ Low‑level LLM runtimes like **GGML** squeeze every last drop of performance ou
 - **Attention heat‑map** – for transformer models, display token‑by‑token attention scores (planned)
 - **Memory arena explorer** – visualise GGMLʼs bump‑allocator, fragmentation, and live/peak usage (planned)
 
-If youʼve ever wondered **"why did my 70‑B model drop to 1 tok/s after the 2‑k context mark?"** this tool will give you answers.
-
 ---
 
 ## 2 • Features at a glance
@@ -83,10 +81,10 @@ The dashboard opens automatically showing the captured inference data. For more 
 ./bin/ggml-viz --help
 
 # Load existing trace file
-./bin/ggml-viz trace.ggmlviz
+./bin/ggml-viz tests/traces/trace.ggmlviz
 
 # Enable verbose output
-./bin/ggml-viz --verbose trace.ggmlviz
+./bin/ggml-viz --verbose tests/traces/trace.ggmlviz
 
 # Live mode (experimental - not fully implemented)
 ./bin/ggml-viz --live --port 8080
@@ -104,10 +102,10 @@ graph TD
   Hook --> IPC{{Zero‑Copy IPC}}
   IPC -->|shared structs| ServerCore([
     Data‑Collector
-    • ring‑buffer events\n    • tensor snapshots
+    • ring-buffer events    • tensor snapshots
   ])
   ServerCore --> API{{gRPC / WebSocket}}
-  API --> UI[Electron/ImGui front‑end]
+  API --> UI[Planned Electron/ImGui front‑end ]
 ```
 
 - **Instrumentation hooks** – small patch (\~200 LOC) to GGML that triggers a callback before/after each op; can be upstreamed.
@@ -169,8 +167,8 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=OFF
 make -j4
 
 # Test
-./bin/test_ggml_hook
-./bin/test_trace_reader test_trace.ggmlviz
+./tests/manual/test_ggml_hook
+./bin/test_trace_reader tests/assets/test_trace.ggmlviz
 
 # Run visualizer
 ./bin/ggml-viz --help
@@ -204,27 +202,26 @@ make -j4
 - Anthropicʼs **Neuronpedia** and Metaʼs **LLM Transparency Tool** for paving the way in model interpretability.
 - **Tracy** profiler for showing that real‑time, low‑overhead visualisation is possible in C++.
 
-*"The best debugger is a graphical one you can keep open while your model runs."* – Someone on Discord
+*"The best debugger is a graphical one you can keep open while your model runs."* – Me
 
 ---
 
 ## Implementation Status Summary
 
-### ✅ **Working Components (2,300+ LOC)**
-- **Core instrumentation** (498 LOC) - Complete GGML hook infrastructure with event capture
-- **Auto-initialization** (169 LOC) - Environment variable configuration system
-- **Main executable** (220 LOC) - Full CLI argument parsing with help, version, validation
-- **ImGui frontend** (593 LOC) - Desktop UI with trace file loading capability
-- **Custom ImGui widgets** (786 LOC) - Graph visualization, timeline, inspection widgets
-- **Trace reader** (134 LOC) - Binary .ggmlviz file parsing and event replay
-- **Data collection system** (324 LOC) - Event processing and live data streaming
+### ✅ **Working Components**
+- **Core instrumentation** - Complete GGML hook infrastructure with event capture
+- **Auto-initialization** - Environment variable configuration system
+- **Main executable** - Full CLI argument parsing with help, version, validation
+- **ImGui frontend** - Desktop UI with trace file loading capability
+- **Custom ImGui widgets** - Graph visualization, timeline, inspection widgets
+- **Trace reader** - Binary .ggmlviz file parsing and event replay
 
 ### 🛠 **Partially Implemented**  
 - **Injection scripts** - macOS/Linux dynamic library injection helpers
 - **Live mode** - CLI option exists but functionality not fully implemented
 - **Configuration loading** - CLI option exists but not implemented
 
-### ❌ **Empty Stubs Requiring Implementation (0 LOC each)**
+### ❌ **Empty Stubs Requiring Implementation**
 - **IPC layer** - Cross-platform shared memory (POSIX/Windows)
 - **Plugin system** - Dynamic loading API and plugin loader
 - **gRPC server** - Remote API for live data access
@@ -232,26 +229,11 @@ make -j4
 - **Development tools** - Linting, formatting, and test execution scripts
 
 ### 🚀 **Current Usability**
-The instrumentation core is production-ready! You can instrument any GGML application by setting `GGML_VIZ_OUTPUT`, generate .ggmlviz trace files, and visualize them in the desktop UI. The CLI is fully functional with comprehensive help and validation.
+The instrumentation core is production-ready. You should be able to instrument any GGML application by setting `GGML_VIZ_OUTPUT`, generate .ggmlviz trace files, and visualize them in the desktop UI. If this isn't the case, please contact the maintainers (Will Brodhead). The CLI is fully functional with comprehensive help and validation.
 
 ### 📦 **Project Structure & Submodules**
 
 The project is organized with a modular architecture using git submodules for external dependencies:
-
-#### **Core Directory Structure**
-```
-ggml-viz/
-├── src/                    # Main application source
-│   ├── instrumentation/    # Hook system & event capture
-│   ├── frontend/          # ImGui desktop interface  
-│   ├── server/            # Data collection & live streaming
-│   └── utils/             # Configuration & trace reading
-├── tests/                 # Unit tests & integration demos
-│   ├── assets/           # Sample trace files
-│   ├── demo/             # Working demonstrations
-│   └── integration/      # External tool integration
-└── third_party/          # Git submodules (see below)
-```
 
 #### **Git Submodules**
 - **`third_party/ggml`** - Fork of GGML tensor library with backend hooks ([brodheadw/willb-ggml](https://github.com/brodheadw/willb-ggml))
