@@ -80,18 +80,11 @@ GGMLHook::GGMLHook() {
         config_.max_events = atoi(max_events_env);
     }
 
-    printf("[DEBUG] GGMLHook constructor: output_filename=%s, max_events=%zu\n", 
-           config_.output_filename.c_str(), config_.max_events);
 }
 
 // Singleton implementation
 GGMLHook& GGMLHook::instance() {
     static GGMLHook instance;
-    static bool debug_printed = false;
-    if (!debug_printed) {
-        printf("[DEBUG] GGMLHook::instance() called, returning %p\n", &instance);
-        debug_printed = true;
-    }
     return instance;
 }
 
@@ -164,8 +157,6 @@ void GGMLHook::stop() {
     if (!active_.exchange(false)) {
         return;
     }
-    
-    printf("[DEBUG] GGMLHook::stop() called from somewhere\n");
 
     if (output_file_) {
         std::lock_guard<std::mutex> lock(file_mutex_);
@@ -234,38 +225,30 @@ std::vector<Event> GGMLHook::consume_available_events() {
 }
 
 GGMLHook::~GGMLHook() {
-    printf("[DEBUG] GGMLHook destructor called\n");
     stop();
 }
 
 void GGMLHook::record_event(const Event& event) {
-    printf("[DEBUG] record_event: START, active=%d\n", active_.load());
-    
     if (!active_.load()) {
-        printf("[DEBUG] record_event: not active\n");
         return;
     }
 
     if (event_count_.load() >= config_.max_events) {
-        printf("[DEBUG] Event limit reached: %zu >= %zu, stopping trace\n", 
-               event_count_.load(), config_.max_events);
         std::cerr << "Warning: Event limit reached, stopping trace\n";
         stop();
         return;
     }
 
-    printf("[DEBUG] record_event: About to get buffer position\n");
     const size_t pos = write_pos_.fetch_add(1, std::memory_order_relaxed) & (BUFFER_SIZE - 1);
-    printf("[DEBUG] record_event: Got buffer position %zu\n", pos);
     {
         std::lock_guard<std::mutex> lock(buffer_mutex_);
         event_buffer_[pos] = event;
     }
     
     // Increment event count after storing the event
-    event_count_.fetch_add(1, std::memory_order_relaxed);
+    size_t new_count = event_count_.fetch_add(1, std::memory_order_relaxed) + 1;
 
-    if (config_.write_to_file && (event_count_.load() & 0xFFF) == 0) {
+    if (config_.write_to_file && (new_count & 0xFFF) == 0) {
         std::lock_guard<std::mutex> lock(file_mutex_);
         flush_to_file();
     }
@@ -304,14 +287,10 @@ void GGMLHook::flush_to_file() {
 }
 
 void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
-    printf("[DEBUG] on_graph_compute_begin called, active: %d, enable_op_timing: %d\n", 
-           active_.load(), config_.enable_op_timing);
-    
     if (!active_.load() || !config_.enable_op_timing) return;
 
     // Add NULL check for graph pointer
     int n_nodes = (graph != nullptr) ? graph->n_nodes : 0;
-    std::cout << "[DEBUG] Graph compute begin, nodes: " << n_nodes << ", backend: " << (backend ? "yes" : "no") << "\n";
 
     Event event = {};
     event.type = EventType::GRAPH_COMPUTE_BEGIN;
@@ -412,7 +391,6 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* 
 // C-style hook functions that can be called from ggml
 extern "C" {
     void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
-        printf("[DEBUG] C wrapper called: ggml_viz_hook_graph_compute_begin with backend\n");
         GGMLHook::instance().on_graph_compute_begin(graph, backend);
     }
 

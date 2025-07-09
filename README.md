@@ -1,249 +1,387 @@
 # GGML Visualizer
 
-> **A cross‑platform, real‑time dashboard that lets you *****see***** whatʼs happening inside any GGML‑based runtime — from **`llama.cpp`** on a Raspberry Pi to **`whisper.cpp`** on an M3 Max.**
+> **A cross-platform, real-time dashboard for visualizing GGML-based LLM runtimes like llama.cpp and whisper.cpp with Metal, CUDA, and CPU backend support.**
 
 ---
 
-## 1 • Why does this exist?
+## 🚀 Quick Start (2 Minutes)
 
-Low‑level LLM runtimes like **GGML** squeeze every last drop of performance out of CPUs and GPUs, but they are effectively a black box once the code is running.  Developers currently debug with `printf()` and perf logs — painful and time‑consuming. **GGML Visualizer** removes that friction:
-
-- **Graph view** – static compute graph visualization with operation details
-- **Timeline view** – flame‑chart showing kernel launches, thread utilisation, cache misses, and memory transfers (planned)
-- **Tensor inspector** – peek at activations, histograms, min/max, sparsity, quantisation buckets (planned)
-- **Attention heat‑map** – for transformer models, display token‑by‑token attention scores (planned)
-- **Memory arena explorer** – visualise GGMLʼs bump‑allocator, fragmentation, and live/peak usage (planned)
-
----
-
-## 2 • Features at a glance
-
-| Category          | Feature                                            | Status    |
-| ----------------- | -------------------------------------------------- | --------- |
-| **Graph**         | Static compute graph visualization                 | ✅ Ready   |
-|                   | Static graph import (`ggml_graph_dump_dot`)        | ✅ Ready   |
-| **Timeline**      | CPU & GPU kernel flame‑chart                       | ❌ Planned |
-| **Tensors**       | On‑hover statistics (mean/σ, sparsity)             | ❌ Planned |
-|                   | Slice & heat‑map viewer                            | ❌ Planned |
-| **Memory**        | Live arena visual + peak tracker                   | ❌ Planned |
-| **Model‑aware**   | Transformer attention & KV‑cache heat‑maps         | ❌ Planned |
-| **Extensibility** | Plugin SDK (C++)                                   | ❌ Planned |
-
-Legend: ✅ = production‑ready · 🛠 = usable but polishing · ❌ = stub / not started
-
----
-
-## 3 • Quick start (90 seconds)
-
-### 3.1 Install prerequisites
+### Prerequisites
 
 ```bash
-# Ubuntu / Debian
-sudo apt update && sudo apt install -y git cmake build-essential libgl1-mesa-dev libxinerama-dev libxcursor-dev libxi-dev libxrandr-dev
-
-# macOS (Apple Silicon & Intel)
+# macOS
 brew install cmake glfw
+
+# Ubuntu/Debian
+sudo apt update && sudo apt install -y git cmake build-essential libgl1-mesa-dev libxinerama-dev libxcursor-dev libxi-dev libxrandr-dev
 ```
 
-### 3.2 Build
+### Build
 
 ```bash
-git clone --recursive [REPOSITORY_URL_TBD]
-cd ggml‑visualizer
+git clone --recursive https://github.com/your-org/ggml-visualizer
+cd ggml-visualizer
 mkdir build && cd build
 
-# macOS (recommended due to Metal shader issues)
+# macOS (Metal disabled due to shader issues)
 cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=OFF
+make -j4
 
-# Linux/Ubuntu
+# Linux
 cmake .. -DCMAKE_BUILD_TYPE=Release
-
-make -j4
+make -j$(nproc)
 ```
 
-### 3.3 Capture and visualize llama.cpp
+### Test the Installation
 
 ```bash
-# Step 1: Set environment variable for trace capture
-export GGML_VIZ_OUTPUT=my_llama_trace.ggmlviz
-
-# Step 2: Run llama.cpp normally (hooks auto-capture GGML events)
-/path/to/llama.cpp/main -m /path/to/model.gguf -p "Hello, world!" -n 50
-
-# Step 3: Visualize the captured data
-./bin/ggml-viz my_llama_trace.ggmlviz
-```
-
-The dashboard opens automatically showing the captured inference data. For more options:
-
-```bash
-# Show help with all available options
+# Verify build
+./bin/ggml-viz --version
 ./bin/ggml-viz --help
 
-# Load existing trace file
-./bin/ggml-viz tests/traces/trace.ggmlviz
-
-# Enable verbose output
-./bin/ggml-viz --verbose tests/traces/trace.ggmlviz
-
-# Live mode (experimental - not fully implemented)
-./bin/ggml-viz --live --port 8080
-```
-
----
-
-## 4 • Architecture
-
-```mermaid
-graph TD
-  subgraph GGML Runtime
-    GG[ggml.c] -->|calls| Hook[Instrumentation hooks]
-  end
-  Hook --> IPC{{Zero‑Copy IPC}}
-  IPC -->|shared structs| ServerCore([
-    Data‑Collector
-    • ring-buffer events    • tensor snapshots
-  ])
-  ServerCore --> API{{gRPC / WebSocket}}
-  API --> UI[Planned Electron/ImGui front‑end ]
-```
-
-- **Instrumentation hooks** – small patch (\~200 LOC) to GGML that triggers a callback before/after each op; can be upstreamed.
-- **Zero‑Copy IPC** – POSIX shared memory on Unix, `CreateFileMapping` on Windows (planned).
-- **Front‑end** – Desktop ImGui build (ready) or optional Electron client for web dashboards (planned).
-
----
-
-## 5 • Supported platforms & back‑ends
-
-| OS / Arch                  | CPU (AVX2 / AVX‑512 / NEON) | GPU (Metal / CUDA / Vulkan) | Status |
-| -------------------------- | --------------------------- | --------------------------- | ------ |
-| macOS 12+ (arm64, x86\_64) | ✔︎                          | CPU only*                   | ✅      |
-| Linux (x86\_64)            | ✔︎                          | CUDA 11+, Vulkan            | ✅      |
-| Windows 10+                | ✔︎                          | Untested                     | ❌     |
-| Raspberry Pi 5             | ✔︎ (NEON)                   | —                           | 🛠     |
-
-*Metal backend disabled by default due to shader compilation issues
-
-Performance overhead: ~1-2% (preliminary - see [BENCHMARKING.md](docs/BENCHMARKING.md) for details and critical issues).
-
-**Recent Fix**: Critical bug resolved - instrumentation now properly records events (was recording 0 events, now records 60+ events per test run).
-
----
-
-## 6 • Roadmap (2025‑Q3)
-
-- **0.2.0** – Full CPU timeline, tensor heat‑maps, KV‑cache view ✨
-- **0.3.0** – GPU kernel correlation (Metal & CUDA), quant‑bucket viewer
-- **0.4.0** – Plugin SDK v1 + Python bindings
-- **0.5.0** – Attention & router head visualizer, export to SVG/JSON
-
-See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for granular history.
-
----
-
-## 7 • Contributing
-
-1. **Pick an issue** tagged `good‑first‑issue` or `help‑wanted`.
-2. Fork → feature branch → PR. Code formatting and linting TBD.
-3. Each PR must pass tests (CI setup TBD).
-4. Follow project guidelines (contributor agreement TBD).
-
-We especially welcome:
-
-- **UI/UX polishers** (ImGui, Dear ImGui Docking, Electron)
-- **GPU devs** – Metal shaders & CUDA kernel tracing
-- **Model folk** – attention/KV‑cache interpretation modules
-
----
-
-## 8 • Quick reference
-
-### Build and test commands:
-```bash
-# Build (macOS)
-mkdir -p build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=OFF
-make -j4
-
-# Test
+# Run basic test
 ./tests/manual/test_ggml_hook
-./bin/test_trace_reader tests/assets/test_trace.ggmlviz
 
-# Run visualizer
-./bin/ggml-viz --help
+# Load sample trace file
+./bin/ggml-viz tests/assets/test_trace.ggmlviz
 ```
 
-### Environment variables:
-- `GGML_VIZ_OUTPUT`: Output trace file (required for capture)
-- `GGML_VIZ_VERBOSE`: Enable verbose logging
-- `GGML_VIZ_DISABLE`: Disable instrumentation entirely
+---
 
-### Performance benchmarking:
+## 📖 Complete Tutorial
+
+### Method 1: External Hook Injection (Recommended)
+
+This method works with **any existing llama.cpp installation** without recompiling.
+
+#### Step 1: Download a Test Model
+```bash
+# Download a small model for testing
+mkdir -p models && cd models
+wget https://huggingface.co/microsoft/DialoGPT-medium/resolve/main/pytorch_model.bin
+# Or use any .gguf model you have
+```
+
+#### Step 2: Start the GUI (Terminal 1)
+```bash
+# Start GUI in live mode, monitoring trace.ggmlviz
+./bin/ggml-viz --live tests/traces/trace.ggmlviz --no-hook --verbose
+```
+
+You should see:
+```
+[ImGuiApp] Live mode enabled with built-in hook disabled (--no-hook)
+[ImGuiApp] Monitoring specified trace file: tests/traces/trace.ggmlviz
+```
+
+#### Step 3: Run llama.cpp with Hooks (Terminal 2)
+```bash
+# Set environment variables
+export GGML_VIZ_OUTPUT=tests/traces/trace.ggmlviz
+export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib
+
+# Run any llama.cpp binary with hooks
+./third_party/llama.cpp/build/bin/llama-cli \
+  -m models/your-model.gguf \
+  -p "Hello, world!" \
+  -n 10 \
+  --no-display-prompt
+```
+
+#### Step 4: Watch Real-Time Visualization
+The GUI automatically updates as events are captured. You should see:
+- **Hook Output**: `[GGML_VIZ] *** SCHEDULER INTERPOSED ***` messages
+- **GUI Updates**: `[ImGuiApp] Loaded X new events from external file`
+- **Live Dashboard**: Real-time graph and timeline visualization
+
+### Method 2: Direct Integration (Advanced)
+
+For custom GGML applications or development purposes.
+
+#### Step 1: Link Against ggml-viz
+```cmake
+# In your CMakeLists.txt
+find_package(ggml_viz REQUIRED)
+target_link_libraries(your_app ggml_viz_hook)
+```
+
+#### Step 2: Initialize in Code
+```cpp
+#include "ggml_hook.hpp"
+
+int main() {
+    // Start instrumentation
+    auto& hook = ggml_viz::GGMLHook::instance();
+    hook.start();
+    
+    // Your GGML code here
+    ggml_graph_compute(ctx, graph);
+    
+    // Stop instrumentation
+    hook.stop();
+    return 0;
+}
+```
+
+#### Step 3: Set Output and Run
+```bash
+export GGML_VIZ_OUTPUT=my_trace.ggmlviz
+./your_app
+
+# Visualize results
+./bin/ggml-viz my_trace.ggmlviz
+```
+
+---
+
+## 🛠 Advanced Usage
+
+### Live Mode with Custom File Paths
+```bash
+# Terminal 1: GUI monitoring specific file
+./bin/ggml-viz --live /path/to/my_trace.ggmlviz --no-hook
+
+# Terminal 2: Application writing to same file
+export GGML_VIZ_OUTPUT=/path/to/my_trace.ggmlviz
+export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib
+./your_ggml_app
+```
+
+### Web Server Mode (Experimental)
+```bash
+# Start web server
+./bin/ggml-viz --web --port 8080
+
+# Access dashboard at http://localhost:8080
+```
+
+### Batch Processing Multiple Traces
+```bash
+# Process all traces in directory
+for trace in tests/traces/*.ggmlviz; do
+    echo "Processing $trace..."
+    ./bin/ggml-viz "$trace" --export-stats
+done
+```
+
+### Performance Benchmarking
 ```bash
 # Quick performance check
 ./scripts/simple_benchmark.sh
 
-# Comprehensive analysis
-./scripts/benchmark.sh
+# Detailed benchmarking with overhead measurement
+./scripts/benchmark.sh --with-visualization
 ```
 
 ---
 
-## 9 • License
+## 🎯 Environment Variables
 
-`ggml‑visualizer` is licensed under the **Apache 2.0** license. See `docs/THIRD_PARTY.md` for dependency licenses.
+### Essential Variables
+- **`GGML_VIZ_OUTPUT`**: Output trace file path (required for capture)
+- **`DYLD_INSERT_LIBRARIES`**: macOS library injection path
+- **`LD_PRELOAD`**: Linux library injection path (when available)
+
+### Configuration Variables
+- **`GGML_VIZ_VERBOSE`**: Enable verbose logging output
+- **`GGML_VIZ_DISABLE`**: Disable instrumentation entirely  
+- **`GGML_VIZ_MAX_EVENTS`**: Maximum events to capture (default: 10,000,000)
+
+### Advanced Debugging
+- **`GGML_VIZ_OP_TIMING`**: Enable operation timing (default: true)
+- **`GGML_VIZ_MEMORY_TRACKING`**: Enable memory tracking (default: false)
+- **`GGML_VIZ_THREAD_TRACKING`**: Enable thread tracking (default: false)
+- **`GGML_VIZ_TENSOR_NAMES`**: Capture tensor names (default: true)
 
 ---
 
-## 10 • Credits & Inspiration
+## 📊 Understanding the Output
 
-- Georgi Gerganov and the **GGML** community for the blazing‑fast runtime.
-- Anthropicʼs **Neuronpedia** and Metaʼs **LLM Transparency Tool** for paving the way in model interpretability.
-- **Tracy** profiler for showing that real‑time, low‑overhead visualisation is possible in C++.
+### Trace File Format
+Generated `.ggmlviz` files contain:
+- **Header**: Magic bytes "GGMLVIZ1" + metadata
+- **Events**: Binary event stream with timestamps
+- **Statistics**: Performance metrics and summaries
 
-*"The best debugger is a graphical one you can keep open while your model runs."* – Me
+### Event Types Captured
+- **Graph Compute**: Begin/end of graph execution
+- **Operation Timing**: Individual operation performance
+- **Memory Events**: Allocation/deallocation tracking
+- **Backend Events**: GPU kernel launches and synchronization
+
+### GUI Components
+- **Timeline View**: Flame chart showing operation execution
+- **Graph View**: Static computation graph visualization  
+- **Memory View**: Memory usage and allocation patterns
+- **Statistics Panel**: Performance metrics and bottlenecks
 
 ---
 
-## Implementation Status Summary
+## 🔧 Troubleshooting
 
-### ✅ **Working Components**
-- **Core instrumentation** - Complete GGML hook infrastructure with event capture
-- **Auto-initialization** - Environment variable configuration system
-- **Main executable** - Full CLI argument parsing with help, version, validation
-- **ImGui frontend** - Desktop UI with trace file loading capability
-- **Custom ImGui widgets** - Graph visualization, timeline, inspection widgets
-- **Trace reader** - Binary .ggmlviz file parsing and event replay
+### Common Issues
 
-### 🛠 **Partially Implemented**  
-- **Injection scripts** - macOS/Linux dynamic library injection helpers
-- **Live mode** - CLI option exists but functionality not fully implemented
-- **Configuration loading** - CLI option exists but not implemented
+#### "No events captured"
+```bash
+# Check if hooks are loaded
+export GGML_VIZ_VERBOSE=1
+# Look for "[GGML_VIZ] Hook started" messages
+```
 
-### ❌ **Empty Stubs Requiring Implementation**
-- **IPC layer** - Cross-platform shared memory (POSIX/Windows)
-- **Plugin system** - Dynamic loading API and plugin loader
-- **gRPC server** - Remote API for live data access
-- **Advanced visualizations** - Timeline, tensor stats, memory tracking
-- **Development tools** - Linting, formatting, and test execution scripts
+#### "Failed to read trace header"
+```bash
+# Verify file exists and has correct format
+hexdump -C your_trace.ggmlviz | head -1
+# Should start with: 47 47 4d 4c 56 49 5a 31 (GGMLVIZ1)
+```
 
-### 🚀 **Current Usability**
-The instrumentation core is production-ready. You should be able to instrument any GGML application by setting `GGML_VIZ_OUTPUT`, generate .ggmlviz trace files, and visualize them in the desktop UI. If this isn't the case, please contact the maintainers (Will Brodhead). The CLI is fully functional with comprehensive help and validation.
+#### macOS "Library not loaded"
+```bash
+# Fix library path
+export DYLD_INSERT_LIBRARIES=$(pwd)/build/src/libggml_viz_hook.dylib
+# Use absolute path instead of relative
+```
 
-### 📦 **Project Structure & Submodules**
+#### GUI not updating in live mode
+```bash
+# Ensure both processes use the same file path
+./bin/ggml-viz --live trace.ggmlviz --no-hook  # Terminal 1
+export GGML_VIZ_OUTPUT=trace.ggmlviz           # Terminal 2
+```
 
-The project is organized with a modular architecture using git submodules for external dependencies:
+### Debug Commands
+```bash
+# Test hook system
+./tests/manual/test_ggml_hook
 
-#### **Git Submodules**
-- **`third_party/ggml`** - Fork of GGML tensor library with backend hooks ([brodheadw/willb-ggml](https://github.com/brodheadw/willb-ggml))
-- **`third_party/llama.cpp`** - Fork with Metal backend hooks ([brodheadw/llama.cpp](https://github.com/brodheadw/llama.cpp))
-- **`third_party/glfw`** - OpenGL window management (upstream)
-- **`third_party/imgui`** - Immediate mode GUI framework (upstream)
+# Verify library symbols
+nm build/src/libggml_viz_hook.dylib | grep viz_sched
 
-#### **Metal Backend Integration**
-The llama.cpp submodule uses a custom fork with visualization hooks:
-- **Branch**: `ggml-viz-hooks` 
-- **Modifications**: Universal backend interception at `ggml_backend_graph_compute()`
-- **Coverage**: All backends (Metal, CPU, CUDA, Vulkan) through single integration point
-- **Compatibility**: Weak symbols allow dynamic library injection without code changes
+# Check file permissions
+ls -la tests/traces/trace.ggmlviz
+
+# Monitor file changes
+tail -f tests/traces/trace.ggmlviz
+```
+
+---
+
+## 🏗 Architecture
+
+### Core Components
+
+```mermaid
+graph TD
+    A[GGML Application] -->|DYLD_INTERPOSE| B[Scheduler Hooks]
+    B --> C[Event Capture]
+    C --> D[Ring Buffer]
+    D --> E[Binary Trace File]
+    E --> F[GUI Monitoring]
+    F --> G[Real-time Visualization]
+```
+
+- **Scheduler Interposition**: DYLD_INTERPOSE for guaranteed symbol replacement
+- **Event Capture**: Lock-free ring buffer for high-performance recording
+- **Binary Format**: Efficient `.ggmlviz` format with version headers
+- **Live Monitoring**: File-based communication between processes
+- **Cross-Platform**: Works with Metal, CUDA, CPU, and Vulkan backends
+
+### Supported Platforms
+
+| Platform | CPU | GPU | Hook Method | Status |
+|----------|-----|-----|-------------|---------|
+| macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Production |
+| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | 🛠 In Progress |
+| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | DLL Injection | ❌ Planned |
+| Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | 🛠 Limited |
+
+*Metal backend requires `-DGGML_METAL=OFF` due to shader compilation issues
+
+---
+
+## 🧪 Development
+
+### Running Tests
+```bash
+# Unit tests
+cd build && ctest
+
+# Manual tests
+./tests/manual/test_ggml_hook
+./tests/manual/test_interpose
+
+# Integration tests
+./tests/integration/demo_live_mode_with_llama.sh
+```
+
+### Contributing
+
+1. **Fork the repository** and create a feature branch
+2. **Follow the coding style** (clang-format configuration included)
+3. **Add tests** for new functionality
+4. **Update documentation** for user-facing changes
+5. **Submit a pull request** with clear description
+
+### Development Commands
+```bash
+# Format code
+./scripts/format.sh
+
+# Run linting
+./scripts/lint.sh
+
+# Build with debug symbols
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DGGML_METAL=OFF
+make -j4
+
+# Test with verbose output
+./bin/ggml-viz --verbose tests/traces/trace.ggmlviz
+```
+
+---
+
+## 📝 Status & Roadmap
+
+### ✅ **Working (Production Ready)**
+- ✅ External hook injection via DYLD_INTERPOSE
+- ✅ Scheduler interposition for modern llama.cpp
+- ✅ Real-time trace file generation and monitoring
+- ✅ ImGui desktop visualization interface
+- ✅ Binary trace format with version headers
+- ✅ Cross-backend support (Metal, CPU, CUDA, Vulkan)
+- ✅ Live mode with file-based communication
+- ✅ Comprehensive CLI with --help, --version, --no-hook
+
+### 🛠 **In Progress**
+- 🛠 Linux LD_PRELOAD support
+- 🛠 Advanced timeline visualization
+- 🛠 Tensor inspection and statistics
+- 🛠 Memory usage tracking
+
+### 📋 **Planned**
+- 📋 Windows DLL injection support  
+- 📋 Web dashboard (browser-based interface)
+- 📋 Plugin system for custom visualizations
+- 📋 Export capabilities (SVG, JSON, CSV)
+- 📋 Integration with profiling tools (Tracy, perf)
+
+---
+
+## 📄 License
+
+Licensed under **Apache 2.0**. See [LICENSE](LICENSE) for details.
+
+Third-party dependencies are listed in [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md).
+
+---
+
+## 🙏 Credits
+
+- **Georgi Gerganov** and the GGML community for the foundation
+- **llama.cpp contributors** for the excellent inference engine
+- **ImGui team** for the immediate mode GUI framework
+- **Tracy profiler** for real-time profiling inspiration
+
+---
+
+*"The best way to understand your model is to watch it run."*
