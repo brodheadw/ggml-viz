@@ -10,6 +10,7 @@
 #ifndef _WIN32
 #include <dlfcn.h>  // for dlopen, dlsym, dlclose
 #include <unistd.h> // for fsync
+#include <fcntl.h>  // for fcntl
 #endif
 
 namespace ggml_viz {
@@ -284,6 +285,14 @@ void GGMLHook::flush_to_file() {
 
     read_pos_ = current_read;
     fflush(output_file_);
+    
+    // Force immediate disk write for live mode visibility
+    int fd = fileno(output_file_);
+#ifdef __APPLE__
+    fcntl(fd, F_FULLFSYNC, 0);
+#else
+    fsync(fd);
+#endif
 }
 
 void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
@@ -322,6 +331,12 @@ void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend
     event.label = nullptr;
 
     record_event(event);
+    
+    // Flush to file immediately after each graph computation for live mode
+    if (config_.write_to_file) {
+        std::lock_guard<std::mutex> lock(file_mutex_);
+        flush_to_file();
+    }
 }
 
 void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend) {

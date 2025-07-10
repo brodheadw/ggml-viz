@@ -23,6 +23,15 @@ enum ggml_status viz_sched_graph_compute(ggml_backend_sched_t sched, struct ggml
 
     if (hook.is_active()) {
         hook.on_graph_compute_begin(cg, reinterpret_cast<const ggml_backend*>(sched));
+        
+        // Capture individual operation events
+        if (cg && cg->nodes) {
+            for (int i = 0; i < cg->n_nodes; i++) {
+                if (cg->nodes[i]) {
+                    hook.on_op_compute_begin(cg->nodes[i], reinterpret_cast<const ggml_backend*>(sched));
+                }
+            }
+        }
     }
 
     // Call the original function if it exists
@@ -35,6 +44,15 @@ enum ggml_status viz_sched_graph_compute(ggml_backend_sched_t sched, struct ggml
     }
 
     if (hook.is_active()) {
+        // Capture individual operation end events
+        if (cg && cg->nodes) {
+            for (int i = 0; i < cg->n_nodes; i++) {
+                if (cg->nodes[i]) {
+                    hook.on_op_compute_end(cg->nodes[i], reinterpret_cast<const ggml_backend*>(sched));
+                }
+            }
+        }
+        
         hook.on_graph_compute_end(cg, reinterpret_cast<const ggml_backend*>(sched));
     }
 
@@ -51,6 +69,15 @@ enum ggml_status viz_sched_graph_compute_async(ggml_backend_sched_t sched, struc
 
     if (hook.is_active()) {
         hook.on_graph_compute_begin(cg, reinterpret_cast<const ggml_backend*>(sched));
+        
+        // Capture individual operation events
+        if (cg && cg->nodes) {
+            for (int i = 0; i < cg->n_nodes; i++) {
+                if (cg->nodes[i]) {
+                    hook.on_op_compute_begin(cg->nodes[i], reinterpret_cast<const ggml_backend*>(sched));
+                }
+            }
+        }
     }
 
     // Call the original function if it exists
@@ -63,6 +90,15 @@ enum ggml_status viz_sched_graph_compute_async(ggml_backend_sched_t sched, struc
     }
 
     if (hook.is_active()) {
+        // Capture individual operation end events
+        if (cg && cg->nodes) {
+            for (int i = 0; i < cg->n_nodes; i++) {
+                if (cg->nodes[i]) {
+                    hook.on_op_compute_end(cg->nodes[i], reinterpret_cast<const ggml_backend*>(sched));
+                }
+            }
+        }
+        
         hook.on_graph_compute_end(cg, reinterpret_cast<const ggml_backend*>(sched));
     }
 
@@ -80,6 +116,15 @@ enum ggml_status viz_backend_graph_compute(ggml_backend_t backend, struct ggml_c
 
     if (hook.is_active()) {
         hook.on_graph_compute_begin(cg, reinterpret_cast<const ggml_backend*>(backend));
+        
+        // Capture individual operation events
+        if (cg && cg->nodes) {
+            for (int i = 0; i < cg->n_nodes; i++) {
+                if (cg->nodes[i]) {
+                    hook.on_op_compute_begin(cg->nodes[i], reinterpret_cast<const ggml_backend*>(backend));
+                }
+            }
+        }
     }
 
     // Call the original function if it exists
@@ -92,6 +137,15 @@ enum ggml_status viz_backend_graph_compute(ggml_backend_t backend, struct ggml_c
     }
 
     if (hook.is_active()) {
+        // Capture individual operation end events
+        if (cg && cg->nodes) {
+            for (int i = 0; i < cg->n_nodes; i++) {
+                if (cg->nodes[i]) {
+                    hook.on_op_compute_end(cg->nodes[i], reinterpret_cast<const ggml_backend*>(backend));
+                }
+            }
+        }
+        
         hook.on_graph_compute_end(cg, reinterpret_cast<const ggml_backend*>(backend));
     }
 
@@ -108,6 +162,15 @@ enum ggml_status viz_backend_graph_compute_async(ggml_backend_t backend, struct 
 
     if (hook.is_active()) {
         hook.on_graph_compute_begin(cg, reinterpret_cast<const ggml_backend*>(backend));
+        
+        // Capture individual operation events
+        if (cg && cg->nodes) {
+            for (int i = 0; i < cg->n_nodes; i++) {
+                if (cg->nodes[i]) {
+                    hook.on_op_compute_begin(cg->nodes[i], reinterpret_cast<const ggml_backend*>(backend));
+                }
+            }
+        }
     }
 
     // Call the original function if it exists
@@ -120,6 +183,15 @@ enum ggml_status viz_backend_graph_compute_async(ggml_backend_t backend, struct 
     }
 
     if (hook.is_active()) {
+        // Capture individual operation end events
+        if (cg && cg->nodes) {
+            for (int i = 0; i < cg->n_nodes; i++) {
+                if (cg->nodes[i]) {
+                    hook.on_op_compute_end(cg->nodes[i], reinterpret_cast<const ggml_backend*>(backend));
+                }
+            }
+        }
+        
         hook.on_graph_compute_end(cg, reinterpret_cast<const ggml_backend*>(backend));
     }
 

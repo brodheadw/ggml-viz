@@ -191,6 +191,12 @@ bool ImGuiApp::is_live_mode() const {
 void ImGuiApp::update_live_data() {
     if (!data_->live_mode) return;
     
+    static int call_count = 0;
+    if (++call_count % 100 == 0) {  // Only print every 100 calls to avoid spam
+        std::cout << "[ImGuiApp] update_live_data() called (file: " << data_->live_file_path 
+                  << ", events: " << data_->live_events.size() << ")" << std::endl;
+    }
+    
     // Try to get live events from GGMLHook (in-process events)
     try {
         auto& hook = GGMLHook::instance();
@@ -231,6 +237,8 @@ void ImGuiApp::update_live_data() {
                     static_cast<size_t>(file_stat.st_size) > data_->last_file_size) {
                     
                     // File has been updated, reload it
+                    std::cout << "[ImGuiApp] File changed - reloading: " << data_->live_file_path 
+                              << " (size: " << file_stat.st_size << " bytes)" << std::endl;
                     auto new_trace_reader = std::make_unique<TraceReader>(data_->live_file_path);
                     if (new_trace_reader->is_valid()) {
                         const auto& events = new_trace_reader->events();
@@ -247,6 +255,9 @@ void ImGuiApp::update_live_data() {
                             
                             std::cout << "[ImGuiApp] Loaded " << (events.size() - start_idx) 
                                       << " new events from external file" << std::endl;
+                        } else {
+                            std::cout << "[ImGuiApp] No new events to load (total: " << events.size() 
+                                      << ", start_idx: " << start_idx << ")" << std::endl;
                         }
                         
                         // Update file monitoring state
@@ -575,12 +586,23 @@ void ImGuiApp::render_timeline_view() {
             // Visual Timeline tab
             if (ImGui::BeginTabItem("Visual Timeline")) {
                 // Render the custom timeline widget
-                timeline_widget_.render("##timeline", data_->trace_reader.get(), timeline_config_);
+                TraceReader* trace_reader_for_widget = nullptr;
+                if (data_->live_mode && data_->live_trace_reader) {
+                    trace_reader_for_widget = data_->live_trace_reader.get();
+                } else {
+                    trace_reader_for_widget = data_->trace_reader.get();
+                }
                 
-                // Sync selection between timeline widget and event details
-                int selected = timeline_widget_.get_selected_event();
-                if (selected != data_->selected_event) {
-                    data_->selected_event = selected;
+                if (trace_reader_for_widget) {
+                    timeline_widget_.render("##timeline", trace_reader_for_widget, timeline_config_);
+                    
+                    // Sync selection between timeline widget and event details
+                    int selected = timeline_widget_.get_selected_event();
+                    if (selected != data_->selected_event) {
+                        data_->selected_event = selected;
+                    }
+                } else {
+                    ImGui::Text("No trace data available for timeline visualization");
                 }
                 
                 ImGui::EndTabItem();
@@ -713,7 +735,19 @@ void ImGuiApp::render_graph_view() {
             }
             ImGui::Text("Graph Begin Events: %zu", graph_begin_count);
             ImGui::Text("Graph End Events: %zu", graph_end_count);
-            ImGui::Text("Graph visualization for live mode coming soon...");
+            
+            ImGui::Separator();
+            
+            // Use live trace reader for graph visualization
+            if (data_->live_trace_reader) {
+                graph_widget_.render("##compute_graph", data_->live_trace_reader.get(), graph_config_);
+                
+                // Sync selection between graph widget and other views
+                int selected = graph_widget_.get_selected_node();
+                // TODO: Map node selection to event selection
+            } else {
+                ImGui::Text("Loading graph data...");
+            }
             
         } else if (data_->trace_reader) {
             auto graph_events = data_->trace_reader->get_graph_events();
