@@ -318,11 +318,13 @@ cd build && ctest
 
 ### Contributing
 
-1. **Fork the repository** and create a feature branch
-2. **Follow the coding style** (clang-format configuration included)
-3. **Add tests** for new functionality
-4. **Update documentation** for user-facing changes
-5. **Submit a pull request** with clear description
+We welcome contributions! Please see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for:
+
+- Development setup instructions
+- Code style guidelines and automated formatting tools
+- Testing procedures
+- Current development priorities (see [TODO.md](TODO.md))
+- Pull request process
 
 ### Development Commands
 ```bash

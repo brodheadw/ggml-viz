@@ -40,17 +40,32 @@ Run the test suite:
 
 ## Code Style
 
+We provide automated tools to help maintain consistent code style:
+
+```bash
+# Auto-format code (requires clang-format)
+./scripts/format.sh
+
+# Run static analysis and linting
+./scripts/lint.sh
+
+# Run test suite
+./scripts/run_tests.sh
+```
+
 - Follow existing code style and formatting
 - Add appropriate comments for complex logic
 - Update documentation for user-facing changes
 
-## Areas We Need Help
+## Current Development Priorities
 
-1. **Performance benchmarking** - Measure actual overhead
-2. **Development scripts** - Implement linting, formatting, testing scripts
-3. **Example integrations** - Real llama.cpp/whisper.cpp demos
-4. **Advanced visualizations** - Timeline, tensor stats, memory tracking
-5. **Cross-platform testing** - Windows, Linux validation
+See [TODO.md](../TODO.md) for the complete list of current development priorities and tasks. This includes:
+
+- High-priority features and infrastructure improvements
+- Medium-priority advanced features
+- Low-priority nice-to-have enhancements
+
+The TODO.md file is actively maintained and provides the most up-to-date view of what needs to be done.
 
 ## Reporting Issues
 
@@ -65,4 +80,4 @@ By contributing, you agree that your contributions will be licensed under the Ap
 
 ---
 
-**Note**: This project is in active development. Many development tools (linting, CI, etc.) are still being implemented. See TODO.md for current priorities.
+**Note**: This project has reached production readiness with live mode fully functional on macOS. Core development tools (formatting, linting, testing) are implemented. See [TODO.md](../TODO.md) for remaining features and priorities.

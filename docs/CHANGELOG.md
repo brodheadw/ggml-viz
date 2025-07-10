@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+
+## [1.0.0] - 2025-07-10
+
+### Added - Live Mode Complete ✅
+- **Op-level hooks to capture individual tensor operations** - Full operation-level instrumentation
+  - Individual tensor operation begin/end events in scheduler interposition
+  - Enhanced event capture for both sync and async compute paths
+  - Complete operation timeline tracking for detailed profiling
+- **Live functionality working completely on macOS** - Production-ready live visualization
+  - Real-time graph view with live trace reader integration
+  - Timeline views fixed and working with live data
+  - Automatic file monitoring and reload for external applications
+  - Immediate disk flushing for live mode visibility (`F_FULLFSYNC` on macOS)
+- **USER_GUIDE2.md** - Comprehensive setup guide for live mode workflows
+  - Step-by-step terminal setup instructions
+  - Environment variable configuration examples
+  - DYLD_INSERT_LIBRARIES integration with llama.cpp
+
+### Fixed - Critical Live Mode Issues
+- **Widget data source corrected** - Fixed data_->live_trace_reader instead of data_->trace_reader in live mode
+  - Timeline widget now uses correct trace reader for live data
+  - Graph widget properly displays live computation graphs
+  - Eliminated "No trace data available" errors in live mode
+- **Enhanced live data monitoring** - Improved file change detection and event loading
+  - Better logging for live mode debugging (call count throttling)
+  - File size monitoring with detailed change notifications
+  - Improved new event detection and loading from external files
+- **Immediate file flushing** - Critical for live mode responsiveness
+  - Force disk sync after each graph computation
+  - Platform-specific sync calls (F_FULLFSYNC on macOS, fsync on Linux)
+  - Ensures external applications can immediately see trace updates
+
+### Technical Improvements
+- **Enhanced scheduler interposition** - Complete operation capture in all compute paths
+  - `viz_sched_graph_compute` and `viz_sched_graph_compute_async` 
+  - `viz_backend_graph_compute` and `viz_backend_graph_compute_async`
+  - Individual node iteration with proper operation event recording
+- **Live mode architecture** - Robust real-time data pipeline
+  - Dual trace reader system (live vs static)
+  - Event synchronization between widgets and data sources
+  - File monitoring with size-based change detection
+
+### Added
+- **Development Scripts Infrastructure** - Complete suite of development tools
+  - `scripts/format.sh` - Automatic code formatting with clang-format and cmake-format
+  - `scripts/lint.sh` - Static analysis with clang-tidy, cppcheck, and custom checks
+  - `scripts/run_tests.sh` - Test suite runner with build validation
+  - Graceful degradation when tools aren't installed
+  - Installation guidance for macOS and Ubuntu
+- **Performance Benchmarking Infrastructure** - Complete benchmarking system with statistical analysis
+  - Measured < 5% overhead in all configurations
+  - Created PERFORMANCE_REPORT.md with detailed analysis
+  - Updated README.md with accurate performance claims
+
+## [0.2.0] - 2025-07-01
+
 ### Added
 - **Performance Benchmarking Infrastructure** - Complete benchmarking system with statistical analysis
 - **BENCHMARKING.md** - Comprehensive guide for performance measurement  
