@@ -21,7 +21,7 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 - [x] **Environment variable support** - ✅ **COMPLETE** - `GGML_VIZ_OUTPUT`, `GGML_VIZ_DISABLE`, `GGML_VIZ_MAX_EVENTS`
 - [x] **Auto-start functionality** - ✅ **COMPLETE** - Hooks start automatically when `GGML_VIZ_OUTPUT` is set
 - [x] **GUI rebuild and testing** - ✅ **VERIFIED** - 1.4MB executable with 9 macOS frameworks linked
-- [ ] **Performance benchmarking** - Measure actual overhead vs. fabricated claims in README
+- [x] **Performance benchmarking** - ✅ **COMPLETE** - Measured < 5% overhead, created PERFORMANCE_REPORT.md
 - [ ] **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh`
 - [ ] **Basic logging system** - `src/utils/logger.cpp` for debugging
 - [ ] **Configuration management** - `src/utils/config.cpp` for settings
