@@ -326,11 +326,10 @@ cd build && ctest
 
 ### Development Commands
 ```bash
-# Format code
-./scripts/format.sh
-
-# Run linting
-./scripts/lint.sh
+# Code quality
+./scripts/format.sh     # Auto-format C++ and CMake files
+./scripts/lint.sh       # Static analysis and code linting
+./scripts/run_tests.sh  # Run test suite
 
 # Build with debug symbols
 cmake .. -DCMAKE_BUILD_TYPE=Debug -DGGML_METAL=OFF

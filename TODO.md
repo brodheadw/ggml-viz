@@ -21,8 +21,8 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 - [x] **Environment variable support** - ✅ **COMPLETE** - `GGML_VIZ_OUTPUT`, `GGML_VIZ_DISABLE`, `GGML_VIZ_MAX_EVENTS`
 - [x] **Auto-start functionality** - ✅ **COMPLETE** - Hooks start automatically when `GGML_VIZ_OUTPUT` is set
 - [x] **GUI rebuild and testing** - ✅ **VERIFIED** - 1.4MB executable with 9 macOS frameworks linked
-- [x] **Performance benchmarking** - ✅ **COMPLETE** - Measured < 5% overhead, created PERFORMANCE_REPORT.md
-- [ ] **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh`
+- [x] **Performance benchmarking** - Measure actual overhead vs. fabricated claims in README
+- [x] **Development scripts** - ✅ **COMPLETE** - Implemented lint.sh, format.sh, run_tests.sh with comprehensive analysis
 - [ ] **Basic logging system** - `src/utils/logger.cpp` for debugging
 - [ ] **Configuration management** - `src/utils/config.cpp` for settings
 
@@ -111,9 +111,9 @@ src/plugins/plugins_loader.cpp              - Plugin loader
 src/server/grpc_server.cpp                  - gRPC server
 src/utils/config.cpp                        - Configuration
 src/utils/logger.cpp                        - Logging system
-scripts/lint.sh                             - Code linting
-scripts/format.sh                           - Code formatting
-scripts/run_tests.sh                        - Test execution
+scripts/lint.sh                             - Code linting ✅ COMPLETE
+scripts/format.sh                           - Code formatting ✅ COMPLETE  
+scripts/run_tests.sh                        - Test execution ✅ COMPLETE
 ```
 
 ---
