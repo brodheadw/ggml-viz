@@ -16,11 +16,11 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 ## 🎯 **Phase 1: Core Functionality (High Priority)**
 
 ### 📱 Essential Missing Components
-- [x] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz` ✅ **COMPLETE** (220 LOC)
+- [x] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz` ✅ **COMPLETE**
 - [x] **Hook instrumentation system** - ✅ **FIXED** - Now records 60 events vs. 0 events before
 - [x] **Environment variable support** - ✅ **COMPLETE** - `GGML_VIZ_OUTPUT`, `GGML_VIZ_DISABLE`, `GGML_VIZ_MAX_EVENTS`
 - [x] **Auto-start functionality** - ✅ **COMPLETE** - Hooks start automatically when `GGML_VIZ_OUTPUT` is set
-- [x] **GUI rebuild and testing** - ✅ **VERIFIED** - 1.4MB executable with 9 macOS frameworks linked
+- [x] **GUI rebuild and testing** - ✅ **VERIFIED** - Working executable with proper framework linking
 - [ ] **Performance benchmarking** - Measure actual overhead vs. fabricated claims in README
 - [ ] **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh`
 - [ ] **Basic logging system** - `src/utils/logger.cpp` for debugging
