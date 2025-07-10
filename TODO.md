@@ -16,11 +16,11 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 ## 🎯 **Phase 1: Core Functionality (High Priority)**
 
 ### 📱 Essential Missing Components
-- [x] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz` ✅ **COMPLETE** (220 LOC)
+- [x] **Main CLI interface** - Command line argument parsing for `./bin/ggml-viz` ✅ **COMPLETE**
 - [x] **Hook instrumentation system** - ✅ **FIXED** - Now records 60 events vs. 0 events before
 - [x] **Environment variable support** - ✅ **COMPLETE** - `GGML_VIZ_OUTPUT`, `GGML_VIZ_DISABLE`, `GGML_VIZ_MAX_EVENTS`
 - [x] **Auto-start functionality** - ✅ **COMPLETE** - Hooks start automatically when `GGML_VIZ_OUTPUT` is set
-- [x] **GUI rebuild and testing** - ✅ **VERIFIED** - 1.4MB executable with 9 macOS frameworks linked
+- [x] **GUI rebuild and testing** - ✅ **VERIFIED** - Working executable with proper framework linking
 - [ ] **Performance benchmarking** - Measure actual overhead vs. fabricated claims in README
 - [ ] **Development scripts** - `scripts/lint.sh`, `scripts/format.sh`, `scripts/run_tests.sh`
 - [ ] **Basic logging system** - `src/utils/logger.cpp` for debugging
@@ -79,41 +79,41 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 
 ---
 
-## 📋 **Detailed File Status**
+## 📋 **Implementation Status**
 
 ### ✅ **Implemented (Ready for Use)**
 ```
-src/instrumentation/ggml_hook.cpp           (498 LOC) - Core hook system
-src/instrumentation/ggml_viz_init.cpp       (169 LOC) - Auto-initialization
-src/main.cpp                                (220 LOC) - Full CLI with help, validation
-src/frontend/imgui_app.cpp                  (593 LOC) - Main UI application
-src/frontend/imgui_widgets.cpp              (786 LOC) - Custom widgets
-src/utils/trace_reader.cpp                  (134 LOC) - File parsing
-src/server/data_collector.cpp               (100 LOC) - Event processing
-src/server/live_data_collector.hpp          (199 LOC) - Real-time streaming
+src/instrumentation/ggml_hook.cpp           - Core hook system
+src/instrumentation/ggml_viz_init.cpp       - Auto-initialization
+src/main.cpp                                - Full CLI with help, validation
+src/frontend/imgui_app.cpp                  - Main UI application
+src/frontend/imgui_widgets.cpp              - Custom widgets
+src/utils/trace_reader.cpp                  - File parsing
+src/server/data_collector.cpp               - Event processing
+src/server/live_data_collector.hpp          - Real-time streaming
 ```
 
 ### 🛠 **Partially Implemented**
 ```
-scripts/inject_macos.sh                     (92 LOC)  - Library injection
-scripts/inject_linux.sh                     (81 LOC)  - Library injection
-Live mode functionality                     (CLI)      - Option exists, backend missing
-Configuration file loading                  (CLI)      - Option exists, loader missing
+scripts/inject_macos.sh                     - Library injection
+scripts/inject_linux.sh                     - Library injection
+Live mode functionality                     - CLI option exists, backend missing
+Configuration file loading                  - CLI option exists, loader missing
 ```
 
 ### ❌ **Empty Stubs (Need Implementation)**
 ```
-src/ipc/ipc_common.hpp                      (0 LOC)   - IPC definitions
-src/ipc/shm_posix.cpp                       (0 LOC)   - POSIX shared memory
-src/ipc/shm_windows.cpp                     (0 LOC)   - Windows shared memory
-src/plugins/plugins_api.hpp                 (0 LOC)   - Plugin API
-src/plugins/plugins_loader.cpp              (0 LOC)   - Plugin loader
-src/server/grpc_server.cpp                  (0 LOC)   - gRPC server
-src/utils/config.cpp                        (0 LOC)   - Configuration
-src/utils/logger.cpp                        (0 LOC)   - Logging system
-scripts/lint.sh                             (0 LOC)   - Code linting
-scripts/format.sh                           (0 LOC)   - Code formatting
-scripts/run_tests.sh                        (0 LOC)   - Test execution
+src/ipc/ipc_common.hpp                      - IPC definitions
+src/ipc/shm_posix.cpp                       - POSIX shared memory
+src/ipc/shm_windows.cpp                     - Windows shared memory
+src/plugins/plugins_api.hpp                 - Plugin API
+src/plugins/plugins_loader.cpp              - Plugin loader
+src/server/grpc_server.cpp                  - gRPC server
+src/utils/config.cpp                        - Configuration
+src/utils/logger.cpp                        - Logging system
+scripts/lint.sh                             - Code linting
+scripts/format.sh                           - Code formatting
+scripts/run_tests.sh                        - Test execution
 ```
 
 ---
@@ -139,7 +139,7 @@ scripts/run_tests.sh                        (0 LOC)   - Test execution
 
 ## 📈 **Current Project Health**
 
-**Lines of Code**: 2,699 LOC implemented (~2,300 core + 400 supporting), ~800 LOC remaining for full feature set
+**Implementation**: Core system fully implemented with all critical components working
 **Usability**: ✅ Core functionality works and is production-ready - **CRITICAL BUGS FIXED**
 **Architecture**: ✅ Well-designed, extensible foundation
 **Documentation**: ✅ Updated with bug fixes and current status
@@ -148,7 +148,7 @@ scripts/run_tests.sh                        (0 LOC)   - Test execution
 **Recent Fixes (2025-07-01)**:
 - ✅ **CRITICAL**: Fixed zero event recording bug in hook system
 - ✅ **CRITICAL**: Environment variable parsing now works correctly
-- ✅ **GUI**: Verified 1.4MB executable builds and loads trace files
+- ✅ **GUI**: Verified executable builds and loads trace files
 - ✅ **Testing**: All components verified with end-to-end workflow
 
 **Overall Status**: 🚀 **Production-ready with all critical issues resolved!**
