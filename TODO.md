@@ -5,9 +5,9 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 ---
 
 ## 🚀 **Current Status**
-- **Core instrumentation system**: ✅ Complete (498 LOC) - **CRITICAL BUG FIXED**
-- **Desktop UI with visualization**: ✅ Complete (1,379 LOC) - **GUI VERIFIED WORKING**
-- **Trace file generation/loading**: ✅ Complete (457 LOC) - **EVENT RECORDING FIXED**
+- **Core instrumentation system**: ✅ Complete - **CRITICAL BUG FIXED**
+- **Desktop UI with visualization**: ✅ Complete - **GUI VERIFIED WORKING**
+- **Trace file generation/loading**: ✅ Complete - **EVENT RECORDING FIXED**
 - **Environment variable support**: ✅ Complete - **AUTO-START IMPLEMENTED**
 - **Basic functionality**: **Production ready!**
 
