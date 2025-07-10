@@ -1,0 +1,6 @@
+Test,Max_Memory_MB
+Baseline (hooks disabled),23.48437500000000000000
+Hooks enabled (no output),23.62500000000000000000
+Hooks with file output,23.53125000000000000000
+Hooks with verbose logging,23.46875000000000000000
+Trace file reading,.03125000000000000000
