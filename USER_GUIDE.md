@@ -1,63 +1,33 @@
 # GGML Visualizer User Guide
 
-A comprehensive guide to using GGML Visualizer with llama.cpp for real-time LLM performance analysis and visualization.
+Real-time visualization and analysis of GGML-based language model inference. See your models compute in action with detailed operation timelines and computation graphs.
 
 ## Table of Contents
 
-1. [Quick Start](#quick-start)
-2. [Installation](#installation)
-3. [Basic Usage](#basic-usage)
-4. [Working with llama.cpp](#working-with-llamacpp)
-5. [Understanding the Interface](#understanding-the-interface)
-6. [Advanced Configuration](#advanced-configuration)
-7. [Performance Analysis](#performance-analysis)
-8. [Troubleshooting](#troubleshooting)
-9. [Tips and Best Practices](#tips-and-best-practices)
+1. [macOS Quick Start](#macos-quick-start)
+2. [Linux Setup](#linux-setup)
+3. [Windows Setup](#windows-setup)
+4. [Understanding the Interface](#understanding-the-interface)
+5. [Advanced Usage](#advanced-usage)
+6. [Troubleshooting](#troubleshooting)
 
 ---
 
-## Quick Start
-
-**30-second setup for existing llama.cpp users:**
-
-```bash
-# 1. Set output file
-export GGML_VIZ_OUTPUT=my_llama_trace.ggmlviz
-
-# 2. Run your llama.cpp inference as usual
-./llama.cpp/main -m your_model.gguf -p "Hello, how are you?" -n 50
-
-# 3. Visualize the results
-./ggml-viz/build/bin/ggml-viz my_llama_trace.ggmlviz
-```
-
-That's it! The visualizer will capture all GGML operations automatically.
-
----
-
-## Installation
+## macOS Quick Start
 
 ### Prerequisites
 
-**macOS:**
 ```bash
+# Install dependencies
 brew install cmake glfw
-```
-
-**Ubuntu/Debian:**
-```bash
-sudo apt update && sudo apt install -y git cmake build-essential \
-    libgl1-mesa-dev libxinerama-dev libxcursor-dev libxi-dev libxrandr-dev
 ```
 
 ### Build GGML Visualizer
 
 ```bash
-# Clone with submodules
+# Clone and build
 git clone --recursive https://github.com/your-org/ggml-visualizer.git
 cd ggml-visualizer
-
-# Build (use -DGGML_METAL=OFF on macOS if you encounter Metal shader issues)
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=OFF
 make -j4
@@ -66,550 +36,367 @@ make -j4
 ./bin/ggml-viz --help
 ```
 
-### Verify Installation
+### Method 1: Live Mode (Recommended)
 
+Watch your model compute in real-time as it generates tokens:
+
+**Terminal 1 (Start the GUI):**
 ```bash
-# Run basic test
-./bin/test_ggml_hook
-
-# Check if trace file was created
-ls -la *.ggmlviz
-
-# Test GUI (should open empty dashboard)
-./bin/ggml-viz
+./build/bin/ggml-viz --live test_live_trace.ggmlviz --no-hook
 ```
 
----
+**Terminal 2 (Run your model with hooks):**
+```bash
+env GGML_VIZ_OUTPUT=test_live_trace.ggmlviz \
+    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    ./third_party/llama.cpp/build/bin/llama-cli \
+    -m ./models/your-model.gguf \
+    -p "Hello world" \
+    -n 10 \
+    --verbose-prompt
+```
 
-## Basic Usage
+**What you'll see:**
+- **Real-time updates**: Events appear as they happen (~1,500 operations per token)
+- **Timeline View**: Detailed operation timeline showing matrix multiplies, additions, etc.
+- **Graph View**: Visual representation of the neural network computation graph
+- **Live statistics**: Token generation speed, operation counts, timing data
 
-### The Two-Step Process
+### Method 2: Offline Analysis
 
-GGML Visualizer works in two phases:
-
-1. **Capture Phase**: Record GGML operations during inference
-2. **Analysis Phase**: Visualize and analyze the recorded data
-
-### Command Line Interface
+Capture trace data first, then analyze:
 
 ```bash
-# Show help
-./bin/ggml-viz --help
+# 1. Capture inference data
+export GGML_VIZ_OUTPUT=my_trace.ggmlviz
+env DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    ./third_party/llama.cpp/build/bin/llama-cli \
+    -m ./models/your-model.gguf \
+    -p "Explain quantum computing" \
+    -n 50
 
-# Load a specific trace file
-./bin/ggml-viz my_trace.ggmlviz
+# 2. Analyze the captured data
+./build/bin/ggml-viz my_trace.ggmlviz
+```
 
-# Enable verbose logging
-./bin/ggml-viz --verbose my_trace.ggmlviz
+### Setting Up llama.cpp with Hooks
 
-# Live mode (experimental)
-./bin/ggml-viz --live --port 9000
+If you don't have llama.cpp built with shared libraries:
+
+```bash
+# Build llama.cpp with shared GGML libraries
+cd third_party/llama.cpp
+cmake -B build -DLLAMA_STATIC=OFF -DGGML_BUILD_CPP_SHARED=ON
+cmake --build build --config Release
+```
+
+### Example Session
+
+```bash
+# Start live visualization
+./build/bin/ggml-viz --live chat_session.ggmlviz --no-hook &
+
+# Run an interactive chat session with visualization
+env GGML_VIZ_OUTPUT=chat_session.ggmlviz \
+    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    ./third_party/llama.cpp/build/bin/llama-cli \
+    -m ./models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \
+    -p "You are a helpful assistant. User: " \
+    -i
 ```
 
 ### Environment Variables
 
-**Essential Variables:**
-- `GGML_VIZ_OUTPUT`: Output trace file path (required for capture)
-- `GGML_VIZ_VERBOSE`: Enable detailed logging (optional)
-- `GGML_VIZ_DISABLE`: Completely disable instrumentation (optional)
+**Required:**
+- `GGML_VIZ_OUTPUT`: Path to output trace file
 
-**Advanced Variables:**
-- `GGML_VIZ_MAX_EVENTS`: Maximum events to capture (default: 10,000,000)
-- `GGML_VIZ_OP_TIMING`: Enable operation timing (default: true)
-- `GGML_VIZ_MEMORY_TRACKING`: Enable memory tracking (default: false)
-- `GGML_VIZ_THREAD_TRACKING`: Enable thread tracking (default: false)
-- `GGML_VIZ_TENSOR_NAMES`: Capture tensor names (default: true)
+**Optional:**
+- `GGML_VIZ_VERBOSE`: Enable debug output
+- `GGML_VIZ_MAX_EVENTS`: Limit captured events (default: 10M)
+- `GGML_VIZ_DISABLE`: Disable instrumentation entirely
 
 ---
 
-## Working with llama.cpp
+## Linux Setup
 
-### Option 1: Use with Existing llama.cpp Installation
+> **TODO**: Linux instructions coming soon
+> 
+> The basic process will be similar to macOS but using:
+> - `apt install` or `yum install` for dependencies
+> - `LD_PRELOAD` instead of `DYLD_INSERT_LIBRARIES`
+> - Different library paths and build configurations
 
-This is the easiest method - works with any existing llama.cpp installation:
-
+### Prerequisites
 ```bash
-# Set up environment
-export GGML_VIZ_OUTPUT=llama_inference.ggmlviz
-export GGML_VIZ_VERBOSE=1
+# Ubuntu/Debian
+sudo apt update && sudo apt install -y git cmake build-essential \
+    libgl1-mesa-dev libxinerama-dev libxcursor-dev libxi-dev libxrandr-dev
 
-# Run llama.cpp normally (replace paths with your actual paths)
-cd /path/to/your/llama.cpp
-./main -m models/your_model.gguf \
-       -p "Explain quantum computing in simple terms" \
-       -n 100 \
-       --temp 0.7
-
-# Visualize results
-cd /path/to/ggml-visualizer/build
-./bin/ggml-viz llama_inference.ggmlviz
+# CentOS/RHEL
+# TODO: Add package manager commands
 ```
 
-### Option 2: Build llama.cpp with GGML-Viz's Modified GGML
-
-For maximum compatibility and features:
-
+### Build Instructions
 ```bash
-# Clone llama.cpp
-git clone https://github.com/ggerganov/llama.cpp.git llama_with_viz
-cd llama_with_viz
-
-# Replace GGML with our instrumented version
-rm -rf ggml
-cp -r /path/to/ggml-visualizer/third_party/ggml ./ggml
-
-# Build llama.cpp
-make -j4
-
-# Test with instrumentation
-export GGML_VIZ_OUTPUT=llama_trace.ggmlviz
-./main -m your_model.gguf -p "Hello world" -n 10
-
-# Visualize
-/path/to/ggml-visualizer/build/bin/ggml-viz llama_trace.ggmlviz
+# TODO: Add Linux-specific build steps
 ```
 
-### Model Recommendations for Testing
-
-**Small models for initial testing:**
-- **TinyLlama-1.1B**: Fast inference, good for testing
-- **Phi-2 (2.7B)**: Excellent quality-to-size ratio
-- **CodeLlama-7B-Instruct**: Great for code-related tasks
-
-**Download example:**
+### Usage
 ```bash
-# Using Hugging Face Hub
-pip install huggingface_hub
-huggingface-cli download microsoft/Phi-3-mini-4k-instruct-gguf \
-    Phi-3-mini-4k-instruct-q4.gguf --local-dir models/
+# TODO: Add LD_PRELOAD commands for Linux
 ```
 
-### Common llama.cpp Integration Patterns
+---
 
-**Text Generation:**
-```bash
-export GGML_VIZ_OUTPUT=text_generation.ggmlviz
-./main -m model.gguf -p "Write a haiku about programming:" -n 50
+## Windows Setup
+
+> **TODO**: Windows instructions coming soon
+>
+> Windows support will include:
+> - Visual Studio build instructions
+> - DLL injection methods
+> - Windows-specific GUI considerations
+
+### Prerequisites
+```cmd
+REM TODO: Add Windows dependency installation
 ```
 
-**Interactive Chat:**
-```bash
-export GGML_VIZ_OUTPUT=chat_session.ggmlviz
-./main -m model.gguf -p "System: You are a helpful assistant.\nUser: Hello!\nAssistant:" -i
+### Build Instructions
+```cmd
+REM TODO: Add Windows build steps
 ```
 
-**Batch Processing:**
-```bash
-export GGML_VIZ_OUTPUT=batch_inference.ggmlviz
-for prompt in "Hello" "Goodbye" "Thank you"; do
-    ./main -m model.gguf -p "$prompt" -n 20
-done
+### Usage
+```cmd
+REM TODO: Add Windows hook injection commands
 ```
 
 ---
 
 ## Understanding the Interface
 
-### Main Dashboard Components
+### Timeline View
 
-When you open a trace file, you'll see several key areas:
+The Timeline View shows operations as they execute over time:
 
-#### 1. Graph View
-- **Purpose**: Visual representation of the computation graph
-- **What to look for**: 
-  - Model architecture (attention, feed-forward layers)
-  - Tensor shapes and data types
-  - Operation sequence and dependencies
+- **Green bars**: Matrix multiplication operations (usually the slowest)
+- **Blue bars**: Addition and normalization operations  
+- **Purple bars**: Attention computations
+- **Yellow bars**: Activation functions (ReLU, GELU, etc.)
+- **Red bars**: Memory operations
 
-#### 2. Timeline View
-- **Purpose**: Chronological view of operations during inference
-- **What to look for**:
-  - Operation execution order
-  - Time spent per operation
-  - Backend utilization (CPU/Metal/CUDA)
-  - Bottlenecks and performance hotspots
+**What to look for:**
+- Long green bars indicate matrix multiply bottlenecks
+- Gaps between operations suggest synchronization issues
+- Repeated patterns show the layer structure of your model
 
-#### 3. Statistics Panel
-- **Purpose**: Numerical summary of the inference session
-- **Key metrics**:
-  - Total inference time
-  - Number of operations executed
-  - Memory usage patterns
-  - Backend distribution
+### Graph View
 
-#### 4. Operation Details
-- **Purpose**: Detailed information about individual operations
-- **Information shown**:
-  - Operation type (matmul, add, softmax, etc.)
-  - Input/output tensor shapes
-  - Execution time
-  - Backend used
+The Graph View shows the computation graph structure:
 
-### What the Data Tells You
+- **Nodes**: Individual operations (matmul, add, softmax, etc.)
+- **Edges**: Data flow between operations
+- **Colors**: Operation types
+- **Size**: Relative computational cost
 
-**Graph Structure Insights:**
-- **Transformer blocks**: Repeated patterns indicate layers
-- **Attention mechanisms**: Complex matmul patterns
-- **Feed-forward networks**: Linear transformations
-- **Embeddings**: Input/output token processing
+**What to look for:**
+- **Transformer blocks**: Repeated attention + feedforward patterns
+- **Bottleneck operations**: Large nodes that take significant time
+- **Data dependencies**: How operations must wait for each other
 
-**Performance Insights:**
-- **Hot operations**: Operations taking the most time
-- **Backend efficiency**: How well different backends perform
-- **Memory patterns**: Allocation and deallocation timing
-- **Parallelization**: Thread utilization across operations
+### Statistics Panel
 
----
+Key metrics displayed:
+- **Total Events**: Number of operations captured (~1,500 per token for Llama)
+- **Duration**: Total time for inference
+- **Tokens/Second**: Generation speed
+- **Graph Events**: High-level forward passes
+- **Operation Events**: Individual tensor computations
 
-## Advanced Configuration
+### Understanding the Numbers
 
-### Custom Configuration Files
+**For a typical Llama-7B model:**
+- ~1,500 operations per token (matrix mults, adds, etc.)
+- ~50-100ms per token on M1 Max
+- ~70% time in matrix multiplications
+- ~20 graph events (forward passes during initialization + generation)
 
-Create a `config.json` file for repeated use:
-
-```json
-{
-  "output_file": "default_trace.ggmlviz",
-  "max_events": 5000000,
-  "enable_timing": true,
-  "enable_memory_tracking": true,
-  "enable_thread_tracking": false,
-  "capture_tensor_names": true,
-  "verbose_logging": false,
-  "backends": {
-    "cpu": true,
-    "metal": true,
-    "cuda": true,
-    "vulkan": true
-  }
-}
-```
-
-Load with:
-```bash
-./bin/ggml-viz --config config.json my_trace.ggmlviz
-```
-
-### Performance Optimization
-
-**For Large Models (>7B parameters):**
-```bash
-# Limit event capture to prevent memory issues
-export GGML_VIZ_MAX_EVENTS=1000000
-export GGML_VIZ_MEMORY_TRACKING=false
-export GGML_VIZ_THREAD_TRACKING=false
-```
-
-**For Performance Analysis:**
-```bash
-# Enable all tracking for detailed analysis
-export GGML_VIZ_MAX_EVENTS=10000000
-export GGML_VIZ_OP_TIMING=true
-export GGML_VIZ_MEMORY_TRACKING=true
-export GGML_VIZ_THREAD_TRACKING=true
-export GGML_VIZ_VERBOSE=1
-```
-
-**For Production Monitoring:**
-```bash
-# Minimal overhead capture
-export GGML_VIZ_MAX_EVENTS=100000
-export GGML_VIZ_OP_TIMING=false
-export GGML_VIZ_MEMORY_TRACKING=false
-export GGML_VIZ_TENSOR_NAMES=false
-```
-
-### Multi-Backend Analysis
-
-Compare performance across different backends:
-
-```bash
-# CPU-only run
-export GGML_VIZ_OUTPUT=cpu_run.ggmlviz
-CUDA_VISIBLE_DEVICES="" ./main -m model.gguf -p "Test" -n 50
-
-# Metal run (macOS)
-export GGML_VIZ_OUTPUT=metal_run.ggmlviz
-./main -m model.gguf -p "Test" -n 50
-
-# Compare in visualizer
-./bin/ggml-viz cpu_run.ggmlviz
-./bin/ggml-viz metal_run.ggmlviz
-```
+**For smaller models like TinyLlama-1.1B:**
+- ~800-1,200 operations per token  
+- ~10-20ms per token on M1 Max
+- Similar operation distribution but faster execution
 
 ---
 
-## Performance Analysis
+## Advanced Usage
 
-### Key Metrics to Monitor
+### Performance Analysis
 
-#### 1. Inference Speed
-- **Tokens per second**: Overall generation speed
-- **Time per token**: Latency for each generated token
-- **First token latency**: Time to start generation
-
-#### 2. Operation Efficiency
-- **Matrix multiplication time**: Usually the bottleneck
-- **Attention computation**: Self-attention overhead
-- **Activation functions**: ReLU, GELU, SiLU performance
-- **Memory operations**: Data movement costs
-
-#### 3. Resource Utilization
-- **Backend distribution**: CPU vs GPU utilization
-- **Memory usage**: Peak and sustained memory
-- **Thread efficiency**: Parallel execution patterns
-
-### Performance Optimization Strategies
-
-**Based on Timeline Analysis:**
-
-1. **Identify Bottlenecks**:
-   ```
-   Look for operations taking >10% of total time
-   Focus on matmul operations first
-   Check for memory transfer overhead
-   ```
-
-2. **Backend Optimization**:
-   ```
-   Compare CPU vs Metal/CUDA performance
-   Consider mixed-precision inference
-   Evaluate quantization impact
-   ```
-
-3. **Model-Specific Tuning**:
-   ```
-   Analyze attention pattern efficiency
-   Look for redundant operations
-   Consider architectural modifications
-   ```
-
-### Benchmarking Workflow
-
+**Identify bottlenecks:**
 ```bash
-# Create a standardized benchmark
-echo "Benchmarking model performance..."
+# Capture a performance trace
+env GGML_VIZ_OUTPUT=perf_analysis.ggmlviz \
+    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    ./third_party/llama.cpp/build/bin/llama-cli \
+    -m your_model.gguf \
+    -p "Generate some text to analyze" \
+    -n 100
 
-# Short generation for latency
-export GGML_VIZ_OUTPUT=latency_test.ggmlviz
-./main -m model.gguf -p "Hello" -n 1
+# Analyze in GUI - look for:
+# 1. Longest operations in Timeline View
+# 2. Most expensive nodes in Graph View  
+# 3. Patterns in operation timing
+```
 
-# Medium generation for throughput  
-export GGML_VIZ_OUTPUT=throughput_test.ggmlviz
-./main -m model.gguf -p "Write a story about:" -n 100
-
-# Long generation for stability
-export GGML_VIZ_OUTPUT=stability_test.ggmlviz
-./main -m model.gguf -p "Explain machine learning in detail:" -n 500
-
-# Analyze all three
-for trace in latency_test throughput_test stability_test; do
-    echo "Analyzing $trace..."
-    ./bin/ggml-viz ${trace}.ggmlviz
+**Compare models:**
+```bash
+# Test different model sizes
+for model in tinyllama-1b llama-7b llama-13b; do
+    env GGML_VIZ_OUTPUT=${model}_trace.ggmlviz \
+        DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+        ./third_party/llama.cpp/build/bin/llama-cli \
+        -m models/${model}.gguf \
+        -p "Standard test prompt" \
+        -n 20
 done
+```
+
+**Backend comparison:**
+```bash
+# Compare CPU vs Metal performance
+export GGML_VIZ_OUTPUT=cpu_trace.ggmlviz
+env GGML_METAL=0 DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    ./third_party/llama.cpp/build/bin/llama-cli -m model.gguf -p "test" -n 10
+
+export GGML_VIZ_OUTPUT=metal_trace.ggmlviz  
+env GGML_METAL=1 DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    ./third_party/llama.cpp/build/bin/llama-cli -m model.gguf -p "test" -n 10
+```
+
+### Debugging Model Issues
+
+**Analyze poor generation quality:**
+```bash
+# Capture trace with verbose output for debugging
+env GGML_VIZ_OUTPUT=debug_trace.ggmlviz \
+    GGML_VIZ_VERBOSE=1 \
+    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    ./third_party/llama.cpp/build/bin/llama-cli \
+    -m problematic_model.gguf \
+    -p "Test prompt that gives bad output" \
+    -n 20 \
+    --verbose-prompt
+
+# Look for:
+# - Unusual operation patterns
+# - Unexpected tensor shapes
+# - Timing anomalies
+```
+
+### Production Monitoring
+
+**Minimal overhead capture:**
+```bash
+# Lightweight monitoring for production
+env GGML_VIZ_OUTPUT=prod_monitor.ggmlviz \
+    GGML_VIZ_MAX_EVENTS=50000 \
+    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    your_production_command
 ```
 
 ---
 
 ## Troubleshooting
 
-### Common Issues and Solutions
+### Common Issues
 
-#### 1. No Trace File Generated
+**1. "No events captured" / Empty timeline**
 
-**Problem**: GGML_VIZ_OUTPUT is set but no .ggmlviz file appears
-
-**Solutions**:
+Check your environment variables:
 ```bash
-# Check if environment variable is properly set
-echo $GGML_VIZ_OUTPUT
-
-# Ensure directory exists and is writable
-mkdir -p $(dirname $GGML_VIZ_OUTPUT)
-touch $GGML_VIZ_OUTPUT  # Test write permissions
-
-# Enable verbose logging to debug
-export GGML_VIZ_VERBOSE=1
+echo $GGML_VIZ_OUTPUT  # Should show your trace file path
+echo $DYLD_INSERT_LIBRARIES  # Should show path to libggml_viz_hook.dylib
 ```
 
-#### 2. Empty Trace Files
-
-**Problem**: Trace file exists but contains no events
-
-**Possible causes**:
-- GGML hooks not properly integrated
-- Application not using GGML backend system
-- Instrumentation disabled
-
-**Solutions**:
+Verify the hook library exists:
 ```bash
-# Test with known working application
-./bin/test_ggml_hook
-
-# Check if hooks are compiled in
-export GGML_VIZ_VERBOSE=1
-# Look for hook initialization messages
+ls -la ./build/src/libggml_viz_hook.dylib
 ```
 
-#### 3. GUI Won't Load Trace Files
+**2. "Hook library not loading"**
 
-**Problem**: Visualizer opens but can't load trace files
-
-**Solutions**:
+Make sure you're using the correct llama.cpp build:
 ```bash
-# Verify file format
-file your_trace.ggmlviz
-
-# Check file permissions
-ls -la your_trace.ggmlviz
-
-# Test with known good trace
-./bin/test_ggml_hook  # Generates test_trace.ggmlviz
-./bin/ggml-viz test_trace.ggmlviz
+# Check if llama.cpp uses shared GGML libraries
+otool -L third_party/llama.cpp/build/bin/llama-cli | grep ggml
+# Should show libggml.dylib, not static linking
 ```
 
-#### 4. Performance Overhead Too High
+**3. "GUI shows no data in live mode"**
 
-**Problem**: Inference becomes significantly slower with instrumentation
-
-**Solutions**:
+Verify the trace file is growing:
 ```bash
-# Reduce event capture
-export GGML_VIZ_MAX_EVENTS=100000
-
-# Disable expensive tracking
-export GGML_VIZ_MEMORY_TRACKING=false
-export GGML_VIZ_THREAD_TRACKING=false
-export GGML_VIZ_TENSOR_NAMES=false
-
-# Or disable completely for production
-export GGML_VIZ_DISABLE=1
+# In another terminal while model is running
+watch -n 1 "ls -la test_live_trace.ggmlviz"
+# File size should increase as model generates tokens
 ```
 
-#### 5. Build Issues
+**4. "Too many events / GUI is slow"**
 
-**Problem**: Compilation errors during build
-
-**Common solutions**:
+Reduce captured events:
 ```bash
-# For Metal shader issues on macOS
+env GGML_VIZ_OUTPUT=trace.ggmlviz \
+    GGML_VIZ_MAX_EVENTS=100000 \
+    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    your_command
+```
+
+**5. Build errors on macOS**
+
+Disable Metal if you get shader compilation errors:
+```bash
 cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=OFF
-
-# For missing dependencies
-brew install cmake glfw  # macOS
-sudo apt install cmake libgl1-mesa-dev libglfw3-dev  # Ubuntu
-
-# Clean rebuild
-rm -rf build/*
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make clean && make -j4
 ```
 
-### Debug Information
+### Debug Commands
 
-**Enable maximum debugging**:
 ```bash
-export GGML_VIZ_VERBOSE=1
-export GGML_VIZ_OUTPUT=debug_trace.ggmlviz
-./your_llama_command 2>&1 | tee debug.log
+# Test the hook system
+./build/bin/test_ggml_hook
+
+# Verify trace file format
+file your_trace.ggmlviz  # Should show binary data
+
+# Test trace reading
+./build/bin/test_trace_reader your_trace.ggmlviz
+
+# Enable maximum debugging
+env GGML_VIZ_VERBOSE=1 \
+    GGML_VIZ_OUTPUT=debug.ggmlviz \
+    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \
+    your_command 2>&1 | tee debug.log
 ```
 
-**Check system compatibility**:
-```bash
-# Verify GGML backend support
-./bin/ggml-viz --version
+### Getting Help
 
-# Check available backends
-./bin/test_ggml_hook  # Look for backend information in output
-```
+1. **Check the console output** - Look for `[GGML_VIZ]` messages
+2. **Verify your setup** - Use the test commands above
+3. **Start simple** - Try with TinyLlama first, then larger models
+4. **Check file permissions** - Make sure you can write to the output directory
 
 ---
 
-## Tips and Best Practices
+## What You Should See
 
-### Development Workflow
+**Successful live mode session:**
+- Console: `[ImGuiApp] Loaded XXX new events from external file`
+- GUI Timeline: Dense timeline with hundreds of colored bars per token
+- GUI Graph: Network diagram showing model architecture
+- Real-time updates as you type prompts to the model
 
-1. **Start Small**: Use small models (1-3B parameters) for initial development
-2. **Iterative Analysis**: Capture short runs first, then gradually increase length
-3. **Comparative Analysis**: Always compare before/after when making changes
-4. **Document Findings**: Keep notes on performance patterns you discover
+Around ~12,000 lines
 
-### Production Usage
+The visualization gives you unprecedented insight into how language models actually compute. Use it to optimize performance, debug issues, and understand model behavior at the operation level.
 
-1. **Selective Instrumentation**: Only enable when needed
-2. **Automated Analysis**: Script trace capture for CI/CD pipelines
-3. **Performance Budgets**: Set acceptable overhead limits
-4. **Regular Monitoring**: Capture traces for performance regression detection
-
-### Model-Specific Tips
-
-**For Large Language Models:**
-- Focus on attention and feed-forward layer performance
-- Monitor memory usage during long sequences
-- Analyze token generation patterns
-
-**For Code Models:**
-- Pay attention to special token processing
-- Monitor performance with different code structures
-- Analyze tokenization efficiency
-
-**For Chat Models:**
-- Capture multi-turn conversations
-- Monitor context window utilization
-- Analyze system prompt impact
-
-### Advanced Techniques
-
-**Comparative Benchmarking:**
-```bash
-# A/B test different model versions
-for model in model_v1.gguf model_v2.gguf; do
-    export GGML_VIZ_OUTPUT=${model%.*}_trace.ggmlviz
-    ./main -m $model -p "Standard test prompt" -n 100
-done
-```
-
-**Performance Regression Testing:**
-```bash
-# Automated performance monitoring
-#!/bin/bash
-BASELINE_TRACE="baseline_performance.ggmlviz"
-CURRENT_TRACE="current_performance.ggmlviz"
-
-# Run standardized test
-export GGML_VIZ_OUTPUT=$CURRENT_TRACE
-./main -m model.gguf -p "Standardized test prompt" -n 50
-
-# Compare with baseline (manual analysis for now)
-echo "Compare $BASELINE_TRACE with $CURRENT_TRACE in visualizer"
-./bin/ggml-viz $CURRENT_TRACE
-```
-
-**Custom Analysis Scripts:**
-```bash
-# Extract key metrics from trace files
-#!/bin/bash
-for trace in *.ggmlviz; do
-    echo "Analysis for $trace:"
-    ./bin/test_trace_reader $trace | grep -E "(Event count|Total duration)"
-done
-```
-
----
-
-## Next Steps
-
-Now that you have GGML Visualizer set up and understand the basics:
-
-1. **Try with Your Models**: Start with your existing llama.cpp models
-2. **Experiment with Settings**: Test different configuration options
-3. **Analyze Performance**: Identify bottlenecks in your specific use cases
-4. **Optimize Based on Data**: Make informed decisions about model and hardware choices
-5. **Share Findings**: Contribute insights back to the community
-
-For advanced features and development, see:
-- `TODO.md` - Planned features and development roadmap
-- `CLAUDE.md` - Development guidelines and architecture details
-- GitHub Issues - Report bugs and request features
-
-Happy analyzing! 🚀
+Happy visualizing! 🚀
