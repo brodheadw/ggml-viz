@@ -1,6 +1,21 @@
 # src/CMakeLists.txt
 project(ggml_viz_instrumentation)
 
+# Add IPC library
+add_library(ggml_ipc STATIC
+    ipc/ipc_common.hpp
+    ipc/shm_posix.cpp
+)
+
+target_include_directories(ggml_ipc
+    PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
+)
+
+target_link_libraries(ggml_ipc
+    PUBLIC Threads::Threads
+)
+
 add_library(ggml_hook STATIC
     instrumentation/ggml_hook.cpp
     instrumentation/ggml_hook.hpp
@@ -18,7 +33,9 @@ target_compile_definitions(ggml_hook
 )
 
 target_link_libraries(ggml_hook
-    PUBLIC Threads::Threads
+    PUBLIC 
+      Threads::Threads
+      ggml_ipc
 )
 
 # Add utils library
@@ -80,11 +97,16 @@ add_library(ggml_viz_hook SHARED
     instrumentation/ggml_viz_init.cpp
     instrumentation/dyld_interpose_simple.cpp
     instrumentation/sched_interpose.mm
+    instrumentation/linux_interpose.cpp
+    ipc/shm_posix.cpp
+    utils/logger.cpp
 )
 
 target_include_directories(ggml_viz_hook
     PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation
+      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
+      ${CMAKE_CURRENT_SOURCE_DIR}                      # for utils/logger.hpp
       ${CMAKE_SOURCE_DIR}/third_party/ggml/include
       ${CMAKE_SOURCE_DIR}/third_party/ggml/src        # for ggml-impl.h
 )

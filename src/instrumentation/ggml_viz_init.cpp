@@ -1,5 +1,6 @@
 // src/instrumentation/ggml_viz_init.cpp
 #include "ggml_hook.hpp"
+#include "utils/logger.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -38,12 +39,13 @@ static int parse_int_env(const char* var_name, int default_value = 0) {
     }
 }
 
-// Helper function to log messages
+// Helper function to log messages (deprecated - use Logger directly)
 static void log_message(const std::string& message, bool is_error = false) {
+    auto& logger = Logger::instance();
     if (is_error) {
-        std::cerr << "[GGML_VIZ] ERROR: " << message << std::endl;
-    } else if (g_verbose_logging || parse_bool_env("GGML_VIZ_VERBOSE")) {
-        std::cout << "[GGML_VIZ] " << message << std::endl;
+        logger.error(message);
+    } else {
+        logger.info(message);
     }
 }
 
