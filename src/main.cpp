@@ -1,6 +1,7 @@
 // src/main.cpp
 #include "frontend/imgui_app.hpp"
 #include "server/live_data_collector.hpp"
+#include "utils/logger.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -108,8 +109,8 @@ namespace {
                             throw std::out_of_range("Port out of range");
                         }
                     } catch (const std::exception&) {
-                        std::cerr << "Error: Invalid port number: " << optarg << "\n";
-                        std::cerr << "Port must be between 1 and 65535.\n";
+                        GGML_VIZ_LOG_ERROR_FMT("Invalid port number: %s", optarg);
+                        GGML_VIZ_LOG_ERROR("Port must be between 1 and 65535");
                         exit(1);
                     }
                     break;
@@ -180,17 +181,20 @@ namespace {
         // Set environment variables based on config
         if (config.verbose) {
             setenv("GGML_VIZ_VERBOSE", "1", 1);
-            std::cout << "Verbose mode enabled.\n";
+            GGML_VIZ_LOG_INFO("Verbose mode enabled");
         }
+        
+        // Configure logger from environment variables
+        ggml_viz::Logger::instance().configure_from_env();
         
         // Print configuration if verbose
         if (config.verbose) {
-            std::cout << "Configuration:\n";
-            std::cout << "  Trace file: " << (config.trace_file.empty() ? "(none)" : config.trace_file) << "\n";
-            std::cout << "  Config file: " << (config.config_file.empty() ? "(none)" : config.config_file) << "\n";
-            std::cout << "  Live mode: " << (config.live_mode ? "enabled" : "disabled") << "\n";
-            std::cout << "  Port: " << config.port << "\n";
-            std::cout << "  Verbose: " << (config.verbose ? "enabled" : "disabled") << "\n";
+            GGML_VIZ_LOG_INFO("Configuration:");
+            GGML_VIZ_LOG_INFO_FMT("  Trace file: %s", config.trace_file.empty() ? "(none)" : config.trace_file.c_str());
+            GGML_VIZ_LOG_INFO_FMT("  Config file: %s", config.config_file.empty() ? "(none)" : config.config_file.c_str());
+            GGML_VIZ_LOG_INFO_FMT("  Live mode: %s", config.live_mode ? "enabled" : "disabled");
+            GGML_VIZ_LOG_INFO_FMT("  Port: %d", config.port);
+            GGML_VIZ_LOG_INFO_FMT("  Verbose: %s", config.verbose ? "enabled" : "disabled");
         }
     }
 }
