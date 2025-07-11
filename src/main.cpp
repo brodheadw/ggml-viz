@@ -16,7 +16,7 @@
 #include <atomic>
 
 namespace {
-    const char* VERSION = "0.1.0";
+    const char* VERSION = "1.1.0";
     const char* PROGRAM_NAME = "ggml-viz";
     
     struct Config {
@@ -52,10 +52,28 @@ namespace {
                   << "  " << program_name << " --web --port 9000       # Web server on port 9000\n"
                   << "  " << program_name << " --verbose trace.ggmlviz # Load with verbose output\n\n"
                   << "Environment Variables:\n"
-                  << "  GGML_VIZ_OUTPUT         Output file for trace recording\n"
-                  << "  GGML_VIZ_VERBOSE        Enable verbose instrumentation logging\n"
-                  << "  GGML_VIZ_DISABLE        Disable instrumentation entirely\n\n"
-                  << "For more information, visit: https://github.com/your-org/ggml-visualizer\n";
+                  << "  Essential Variables:\n"
+                  << "    GGML_VIZ_OUTPUT       Output file for trace recording\n"
+                  << "    GGML_VIZ_VERBOSE      Enable verbose instrumentation logging\n"
+                  << "    GGML_VIZ_DISABLE      Disable instrumentation entirely\n"
+                  << "\n"
+                  << "  Library Injection:\n"
+                  << "    DYLD_INSERT_LIBRARIES Path to libggml_viz_hook.dylib (macOS)\n"
+                  << "    LD_PRELOAD            Path to libggml_viz_hook.so (Linux)\n"
+                  << "\n"
+                  << "  Configuration Variables:\n"
+                  << "    GGML_VIZ_MAX_EVENTS   Maximum events to capture (default: 10,000,000)\n"
+                  << "    GGML_VIZ_OP_TIMING    Enable operation timing (default: true)\n"
+                  << "    GGML_VIZ_MEMORY_TRACKING  Enable memory tracking (default: false)\n"
+                  << "    GGML_VIZ_THREAD_TRACKING  Enable thread tracking (default: false)\n"
+                  << "    GGML_VIZ_TENSOR_NAMES     Capture tensor names (default: true)\n"
+                  << "\n"
+                  << "  Logging Configuration:\n"
+                  << "    GGML_VIZ_LOG_LEVEL    Log level (DEBUG/INFO/WARN/ERROR/FATAL)\n"
+                  << "    GGML_VIZ_LOG_TIMESTAMP    Enable timestamps (default: true)\n"
+                  << "    GGML_VIZ_LOG_THREAD_ID    Enable thread IDs (default: false)\n"
+                  << "    GGML_VIZ_LOG_PREFIX   Custom log prefix (default: [GGML_VIZ])\n\n"
+                  << "For more information, visit: https://github.com/brodheadw/ggml-viz\n";
     }
     
     void print_version() {
