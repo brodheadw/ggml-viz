@@ -1,6 +1,33 @@
 # src/CMakeLists.txt
 project(ggml_viz_instrumentation)
 
+# Add IPC library for cross-platform shared memory
+add_library(ggml_ipc STATIC
+    ipc/ipc_common.hpp
+)
+
+# Add platform-specific IPC implementations
+if(WIN32)
+    target_sources(ggml_ipc PRIVATE ipc/shm_windows.cpp)
+else()
+    target_sources(ggml_ipc PRIVATE ipc/shm_posix.cpp)
+endif()
+
+target_include_directories(ggml_ipc
+    PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
+)
+
+target_link_libraries(ggml_ipc
+    PUBLIC Threads::Threads
+)
+
+# Windows-specific MinHook dependency
+if(WIN32)
+    find_package(minhook CONFIG REQUIRED)
+    target_link_libraries(ggml_ipc PUBLIC minhook::minhook)
+endif()
+
 add_library(ggml_hook STATIC
     instrumentation/ggml_hook.cpp
     instrumentation/ggml_hook.hpp
@@ -133,9 +160,15 @@ target_compile_definitions(ggml_viz_hook
 
 target_link_libraries(ggml_viz_hook
     PUBLIC 
+      ggml_ipc
       Threads::Threads
       # Note: We intentionally don't link ggml-base to allow function interception
 )
+
+# Windows-specific MinHook linking
+if(WIN32)
+    target_link_libraries(ggml_viz_hook PRIVATE minhook::minhook)
+endif()
 
 # Platform-specific link options
 if(APPLE)
@@ -143,9 +176,11 @@ if(APPLE)
     target_link_options(ggml_viz_hook PRIVATE
         "-undefined" "dynamic_lookup")
 elseif(UNIX)
-    # Linux linker options
+
+# Linux linker options
     target_link_options(ggml_viz_hook PRIVATE
         "-Wl,--unresolved-symbols=ignore-all")
+
 endif()
 
 # Set shared library properties
@@ -165,6 +200,11 @@ if(APPLE)
         MACOSX_RPATH ON
         INSTALL_RPATH "@rpath"
         BUILD_WITH_INSTALL_RPATH ON
+    )
+elseif(WIN32)
+    set_target_properties(ggml_viz_hook PROPERTIES
+        WINDOWS_EXPORT_ALL_SYMBOLS ON
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 elseif(UNIX)
     set_target_properties(ggml_viz_hook PROPERTIES
