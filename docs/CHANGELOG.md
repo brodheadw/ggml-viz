@@ -7,7 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-07-15
 
+### Added - Cross-Platform Production Release ✅
+- **Windows MinHook Integration** - Complete Windows support with DLL injection
+  - Windows shared memory implementation using `CreateFileMappingW` and `MapViewOfFile`
+  - MinHook-based API hooking for `ggml_backend_sched_graph_compute` interception
+  - Automatic DLL initialization via `DllMain` with process attach/detach handling
+  - UTF-8 to wide string conversion for proper Windows Unicode support
+  - Windows-specific error handling and debugging output
+  
+- **Cross-Platform IPC Architecture** - Unified shared memory abstraction
+  - Platform-agnostic `SharedMemoryRegion` interface with factory pattern
+  - POSIX implementation (`shm_posix.cpp`) for Linux/macOS using `shm_open` and `mmap`
+  - Windows implementation (`shm_windows.cpp`) using file mapping APIs
+  - Lock-free ring buffer design with atomic operations across all platforms
+  - Power-of-two capacity validation and efficient masking operations
+  
+- **Enhanced Build System** - Complete CMake integration for all platforms
+  - Platform-specific source selection (Linux, macOS, Windows)
+  - vcpkg integration for Windows dependencies (MinHook)
+  - Conditional compilation flags and library linking
+  - Windows-specific build paths and executable naming
+  
+- **GitHub Actions CI Matrix** - Comprehensive cross-platform testing
+  - Ubuntu, macOS, and Windows CI runners with Release/Debug builds
+  - Platform-specific dependency installation and build commands
+  - Interposition testing for all three platforms
+  - Artifact upload for debugging and distribution
+
+### Changed - Cross-Platform Compatibility
+- **Updated Documentation** - Complete cross-platform setup instructions
+  - Windows PowerShell commands and build process
+  - Platform-specific environment variable setup
+  - Updated supported platform matrix showing Windows as production-ready
+  - Cross-platform testing examples and troubleshooting
+  
+- **Enhanced Interposition System** - Platform-appropriate hooking mechanisms
+  - Linux: `dlsym(RTLD_NEXT)` with `LD_PRELOAD` symbol interposition
+  - macOS: `DYLD_INSERT_LIBRARIES` with dynamic symbol lookup
+  - Windows: MinHook API hooking with automatic DLL injection
+  - Consistent event capture across all platforms without GGML submodule modifications
+
+### Technical Improvements
+- **Improved Error Handling** - Better diagnostics for cross-platform issues
+  - Windows-specific error codes and debugging output
+  - Enhanced shared memory creation error handling
+  - Platform-specific file path handling (Unix vs Windows paths)
+  - Graceful degradation when injection mechanisms fail
+  
+- **Performance Optimizations** - Consistent overhead across platforms
+  - Lock-free ring buffer implementation validated on all platforms
+  - Efficient memory mapping with platform-appropriate APIs
+  - Minimal instrumentation overhead maintained cross-platform
+  - Atomic operations optimized for each platform's memory model
+
+### Fixed - Platform-Specific Issues
+- **Windows Build Issues** - Complete Windows toolchain support
+  - MinHook dependency resolution via vcpkg
+  - Windows-specific CMake configuration and build commands
+  - Platform-specific executable paths and extensions
+  - Windows DLL export/import handling
+  
+- **Cross-Platform Path Handling** - Consistent file system operations
+  - Platform-specific shared memory naming conventions
+  - Windows backslash vs Unix forward slash path handling
+  - Cross-platform environment variable access
+  - Platform-appropriate file permission handling
+
+
+## [1.0.1] - 2025-07-11
+
+Logging system 
 
 ## [1.0.0] - 2025-07-10
 

@@ -30,20 +30,34 @@ make -j4
 # Linux
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
+
+# Windows (PowerShell)
+# First install vcpkg for dependencies
+git clone https://github.com/Microsoft/vcpkg.git
+.\vcpkg\bootstrap-vcpkg.bat
+.\vcpkg\vcpkg.exe install minhook:x64-windows
+
+# Then build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=..\vcpkg\scripts\buildsystems\vcpkg.cmake
+cmake --build . --config Release --parallel
 ```
 
 ### Test the Installation
 
 ```bash
-# Verify build
+# Unix/Linux/macOS
 ./bin/ggml-viz --version
 ./bin/ggml-viz --help
-
-# Run basic test
 ./tests/manual/test_ggml_hook
-
-# Load sample trace file
 ./bin/ggml-viz tests/assets/test_trace.ggmlviz
+```
+
+```powershell
+# Windows (PowerShell)
+.\Release\ggml-viz.exe --version
+.\Release\ggml-viz.exe --help
+.\Release\test_ggml_hook.exe
+.\Release\ggml-viz.exe tests\assets\test_trace.ggmlviz
 ```
 
 ---
@@ -75,16 +89,33 @@ You should see:
 ```
 
 #### Step 3: Run llama.cpp with Hooks (Terminal 2)
+
+**Unix/Linux/macOS:**
 ```bash
 # Set environment variables
 export GGML_VIZ_OUTPUT=tests/traces/trace.ggmlviz
-export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib
+export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib  # macOS
+export LD_PRELOAD=build/src/libggml_viz_hook.so               # Linux
 
 # Run any llama.cpp binary with hooks
 ./third_party/llama.cpp/build/bin/llama-cli \
   -m models/your-model.gguf \
   -p "Hello, world!" \
   -n 10 \
+  --no-display-prompt
+```
+
+**Windows (PowerShell):**
+```powershell
+# Set environment variables
+$env:GGML_VIZ_OUTPUT = "tests\traces\trace.ggmlviz"
+$env:GGML_VIZ_VERBOSE = "1"
+
+# Windows uses DLL injection automatically via DllMain
+.\third_party\llama.cpp\build\bin\llama-cli.exe `
+  -m models\your-model.gguf `
+  -p "Hello, world!" `
+  -n 10 `
   --no-display-prompt
 ```
 
@@ -182,7 +213,8 @@ done
 ### Essential Variables
 - **`GGML_VIZ_OUTPUT`**: Output trace file path (required for capture)
 - **`DYLD_INSERT_LIBRARIES`**: macOS library injection path
-- **`LD_PRELOAD`**: Linux library injection path (when available)
+- **`LD_PRELOAD`**: Linux library injection path  
+- **Windows**: Uses automatic DLL injection via DllMain (no manual injection needed)
 
 ### Configuration Variables
 - **`GGML_VIZ_VERBOSE`**: Enable verbose logging output
@@ -293,8 +325,8 @@ graph TD
 | Platform | CPU | GPU | Hook Method | Status |
 |----------|-----|-----|-------------|---------|
 | macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Production |
-| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | 🛠 In Progress |
-| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | DLL Injection | ❌ Planned |
+| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | ✅ Production |
+| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | ✅ Production |
 | Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | 🛠 Limited |
 
 *Metal backend requires `-DGGML_METAL=OFF` due to shader compilation issues
@@ -346,7 +378,8 @@ make -j4
 ## 📝 Status & Roadmap
 
 ### ✅ **Working (Production Ready)**
-- ✅ External hook injection via DYLD_INTERPOSE
+- ✅ Cross-platform support (macOS, Linux, Windows)
+- ✅ External hook injection via DYLD_INTERPOSE, LD_PRELOAD, MinHook
 - ✅ Scheduler interposition for modern llama.cpp
 - ✅ Real-time trace file generation and monitoring
 - ✅ ImGui desktop visualization interface
@@ -354,19 +387,20 @@ make -j4
 - ✅ Cross-backend support (Metal, CPU, CUDA, Vulkan)
 - ✅ Live mode with file-based communication
 - ✅ Comprehensive CLI with --help, --version, --no-hook
+- ✅ Windows MinHook DLL injection with automatic initialization
 
 ### 🛠 **In Progress**
-- 🛠 Linux LD_PRELOAD support
 - 🛠 Advanced timeline visualization
 - 🛠 Tensor inspection and statistics
 - 🛠 Memory usage tracking
+- 🛠 Performance optimization and overhead reduction
 
 ### 📋 **Planned**
-- 📋 Windows DLL injection support  
 - 📋 Web dashboard (browser-based interface)
 - 📋 Plugin system for custom visualizations
 - 📋 Export capabilities (SVG, JSON, CSV)
 - 📋 Integration with profiling tools (Tracy, perf)
+- 📋 Advanced Windows debugging tools integration
 
 ---
 

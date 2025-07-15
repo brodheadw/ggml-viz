@@ -1,6 +1,33 @@
 # src/CMakeLists.txt
 project(ggml_viz_instrumentation)
 
+# Add IPC library for cross-platform shared memory
+add_library(ggml_ipc STATIC
+    ipc/ipc_common.hpp
+)
+
+# Add platform-specific IPC implementations
+if(WIN32)
+    target_sources(ggml_ipc PRIVATE ipc/shm_windows.cpp)
+else()
+    target_sources(ggml_ipc PRIVATE ipc/shm_posix.cpp)
+endif()
+
+target_include_directories(ggml_ipc
+    PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
+)
+
+target_link_libraries(ggml_ipc
+    PUBLIC Threads::Threads
+)
+
+# Windows-specific MinHook dependency
+if(WIN32)
+    find_package(minhook CONFIG REQUIRED)
+    target_link_libraries(ggml_ipc PUBLIC minhook::minhook)
+endif()
+
 add_library(ggml_hook STATIC
     instrumentation/ggml_hook.cpp
     instrumentation/ggml_hook.hpp
@@ -40,6 +67,7 @@ target_include_directories(ggml_utils
 target_link_libraries(ggml_utils
     PUBLIC 
       ggml_hook
+      ggml_ipc
       Threads::Threads
 )
 
@@ -78,9 +106,19 @@ add_library(ggml_viz_hook SHARED
     instrumentation/ggml_hook.cpp
     instrumentation/ggml_hook.hpp
     instrumentation/ggml_viz_init.cpp
-    instrumentation/dyld_interpose_simple.cpp
-    instrumentation/sched_interpose.mm
 )
+
+# Add platform-specific interposition sources
+if(WIN32)
+    target_sources(ggml_viz_hook PRIVATE instrumentation/win32_interpose.cpp)
+    target_compile_definitions(ggml_viz_hook PRIVATE USE_MINHOOK)
+else()
+    target_sources(ggml_viz_hook PRIVATE 
+        instrumentation/linux_interpose.cpp
+        instrumentation/dyld_interpose_simple.cpp
+        instrumentation/sched_interpose.mm
+    )
+endif()
 
 target_include_directories(ggml_viz_hook
     PUBLIC
@@ -99,13 +137,26 @@ target_compile_definitions(ggml_viz_hook
 
 target_link_libraries(ggml_viz_hook
     PUBLIC 
+      ggml_ipc
       Threads::Threads
       # Note: We intentionally don't link ggml-base to allow function interception
 )
 
-# Allow unresolved symbols for scheduler interposition
-target_link_options(ggml_viz_hook PRIVATE
-    "-undefined" "dynamic_lookup")
+# Windows-specific MinHook linking
+if(WIN32)
+    target_link_libraries(ggml_viz_hook PRIVATE minhook::minhook)
+endif()
+
+# Platform-specific link options
+if(APPLE)
+    # Allow unresolved symbols for scheduler interposition
+    target_link_options(ggml_viz_hook PRIVATE
+        "-undefined" "dynamic_lookup")
+elseif(UNIX)
+    # Linux-specific options for symbol interposition
+    target_link_options(ggml_viz_hook PRIVATE
+        "-Wl,--allow-shlib-undefined")
+endif()
 
 # Set shared library properties
 # Hide all symbols by default, only export what we explicitly mark
@@ -124,6 +175,11 @@ if(APPLE)
         MACOSX_RPATH ON
         INSTALL_RPATH "@rpath"
         BUILD_WITH_INSTALL_RPATH ON
+    )
+elseif(WIN32)
+    set_target_properties(ggml_viz_hook PROPERTIES
+        WINDOWS_EXPORT_ALL_SYMBOLS ON
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 elseif(UNIX)
     set_target_properties(ggml_viz_hook PROPERTIES
