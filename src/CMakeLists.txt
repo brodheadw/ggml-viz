@@ -21,6 +21,24 @@ target_link_libraries(ggml_hook
     PUBLIC Threads::Threads
 )
 
+# Add IPC library with platform-specific sources
+add_library(ggml_ipc STATIC
+    ipc/ipc_common.hpp
+)
+
+if(WIN32)
+    target_sources(ggml_ipc PRIVATE ipc/shm_windows.cpp)
+    target_link_libraries(ggml_ipc PUBLIC psapi)
+else()
+    target_sources(ggml_ipc PRIVATE ipc/shm_posix.cpp)
+endif()
+
+target_include_directories(ggml_ipc
+    PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}
+      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
+)
+
 # Add utils library
 add_library(ggml_utils STATIC
     utils/config.cpp
@@ -40,6 +58,7 @@ target_include_directories(ggml_utils
 target_link_libraries(ggml_utils
     PUBLIC 
       ggml_hook
+      ggml_ipc
       Threads::Threads
 )
 
@@ -78,9 +97,24 @@ add_library(ggml_viz_hook SHARED
     instrumentation/ggml_hook.cpp
     instrumentation/ggml_hook.hpp
     instrumentation/ggml_viz_init.cpp
-    instrumentation/dyld_interpose_simple.cpp
-    instrumentation/sched_interpose.mm
 )
+
+# Platform-specific interposition sources
+if(WIN32)
+    target_sources(ggml_viz_hook PRIVATE instrumentation/win32_interpose.cpp)
+    target_link_libraries(ggml_viz_hook PUBLIC ggml_ipc)
+    if(TARGET minhook)
+        target_link_libraries(ggml_viz_hook PUBLIC minhook)
+    endif()
+elseif(APPLE)
+    target_sources(ggml_viz_hook PRIVATE 
+        instrumentation/dyld_interpose_simple.cpp
+        instrumentation/sched_interpose.mm
+    )
+else()
+    # Linux/Unix
+    target_sources(ggml_viz_hook PRIVATE instrumentation/linux_interpose.cpp)
+endif()
 
 target_include_directories(ggml_viz_hook
     PUBLIC
@@ -103,9 +137,16 @@ target_link_libraries(ggml_viz_hook
       # Note: We intentionally don't link ggml-base to allow function interception
 )
 
-# Allow unresolved symbols for scheduler interposition
-target_link_options(ggml_viz_hook PRIVATE
-    "-undefined" "dynamic_lookup")
+# Platform-specific link options
+if(APPLE)
+    # Allow unresolved symbols for scheduler interposition
+    target_link_options(ggml_viz_hook PRIVATE
+        "-undefined" "dynamic_lookup")
+elseif(UNIX)
+    # Linux linker options
+    target_link_options(ggml_viz_hook PRIVATE
+        "-Wl,--unresolved-symbols=ignore-all")
+endif()
 
 # Set shared library properties
 # Hide all symbols by default, only export what we explicitly mark
