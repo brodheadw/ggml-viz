@@ -237,10 +237,21 @@ jobs:
     - name: Verify examples and guides
       run: |
         # Verify key documentation files exist
-        required_docs=("README.md" "USER_GUIDE.md" "CONTRIBUTING.md" "CHANGELOG.md")
-        for doc in "${required_docs[@]}"; do
+        root_docs=("README.md" "USER_GUIDE.md")
+        docs_dir_files=("CONTRIBUTING.md" "CHANGELOG.md")
+        
+        # Check root directory files
+        for doc in "${root_docs[@]}"; do
           if [ ! -f "$doc" ]; then
-            echo "Error: Required documentation file missing: $doc"
+            echo "Error: Required documentation file missing in root: $doc"
+            exit 1
+          fi
+        done
+        
+        # Check docs directory files  
+        for doc in "${docs_dir_files[@]}"; do
+          if [ ! -f "docs/$doc" ]; then
+            echo "Error: Required documentation file missing in docs/: $doc"
             exit 1
           fi
         done
