@@ -22,7 +22,7 @@ target_link_libraries(ggml_ipc
     PUBLIC Threads::Threads
 )
 
-# Windows-specific MinHook dependency
+# Links directory to minhook and psapi targets from FetchContent
 if(WIN32)
     target_link_libraries(ggml_ipc PUBLIC minhook psapi)
 endif()
@@ -111,11 +111,14 @@ add_library(ggml_viz_hook SHARED
 if(WIN32)
     target_sources(ggml_viz_hook PRIVATE instrumentation/win32_interpose.cpp)
     target_compile_definitions(ggml_viz_hook PRIVATE USE_MINHOOK)
-else()
+elseif(APPLE)
     target_sources(ggml_viz_hook PRIVATE 
-        instrumentation/linux_interpose.cpp
         instrumentation/dyld_interpose_simple.cpp
         instrumentation/sched_interpose.mm
+    )
+elseif(UNIX)
+    target_sources(ggml_viz_hook PRIVATE 
+        instrumentation/linux_interpose.cpp
     )
 endif()
 
@@ -141,7 +144,7 @@ target_link_libraries(ggml_viz_hook
       # Note: We intentionally don't link ggml-base to allow function interception
 )
 
-# Windows-specific MinHook linking
+# Links directory to minhook and psapi targets from FetchContent
 if(WIN32)
     target_link_libraries(ggml_viz_hook PRIVATE minhook psapi)
 endif()

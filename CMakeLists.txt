@@ -11,17 +11,34 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
 
+# Windows-specific dependencies
+if(WIN32)
+    include(FetchContent)
+    FetchContent_Declare(
+        MinHook
+        GIT_REPOSITORY https://github.com/TsudaKageyu/minhook.git
+        GIT_TAG        v1.3.3
+    )
+    FetchContent_MakeAvailable(MinHook)
+    
+    # Add Windows-specific compile definitions
+    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
+    if(MSVC)
+        add_compile_options(/EHsc)
+    endif()
+endif()
+
 # Build GUI dependencies first
 add_subdirectory(third_party)
-
-# Build our instrumentation library
-add_subdirectory(src)
 
 # Enable visualization hooks in GGML
 set(GGML_VIZ_ENABLE_HOOKS ON CACHE BOOL "Enable hooks for ggml-viz visualization" FORCE)
 
 # Bring in ggml submodule (will define a 'ggml' target)
 add_subdirectory(third_party/ggml EXCLUDE_FROM_ALL)
+
+# Build our instrumentation library
+add_subdirectory(src)
 
 # Build and run tests
 enable_testing()
