@@ -24,8 +24,7 @@ target_link_libraries(ggml_ipc
 
 # Windows-specific MinHook dependency
 if(WIN32)
-    find_package(minhook CONFIG REQUIRED)
-    target_link_libraries(ggml_ipc PUBLIC minhook::minhook)
+    target_link_libraries(ggml_ipc PUBLIC minhook psapi)
 endif()
 
 add_library(ggml_hook STATIC
@@ -144,7 +143,7 @@ target_link_libraries(ggml_viz_hook
 
 # Windows-specific MinHook linking
 if(WIN32)
-    target_link_libraries(ggml_viz_hook PRIVATE minhook::minhook)
+    target_link_libraries(ggml_viz_hook PRIVATE minhook psapi)
 endif()
 
 # Platform-specific link options
