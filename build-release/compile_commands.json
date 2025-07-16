@@ -1,0 +1,158 @@
+[
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/cc -DGGML_COMMIT=\\\"dc3e13a6\\\" -DGGML_SCHED_MAX_COPIES=4 -DGGML_VERSION=\\\"0.0.2258\\\" -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -o CMakeFiles/ggml-base.dir/ggml.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml.c",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml.c",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DGGML_COMMIT=\\\"dc3e13a6\\\" -DGGML_SCHED_MAX_COPIES=4 -DGGML_VERSION=\\\"0.0.2258\\\" -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -o CMakeFiles/ggml-base.dir/ggml.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/cc -DGGML_COMMIT=\\\"dc3e13a6\\\" -DGGML_SCHED_MAX_COPIES=4 -DGGML_VERSION=\\\"0.0.2258\\\" -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -o CMakeFiles/ggml-base.dir/ggml-alloc.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-alloc.c",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-alloc.c",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DGGML_COMMIT=\\\"dc3e13a6\\\" -DGGML_SCHED_MAX_COPIES=4 -DGGML_VERSION=\\\"0.0.2258\\\" -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -o CMakeFiles/ggml-base.dir/ggml-backend.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DGGML_COMMIT=\\\"dc3e13a6\\\" -DGGML_SCHED_MAX_COPIES=4 -DGGML_VERSION=\\\"0.0.2258\\\" -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -o CMakeFiles/ggml-base.dir/ggml-opt.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-opt.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-opt.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DGGML_COMMIT=\\\"dc3e13a6\\\" -DGGML_SCHED_MAX_COPIES=4 -DGGML_VERSION=\\\"0.0.2258\\\" -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -o CMakeFiles/ggml-base.dir/ggml-threading.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-threading.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-threading.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/cc -DGGML_COMMIT=\\\"dc3e13a6\\\" -DGGML_SCHED_MAX_COPIES=4 -DGGML_VERSION=\\\"0.0.2258\\\" -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -o CMakeFiles/ggml-base.dir/ggml-quants.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-quants.c",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-quants.c",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DGGML_COMMIT=\\\"dc3e13a6\\\" -DGGML_SCHED_MAX_COPIES=4 -DGGML_VERSION=\\\"0.0.2258\\\" -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -o CMakeFiles/ggml-base.dir/gguf.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/gguf.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/gguf.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/cc -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.c",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ggml-cpu.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/repack.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/hbm.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/cc -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/quants.c",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/traits.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/amx.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/amx/mmq.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/binary-ops.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/unary-ops.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/vec.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/ops.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/cc -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=gnu11 -arch arm64 -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/quants.c",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_ACCELERATE -DGGML_USE_CPU_REPACK -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -mcpu=native+dotprod+noi8mm+nosve+nosme -o CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-cpu/arch/arm/repack.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src",
+  "command": "/usr/bin/c++ -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_BLAS -DGGML_USE_CPU -DGGML_USE_METAL -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -o CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-backend-reg.cpp",
+  "output": "third_party/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src/ggml-blas",
+  "command": "/usr/bin/c++ -DACCELERATE_LAPACK_ILP64 -DACCELERATE_NEW_LAPACK -DGGML_BLAS_USE_ACCELERATE -DGGML_SCHED_MAX_COPIES=4 -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-blas/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=c++17 -arch arm64 -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -o CMakeFiles/ggml-blas.dir/ggml-blas.cpp.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-blas/ggml-blas.cpp",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-blas/ggml-blas.cpp",
+  "output": "third_party/ggml/src/ggml-blas/CMakeFiles/ggml-blas.dir/ggml-blas.cpp.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src/ggml-metal",
+  "command": "/usr/bin/cc -DGGML_METAL_EMBED_LIBRARY -DGGML_SCHED_MAX_COPIES=4 -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-metal/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -x objective-c -O3 -DNDEBUG -std=gnu11 -arch arm64 -o CMakeFiles/ggml-metal.dir/ggml-metal.m.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-metal/ggml-metal.m",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-metal/ggml-metal.m",
+  "output": "third_party/ggml/src/ggml-metal/CMakeFiles/ggml-metal.dir/ggml-metal.m.o"
+},
+{
+  "directory": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/third_party/ggml/src/ggml-metal",
+  "command": "/usr/bin/cc -DGGML_METAL_EMBED_LIBRARY -DGGML_SCHED_MAX_COPIES=4 -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/ggml-metal/.. -I/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/../include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Foundation.framework -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Metal.framework -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/MetalKit.framework -O3 -DNDEBUG -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -o CMakeFiles/ggml-metal.dir/__/__/__/__/autogenerated/ggml-metal-embed.s.o -c /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/autogenerated/ggml-metal-embed.s",
+  "file": "/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build-release/autogenerated/ggml-metal-embed.s",
+  "output": "third_party/ggml/src/ggml-metal/CMakeFiles/ggml-metal.dir/__/__/__/__/autogenerated/ggml-metal-embed.s.o"
+}
+]
