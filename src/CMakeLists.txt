@@ -1,5 +1,5 @@
 # src/CMakeLists.txt
-project(ggml_viz_instrumentation)
+# SENTINEL: 2025-07-19T23:05Z - Diagnostic commit b81b9f03
 
 # Add IPC library for cross-platform shared memory
 if(NOT TARGET ggml_ipc)
