@@ -326,7 +326,7 @@ graph TD
 |----------|-----|-----|-------------|---------|
 | macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Production |
 | Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | ✅ Production |
-| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | ✅ Production |
+| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | 🚧 Experimental |
 | Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | 🛠 Limited |
 
 *Metal backend requires `-DGGML_METAL=OFF` due to shader compilation issues

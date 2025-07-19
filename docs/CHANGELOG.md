@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Note - Windows Implementation Status
+- Windows support is approximately 60% complete
+- Compiles successfully with MinHook integration
+- Shared memory implementation functional
+- DLL injection bootstrap works (shows loading message)
+- Full hook path and complete integration still under development
+- Not yet fully functional for end-to-end tracing
+
 ## [1.1.0] - 2025-07-15
 
-### Added - Cross-Platform Production Release ✅
-- **Windows MinHook Integration** - Complete Windows support with DLL injection
+### Added - Cross-Platform Implementation Progress
+- **Windows MinHook Integration** - Experimental Windows support with DLL injection skeleton
   - Windows shared memory implementation using `CreateFileMappingW` and `MapViewOfFile`
   - MinHook-based API hooking for `ggml_backend_sched_graph_compute` interception
   - Automatic DLL initialization via `DllMain` with process attach/detach handling
@@ -40,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Updated Documentation** - Complete cross-platform setup instructions
   - Windows PowerShell commands and build process
   - Platform-specific environment variable setup
-  - Updated supported platform matrix showing Windows as production-ready
+  - Updated supported platform matrix showing Windows as experimental
   - Cross-platform testing examples and troubleshooting
   
 - **Enhanced Interposition System** - Platform-appropriate hooking mechanisms

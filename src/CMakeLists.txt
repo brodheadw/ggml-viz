@@ -2,30 +2,31 @@
 project(ggml_viz_instrumentation)
 
 # Add IPC library for cross-platform shared memory
-add_library(ggml_ipc STATIC
-    ipc/ipc_common.hpp
-)
+if(NOT TARGET ggml_ipc)
+    add_library(ggml_ipc STATIC
+        ipc/ipc_common.hpp
+    )
+    
+    # Add platform-specific IPC implementations
+    if(WIN32)
+        target_sources(ggml_ipc PRIVATE ipc/shm_windows.cpp)
+    else()
+        target_sources(ggml_ipc PRIVATE ipc/shm_posix.cpp)
+    endif()
 
-# Add platform-specific IPC implementations
-if(WIN32)
-    target_sources(ggml_ipc PRIVATE ipc/shm_windows.cpp)
-else()
-    target_sources(ggml_ipc PRIVATE ipc/shm_posix.cpp)
-endif()
+    target_include_directories(ggml_ipc
+        PUBLIC
+          ${CMAKE_CURRENT_SOURCE_DIR}/ipc
+    )
 
-target_include_directories(ggml_ipc
-    PUBLIC
-      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
-)
+    target_link_libraries(ggml_ipc
+        PUBLIC Threads::Threads
+    )
 
-target_link_libraries(ggml_ipc
-    PUBLIC Threads::Threads
-)
-
-# Windows-specific MinHook dependency
-if(WIN32)
-    find_package(minhook CONFIG REQUIRED)
-    target_link_libraries(ggml_ipc PUBLIC minhook::minhook)
+    # Links directory to minhook and psapi targets from FetchContent
+    if(WIN32)
+        target_link_libraries(ggml_ipc PUBLIC minhook psapi)
+    endif()
 endif()
 
 add_library(ggml_hook STATIC
@@ -129,18 +130,16 @@ add_library(ggml_viz_hook SHARED
 # Platform-specific interposition sources
 if(WIN32)
     target_sources(ggml_viz_hook PRIVATE instrumentation/win32_interpose.cpp)
-    target_link_libraries(ggml_viz_hook PUBLIC ggml_ipc)
-    if(TARGET minhook)
-        target_link_libraries(ggml_viz_hook PUBLIC minhook)
-    endif()
+    target_compile_definitions(ggml_viz_hook PRIVATE USE_MINHOOK)
 elseif(APPLE)
     target_sources(ggml_viz_hook PRIVATE 
         instrumentation/dyld_interpose_simple.cpp
         instrumentation/sched_interpose.mm
     )
-else()
-    # Linux/Unix
-    target_sources(ggml_viz_hook PRIVATE instrumentation/linux_interpose.cpp)
+elseif(UNIX)
+    target_sources(ggml_viz_hook PRIVATE 
+        instrumentation/linux_interpose.cpp
+    )
 endif()
 
 target_include_directories(ggml_viz_hook
@@ -165,9 +164,9 @@ target_link_libraries(ggml_viz_hook
       # Note: We intentionally don't link ggml-base to allow function interception
 )
 
-# Windows-specific MinHook linking
+# Links directory to minhook and psapi targets from FetchContent
 if(WIN32)
-    target_link_libraries(ggml_viz_hook PRIVATE minhook::minhook)
+    target_link_libraries(ggml_viz_hook PRIVATE minhook psapi)
 endif()
 
 # Platform-specific link options
