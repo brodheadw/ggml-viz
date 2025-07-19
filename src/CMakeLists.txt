@@ -1,4 +1,5 @@
 # src/CMakeLists.txt
+cmake_minimum_required(VERSION 3.15)
 project(ggml_viz_instrumentation)
 
 # Add IPC library for cross-platform shared memory

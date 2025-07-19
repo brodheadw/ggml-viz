@@ -27,14 +27,12 @@ jobs:
             cxx: clang++
           - os: windows-latest
             platform: windows
-            cc: cl
-            cxx: cl
     
     env:
-      CC: ${{ matrix.cc }}
-      CXX: ${{ matrix.cxx }}
       BUILD_TYPE: ${{ matrix.build_type }}
       PLATFORM: ${{ matrix.platform }}
+      CC: ${{ matrix.os != 'windows-latest' && matrix.cc || '' }}
+      CXX: ${{ matrix.os != 'windows-latest' && matrix.cxx || '' }}
     
     steps:
     - name: Checkout code

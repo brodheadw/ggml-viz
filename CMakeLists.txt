@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
-project(ggml-viz VERSION 0.1 LANGUAGES C CXX OBJC)
+
+# Set languages based on platform
+if(APPLE)
+    project(ggml-viz VERSION 0.1 LANGUAGES C CXX OBJC)
+else()
+    project(ggml-viz VERSION 0.1 LANGUAGES C CXX)
+endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Enforce C++17

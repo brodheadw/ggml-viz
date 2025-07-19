@@ -1,4 +1,5 @@
 # third_party/CMakeLists.txt
+cmake_minimum_required(VERSION 3.15)
 
 # GLFW Configuration
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
