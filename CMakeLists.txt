@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
+project(ggml-viz VERSION 0.1 LANGUAGES C CXX)
 
-# Set languages based on platform
+# Enable Objective-C only on Apple platforms
 if(APPLE)
-    project(ggml-viz VERSION 0.1 LANGUAGES C CXX OBJC)
-else()
-    project(ggml-viz VERSION 0.1 LANGUAGES C CXX)
+    enable_language(OBJC)
 endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 

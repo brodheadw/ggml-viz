@@ -1,0 +1,543 @@
+Put cmake in trace mode, but output only lines of a specified file. Multiple options are allowed.
+-- The C compiler identification is AppleClang 16.0.0.16000026
+-- The CXX compiler identification is AppleClang 16.0.0.16000026
+-- The OBJC compiler identification is AppleClang 16.0.0.16000026
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting OBJC compiler ABI info
+-- Detecting OBJC compiler ABI info - done
+-- Check for working OBJC compiler: /usr/bin/cc - skipped
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found OpenGL: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
+-- Including Cocoa support
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(2):  add_library(glfw ${GLFW_LIBRARY_TYPE} ${GLFW_SOURCE_DIR}/include/GLFW/glfw3.h ${GLFW_SOURCE_DIR}/include/GLFW/glfw3native.h internal.h platform.h mappings.h context.c init.c input.c monitor.c platform.c vulkan.c window.c egl_context.c osmesa_context.c null_platform.h null_joystick.h null_init.c null_monitor.c null_window.c null_joystick.c )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(12):  if(APPLE )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(13):  target_sources(glfw PRIVATE cocoa_time.h cocoa_time.c posix_thread.h posix_module.c posix_thread.c )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(23):  add_custom_target(update_mappings COMMAND ${CMAKE_COMMAND} -P ${GLFW_SOURCE_DIR}/CMake/GenerateMappings.cmake mappings.h.in mappings.h WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMENT Updating gamepad mappings from upstream repository SOURCES mappings.h.in ${GLFW_SOURCE_DIR}/CMake/GenerateMappings.cmake VERBATIM )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(30):  set_target_properties(update_mappings PROPERTIES FOLDER GLFW3 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(32):  if(GLFW_BUILD_COCOA )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(33):  enable_language(OBJC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(34):  target_compile_definitions(glfw PRIVATE _GLFW_COCOA )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(35):  target_sources(glfw PRIVATE cocoa_platform.h cocoa_joystick.h cocoa_init.m cocoa_joystick.m cocoa_monitor.m cocoa_window.m nsgl_context.m )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(40):  if(GLFW_BUILD_WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(47):  if(GLFW_BUILD_X11 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(54):  if(GLFW_BUILD_WAYLAND )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(60):  if(GLFW_BUILD_X11 OR GLFW_BUILD_WAYLAND )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(67):  if(GLFW_BUILD_WAYLAND )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(110):  if(WIN32 AND GLFW_BUILD_SHARED_LIBRARY )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(115):  if(UNIX AND GLFW_BUILD_SHARED_LIBRARY )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(118):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(119):  set(GLFW_LIB_NAME glfw3 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(121):  set(GLFW_LIB_NAME_SUFFIX  )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(123):  set_target_properties(glfw PROPERTIES OUTPUT_NAME ${GLFW_LIB_NAME} VERSION ${GLFW_VERSION_MAJOR}.${GLFW_VERSION_MINOR} SOVERSION ${GLFW_VERSION_MAJOR} POSITION_INDEPENDENT_CODE ON C_STANDARD 99 C_EXTENSIONS OFF DEFINE_SYMBOL _GLFW_BUILD_DLL FOLDER GLFW3 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(133):  target_include_directories(glfw PUBLIC $<BUILD_INTERFACE:${GLFW_SOURCE_DIR}/include> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(136):  target_include_directories(glfw PRIVATE ${GLFW_SOURCE_DIR}/src ${GLFW_BINARY_DIR}/src )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(139):  target_link_libraries(glfw PRIVATE Threads::Threads )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(141):  if(GLFW_BUILD_WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(145):  if(GLFW_BUILD_COCOA )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(146):  target_link_libraries(glfw PRIVATE -framework Cocoa -framework IOKit -framework CoreFoundation -framework QuartzCore )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(151):  set(glfw_PKG_DEPS  )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(152):  set(glfw_PKG_LIBS -framework Cocoa -framework IOKit -framework CoreFoundation -framework QuartzCore )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(155):  if(GLFW_BUILD_WAYLAND )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(175):  if(GLFW_BUILD_X11 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(216):  if(UNIX AND NOT APPLE )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(237):  if(WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(245):  if(MSVC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(247):  elseif(CMAKE_C_COMPILER_ID STREQUAL GNU OR CMAKE_C_COMPILER_ID STREQUAL Clang OR CMAKE_C_COMPILER_ID STREQUAL AppleClang )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(251):  target_compile_options(glfw PRIVATE -Wall )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(254):  if(GLFW_BUILD_WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(262):  if(MINGW )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(267):  if(MINGW )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(277):  if(MSVC OR CMAKE_C_SIMULATE_ID STREQUAL MSVC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(282):  if(CMAKE_SYSTEM_NAME STREQUAL Linux )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(286):  if(GLFW_BUILD_SHARED_LIBRARY )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(346):  list(JOIN glfw_PKG_DEPS   deps )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(347):  list(JOIN glfw_PKG_LIBS   libs )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(349):  set(GLFW_PKG_CONFIG_REQUIRES_PRIVATE ${deps} CACHE INTERNAL GLFW pkg-config Requires.private )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(351):  set(GLFW_PKG_CONFIG_LIBS_PRIVATE ${libs} CACHE INTERNAL GLFW pkg-config Libs.private )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(354):  configure_file(${GLFW_SOURCE_DIR}/CMake/glfw3.pc.in glfw3.pc @ONLY )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(356):  if(GLFW_INSTALL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/glfw/src/CMakeLists.txt(357):  install(TARGETS glfw EXPORT glfwTargets RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(1):  include(CheckCXXCompilerFlag )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(2):  include(../cmake/common.cmake )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(4):  add_compile_definitions(GGML_SCHED_MAX_COPIES=${GGML_SCHED_MAX_COPIES} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(7):  if(CMAKE_SYSTEM_NAME MATCHES Linux )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(11):  if(NOT MSVC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(12):  if(GGML_SANITIZE_THREAD )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(17):  if(GGML_SANITIZE_ADDRESS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(22):  if(GGML_SANITIZE_UNDEFINED )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(28):  if(GGML_FATAL_WARNINGS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(37):  if(GGML_ALL_WARNINGS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(38):  if(NOT MSVC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(39):  list(APPEND WARNING_FLAGS -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(40):  list(APPEND C_FLAGS -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(42):  list(APPEND CXX_FLAGS -Wmissing-declarations -Wmissing-noreturn )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(44):  list(APPEND C_FLAGS ${WARNING_FLAGS} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(45):  list(APPEND CXX_FLAGS ${WARNING_FLAGS} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(47):  ggml_get_flags(${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(49):  add_compile_options($<$<COMPILE_LANGUAGE:C>:${C_FLAGS};${GF_C_FLAGS}> $<$<COMPILE_LANGUAGE:CXX>:${CXX_FLAGS};${GF_CXX_FLAGS}> )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(58):  if(GGML_LTO )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(68):  if(GGML_CCACHE AND NOT CMAKE_C_COMPILER_LAUNCHER AND NOT CMAKE_CXX_COMPILER_LAUNCHER )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(69):  find_program(GGML_CCACHE_FOUND ccache )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(70):  find_program(GGML_SCCACHE_FOUND sccache )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(72):  if(GGML_CCACHE_FOUND OR GGML_SCCACHE_FOUND )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(86):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(87):  message(STATUS Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF )
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(92):  execute_process(COMMAND ${CMAKE_C_COMPILER} ${CMAKE_EXE_LINKER_FLAGS} -Wl,-v ERROR_VARIABLE output OUTPUT_QUIET )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(98):  if(output MATCHES dyld-1015\.7 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(105):  message(STATUS CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR} )
+-- CMAKE_SYSTEM_PROCESSOR: arm64
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(106):  if(MSVC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(109):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(110):  set(CMAKE_GENERATOR_PLATFORM_LWR  )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(112):  ggml_get_system_arch()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(113):  message(STATUS GGML_SYSTEM_ARCH: ${GGML_SYSTEM_ARCH} )
+-- GGML_SYSTEM_ARCH: ARM
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(115):  if(NOT MSVC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(116):  if(GGML_STATIC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(122):  if(GGML_GPROF )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(127):  if(MINGW )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(143):  if(CMAKE_SYSTEM_NAME MATCHES OpenBSD )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(145):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(146):  add_compile_definitions(_XOPEN_SOURCE=600 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(151):  if(CMAKE_SYSTEM_NAME MATCHES Linux OR CMAKE_SYSTEM_NAME MATCHES Android )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(158):  if(CMAKE_SYSTEM_NAME MATCHES Darwin OR CMAKE_SYSTEM_NAME MATCHES iOS OR CMAKE_SYSTEM_NAME MATCHES tvOS OR CMAKE_SYSTEM_NAME MATCHES DragonFly )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(164):  add_compile_definitions(_DARWIN_C_SOURCE )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(170):  if(CMAKE_SYSTEM_NAME MATCHES FreeBSD )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(173):  if(CMAKE_SYSTEM_NAME MATCHES NetBSD )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(176):  if(CMAKE_SYSTEM_NAME MATCHES OpenBSD )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(180):  if(WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(186):  if(GGML_BACKEND_DL AND NOT BUILD_SHARED_LIBS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(190):  add_library(ggml-base ../include/ggml.h ../include/ggml-alloc.h ../include/ggml-backend.h ../include/ggml-cpp.h ../include/ggml-opt.h ../include/gguf.h ggml.c ggml.cpp ggml-alloc.c ggml-backend.cpp ggml-opt.cpp ggml-threading.cpp ggml-threading.h ggml-quants.c ggml-quants.h gguf.cpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(208):  target_include_directories(ggml-base PRIVATE . )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(209):  if(GGML_BACKEND_DL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(213):  add_library(ggml ggml-backend-reg.cpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(215):  add_library(ggml::ggml ALIAS ggml )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(217):  target_link_libraries(ggml PUBLIC ggml-base )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(219):  if(CMAKE_SYSTEM_NAME MATCHES Linux )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(223):  function(ggml_add_backend_library backend )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(257):  function(ggml_add_backend backend )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(270):  function(ggml_add_cpu_backend_variant tag_name )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(298):  ggml_add_backend(CPU )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(260):  string(TOLOWER ggml-${backend} backend_target )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(261):  add_subdirectory(${backend_target} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(262):  message(STATUS Including ${backend} backend )
+-- Including CPU backend
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(263):  if(NOT GGML_BACKEND_DL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(264):  string(TOUPPER GGML_USE_${backend} backend_use )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(265):  target_compile_definitions(ggml PUBLIC ${backend_use} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(300):  if(GGML_CPU_ALL_VARIANTS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(360):  elseif(GGML_CPU )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(361):  ggml_add_cpu_backend_variant_impl( )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(224):  if(GGML_BACKEND_DL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(231):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(232):  add_library(${backend} ${ARGN} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(233):  target_link_libraries(ggml PUBLIC ${backend} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(234):  install(TARGETS ${backend} LIBRARY )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(237):  target_link_libraries(${backend} PRIVATE ggml-base )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(238):  target_include_directories(${backend} PRIVATE .. )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(240):  if(${BUILD_SHARED_LIBS} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(245):  if(NOT GGML_AVAILABLE_BACKENDS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(246):  set(GGML_AVAILABLE_BACKENDS ${backend} CACHE INTERNAL List of backends for cmake package )
+-- Accelerate framework found
+-- Could NOT find OpenMP_C (missing: OpenMP_C_FLAGS OpenMP_C_LIB_NAMES) 
+-- Could NOT find OpenMP_CXX (missing: OpenMP_CXX_FLAGS OpenMP_CXX_LIB_NAMES) 
+-- Could NOT find OpenMP (missing: OpenMP_C_FOUND OpenMP_CXX_FOUND) 
+CMake Warning at third_party/ggml/src/ggml-cpu/CMakeLists.txt:77 (message):
+  OpenMP not found
+Call Stack (most recent call first):
+  third_party/ggml/src/CMakeLists.txt:361 (ggml_add_cpu_backend_variant_impl)
+
+
+-- ARM detected
+-- Performing Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E
+-- Performing Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E - Failed
+-- ARM -mcpu not found, -mcpu=native will be used
+-- Performing Test GGML_MACHINE_SUPPORTS_dotprod
+-- Performing Test GGML_MACHINE_SUPPORTS_dotprod - Success
+-- Performing Test GGML_MACHINE_SUPPORTS_i8mm
+-- Performing Test GGML_MACHINE_SUPPORTS_i8mm - Failed
+-- Performing Test GGML_MACHINE_SUPPORTS_noi8mm
+-- Performing Test GGML_MACHINE_SUPPORTS_noi8mm - Success
+-- Performing Test GGML_MACHINE_SUPPORTS_sve
+-- Performing Test GGML_MACHINE_SUPPORTS_sve - Failed
+-- Performing Test GGML_MACHINE_SUPPORTS_nosve
+-- Performing Test GGML_MACHINE_SUPPORTS_nosve - Success
+-- Performing Test GGML_MACHINE_SUPPORTS_sme
+-- Performing Test GGML_MACHINE_SUPPORTS_sme - Failed
+-- Performing Test GGML_MACHINE_SUPPORTS_nosme
+-- Performing Test GGML_MACHINE_SUPPORTS_nosme - Success
+-- ARM feature DOTPROD enabled
+-- ARM feature FMA enabled
+-- ARM feature FP16_VECTOR_ARITHMETIC enabled
+-- Adding CPU backend variant ggml-cpu: -mcpu=native+dotprod+noi8mm+nosve+nosme 
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(364):  ggml_add_backend(BLAS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(260):  string(TOLOWER ggml-${backend} backend_target )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(261):  add_subdirectory(${backend_target} )
+-- Looking for dgemm_
+-- Looking for dgemm_ - found
+-- Found BLAS: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework
+-- BLAS found, Libraries: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(224):  if(GGML_BACKEND_DL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(231):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(232):  add_library(${backend} ${ARGN} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(233):  target_link_libraries(ggml PUBLIC ${backend} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(234):  install(TARGETS ${backend} LIBRARY )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(237):  target_link_libraries(${backend} PRIVATE ggml-base )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(238):  target_include_directories(${backend} PRIVATE .. )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(240):  if(${BUILD_SHARED_LIBS} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(245):  if(NOT GGML_AVAILABLE_BACKENDS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(248):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(249):  list(FIND GGML_AVAILABLE_BACKENDS ${backend} has_backend )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(250):  if(has_backend EQUAL -1 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(251):  set(GGML_AVAILABLE_BACKENDS ${GGML_AVAILABLE_BACKENDS};${backend} CACHE INTERNAL List of backends for cmake package )
+-- BLAS found, Includes: 
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(262):  message(STATUS Including ${backend} backend )
+-- Including BLAS backend
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(263):  if(NOT GGML_BACKEND_DL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(264):  string(TOUPPER GGML_USE_${backend} backend_use )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(265):  target_compile_definitions(ggml PUBLIC ${backend_use} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(365):  ggml_add_backend(CANN )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(366):  ggml_add_backend(CUDA )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(367):  ggml_add_backend(HIP )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(368):  ggml_add_backend(Kompute )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(369):  ggml_add_backend(METAL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(260):  string(TOLOWER ggml-${backend} backend_target )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(261):  add_subdirectory(${backend_target} )
+-- Metal framework found
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(224):  if(GGML_BACKEND_DL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(231):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(232):  add_library(${backend} ${ARGN} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(233):  target_link_libraries(ggml PUBLIC ${backend} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(234):  install(TARGETS ${backend} LIBRARY )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(237):  target_link_libraries(${backend} PRIVATE ggml-base )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(238):  target_include_directories(${backend} PRIVATE .. )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(240):  if(${BUILD_SHARED_LIBS} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(245):  if(NOT GGML_AVAILABLE_BACKENDS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(248):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(249):  list(FIND GGML_AVAILABLE_BACKENDS ${backend} has_backend )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(250):  if(has_backend EQUAL -1 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(251):  set(GGML_AVAILABLE_BACKENDS ${GGML_AVAILABLE_BACKENDS};${backend} CACHE INTERNAL List of backends for cmake package )
+-- The ASM compiler identification is AppleClang
+-- Found assembler: /usr/bin/cc
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(262):  message(STATUS Including ${backend} backend )
+-- Including METAL backend
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(263):  if(NOT GGML_BACKEND_DL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(264):  string(TOUPPER GGML_USE_${backend} backend_use )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(265):  target_compile_definitions(ggml PUBLIC ${backend_use} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(370):  ggml_add_backend(MUSA )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(371):  ggml_add_backend(RPC )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(372):  ggml_add_backend(SYCL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(373):  ggml_add_backend(Vulkan )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(374):  ggml_add_backend(OpenCL )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(258):  string(TOUPPER GGML_${backend} backend_id )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(259):  if(${backend_id} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(376):  foreach(target ggml-base ggml )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(377):  target_include_directories(${target} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include> $<INSTALL_INTERFACE:include> )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(378):  target_compile_features(${target} PRIVATE c_std_11 cxx_std_17 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(377):  target_include_directories(${target} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include> $<INSTALL_INTERFACE:include> )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(378):  target_compile_features(${target} PRIVATE c_std_11 cxx_std_17 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(381):  target_link_libraries(ggml-base PRIVATE Threads::Threads )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(383):  find_library(MATH_LIBRARY m )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(384):  if(MATH_LIBRARY )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(385):  if(NOT WIN32 OR NOT DEFINED ENV{ONEAPI_ROOT} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(386):  target_link_libraries(ggml-base PRIVATE m )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(390):  if(CMAKE_SYSTEM_NAME MATCHES Android )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(394):  if(CMAKE_SYSTEM_NAME MATCHES visionOS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/third_party/ggml/src/CMakeLists.txt(398):  if(BUILD_SHARED_LIBS )
+-- ggml version: 0.0.2258
+-- ggml commit:  dc3e13a6
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(5):  if(NOT TARGET ggml_ipc )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(6):  add_library(ggml_ipc STATIC ipc/ipc_common.hpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(11):  if(WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(13):  else()
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(14):  target_sources(ggml_ipc PRIVATE ipc/shm_posix.cpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(17):  target_include_directories(ggml_ipc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ipc )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(22):  target_link_libraries(ggml_ipc PUBLIC Threads::Threads )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(27):  if(WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(32):  add_library(ggml_hook STATIC instrumentation/ggml_hook.cpp instrumentation/ggml_hook.hpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(37):  target_include_directories(ggml_hook PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation ${CMAKE_SOURCE_DIR}/third_party/ggml/include ${CMAKE_SOURCE_DIR}/third_party/ggml/src )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(44):  target_compile_definitions(ggml_hook PUBLIC GGML_VIZ_ENABLE_HOOKS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(48):  target_link_libraries(ggml_hook PUBLIC Threads::Threads )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(53):  add_library(ggml_utils STATIC utils/config.cpp utils/logger.cpp utils/trace_reader.cpp utils/trace_reader.hpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(60):  target_include_directories(ggml_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation ${CMAKE_SOURCE_DIR}/third_party/ggml/include ${CMAKE_SOURCE_DIR}/third_party/ggml/src )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(68):  target_link_libraries(ggml_utils PUBLIC ggml_hook ggml_ipc Threads::Threads )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(76):  add_library(ggml_frontend STATIC frontend/imgui_app.cpp frontend/imgui_widgets.hpp frontend/imgui_widgets.cpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(82):  target_include_directories(ggml_frontend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation ${CMAKE_CURRENT_SOURCE_DIR}/utils ${CMAKE_SOURCE_DIR}/third_party/imgui ${CMAKE_SOURCE_DIR}/third_party/imgui/backends )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(91):  target_link_libraries(ggml_frontend PUBLIC ggml_utils imgui OpenGL::GL Threads::Threads )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(99):  target_compile_definitions(ggml_frontend PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W=0 IMGUI_DEFINE_MATH_OPERATORS )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(106):  add_library(ggml_viz_hook SHARED instrumentation/ggml_hook.cpp instrumentation/ggml_hook.hpp instrumentation/ggml_viz_init.cpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(113):  if(WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(116):  elseif(APPLE )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(117):  target_sources(ggml_viz_hook PRIVATE instrumentation/dyld_interpose_simple.cpp instrumentation/sched_interpose.mm )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(127):  target_include_directories(ggml_viz_hook PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation ${CMAKE_SOURCE_DIR}/third_party/ggml/include ${CMAKE_SOURCE_DIR}/third_party/ggml/src )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(134):  target_compile_definitions(ggml_viz_hook PUBLIC GGML_VIZ_ENABLE_HOOKS GGML_VIZ_SHARED_BUILD PRIVATE BUILDING_GGML_VIZ )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(142):  target_link_libraries(ggml_viz_hook PUBLIC ggml_ipc Threads::Threads )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(150):  if(WIN32 )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(155):  if(APPLE )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(157):  target_link_options(ggml_viz_hook PRIVATE -undefined dynamic_lookup )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(167):  set_target_properties(ggml_viz_hook PROPERTIES VERSION 0.1 SOVERSION 1 OUTPUT_NAME ggml_viz_hook POSITION_INDEPENDENT_CODE ON CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(177):  if(APPLE )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(178):  set_target_properties(ggml_viz_hook PROPERTIES MACOSX_RPATH ON INSTALL_RPATH @rpath BUILD_WITH_INSTALL_RPATH ON )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(196):  add_executable(ggml-viz main.cpp )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(200):  target_include_directories(ggml-viz PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} )
+/Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/src/CMakeLists.txt(205):  target_link_libraries(ggml-viz PRIVATE ggml_frontend ggml_utils ggml_hook )
+-- Configuring done (25.8s)
+CMake Warning (dev) at third_party/CMakeLists.txt:22 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at third_party/glfw/src/CMakeLists.txt:2 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at third_party/ggml/src/CMakeLists.txt:190 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at third_party/ggml/src/CMakeLists.txt:232 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+Call Stack (most recent call first):
+  third_party/ggml/src/ggml-cpu/CMakeLists.txt:22 (ggml_add_backend_library)
+  third_party/ggml/src/CMakeLists.txt:361 (ggml_add_cpu_backend_variant_impl)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at third_party/ggml/src/CMakeLists.txt:213 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at third_party/ggml/src/CMakeLists.txt:232 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+Call Stack (most recent call first):
+  third_party/ggml/src/ggml-blas/CMakeLists.txt:14 (ggml_add_backend_library)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at third_party/ggml/src/CMakeLists.txt:232 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+Call Stack (most recent call first):
+  third_party/ggml/src/ggml-metal/CMakeLists.txt:7 (ggml_add_backend_library)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:6 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:32 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:53 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:76 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:106 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:106 (add_library):
+  Policy CMP0181 is not set: Link command-line fragment variables are parsed
+  and re-quoted.  Run "cmake --help-policy CMP0181" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, the contents of variable
+  'CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS' will be used as is.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:106 (add_library):
+  Policy CMP0181 is not set: Link command-line fragment variables are parsed
+  and re-quoted.  Run "cmake --help-policy CMP0181" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, the contents of variable
+  'CMAKE_CXX_LINK_FLAGS' will be used as is.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:196 (add_executable):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:196 (add_executable):
+  Policy CMP0181 is not set: Link command-line fragment variables are parsed
+  and re-quoted.  Run "cmake --help-policy CMP0181" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, the contents of variable
+  'CMAKE_CXX_CREATE_CONSOLE_EXE' will be used as is.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at src/CMakeLists.txt:196 (add_executable):
+  Policy CMP0181 is not set: Link command-line fragment variables are parsed
+  and re-quoted.  Run "cmake --help-policy CMP0181" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, the contents of variable
+  'CMAKE_CXX_LINK_FLAGS' will be used as is.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at tests/CMakeLists.txt:5 (add_library):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at tests/CMakeLists.txt:28 (add_executable):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at tests/CMakeLists.txt:28 (add_executable):
+  Policy CMP0181 is not set: Link command-line fragment variables are parsed
+  and re-quoted.  Run "cmake --help-policy CMP0181" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, the contents of variable
+  'CMAKE_CXX_CREATE_CONSOLE_EXE' will be used as is.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at tests/CMakeLists.txt:28 (add_executable):
+  Policy CMP0181 is not set: Link command-line fragment variables are parsed
+  and re-quoted.  Run "cmake --help-policy CMP0181" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, the contents of variable
+  'CMAKE_CXX_LINK_FLAGS' will be used as is.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at tests/CMakeLists.txt:43 (add_executable):
+  Policy CMP0156 is not set: De-duplicate libraries on link lines based on
+  linker capabilities.  Run "cmake --help-policy CMP0156" for policy details.
+  Use the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, legacy libraries de-duplication strategy will
+  be applied.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at tests/CMakeLists.txt:43 (add_executable):
+  Policy CMP0181 is not set: Link command-line fragment variables are parsed
+  and re-quoted.  Run "cmake --help-policy CMP0181" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, the contents of variable
+  'CMAKE_CXX_CREATE_CONSOLE_EXE' will be used as is.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at tests/CMakeLists.txt:43 (add_executable):
+  Policy CMP0181 is not set: Link command-line fragment variables are parsed
+  and re-quoted.  Run "cmake --help-policy CMP0181" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+  Since the policy is not set, the contents of variable
+  'CMAKE_CXX_LINK_FLAGS' will be used as is.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Generating done (3.8s)
+-- Build files have been written to: /Users/willb/Vaults/Personal/DevLab/ggml/ggml-viz/build
