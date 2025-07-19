@@ -69,10 +69,12 @@ jobs:
         echo "Windows dependencies managed by CMake FetchContent"
         
     - name: Create build directory
+      shell: bash
       run: mkdir -p build
         
     - name: Configure CMake
       working-directory: build
+      shell: bash
       run: |
         if [ "${{ matrix.platform }}" = "macos" ]; then
           cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DGGML_METAL=OFF
@@ -84,6 +86,7 @@ jobs:
         
     - name: Build project
       working-directory: build
+      shell: bash
       run: |
         if [ "${{ matrix.platform }}" = "linux" ]; then
           make -j$(nproc)
@@ -95,6 +98,7 @@ jobs:
         
     - name: Run basic tests
       working-directory: build
+      shell: bash
       run: |
         # Run the basic hook test
         if [ "${{ matrix.platform }}" = "windows" ]; then
@@ -118,6 +122,7 @@ jobs:
         
     - name: Test interposition system
       working-directory: build
+      shell: bash
       run: |
         # Test the interposition system
         export GGML_VIZ_OUTPUT="ci_test.ggmlviz"
@@ -129,8 +134,8 @@ jobs:
         elif [ "${{ matrix.platform }}" = "windows" ]; then
           # Windows uses DLL injection - test the DLL loading
           echo "Testing Windows DLL loading..."
-          set "GGML_VIZ_OUTPUT=win_test.ggmlviz"
-          set "PATH=%cd%\src;%PATH%"
+          export GGML_VIZ_OUTPUT="win_test.ggmlviz"
+          export PATH="$PWD/src:$PATH"
           ./bin/test_ggml_hook.exe
         else
           export LD_PRELOAD="$PWD/src/libggml_viz_hook.so"
@@ -154,6 +159,7 @@ jobs:
         
     - name: Run performance benchmark
       working-directory: build/..
+      shell: bash
       run: |
         # Run simple benchmark (skip on Windows for now)
         if [ "${{ matrix.platform }}" != "windows" ]; then
