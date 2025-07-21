@@ -1,32 +1,42 @@
 # src/CMakeLists.txt
 # SENTINEL: 2025-07-19T23:05Z - Diagnostic commit b81b9f03
 
+# DIAGNOSTIC: Parse guard to detect double processing
+if (DEFINED GGML_VIZ_SRC_CMAKELISTS_PARSED)
+  message(FATAL_ERROR "DIAG: SECOND PARSE of src/CMakeLists.txt")
+endif()
+set(GGML_VIZ_SRC_CMAKELISTS_PARSED TRUE)
+message(STATUS "DIAG: Processing src/CMakeLists.txt")
+
 # Add IPC library for cross-platform shared memory
-if(NOT TARGET ggml_ipc)
-    add_library(ggml_ipc STATIC
+if(NOT TARGET ggml_ipc_core)
+    add_library(ggml_ipc_core STATIC
         ipc/ipc_common.hpp
     )
     
     # Add platform-specific IPC implementations
     if(WIN32)
-        target_sources(ggml_ipc PRIVATE ipc/shm_windows.cpp)
+        target_sources(ggml_ipc_core PRIVATE ipc/shm_windows.cpp)
     else()
-        target_sources(ggml_ipc PRIVATE ipc/shm_posix.cpp)
+        target_sources(ggml_ipc_core PRIVATE ipc/shm_posix.cpp)
     endif()
 
-    target_include_directories(ggml_ipc
+    target_include_directories(ggml_ipc_core
         PUBLIC
           ${CMAKE_CURRENT_SOURCE_DIR}/ipc
     )
 
-    target_link_libraries(ggml_ipc
+    target_link_libraries(ggml_ipc_core
         PUBLIC Threads::Threads
     )
 
     # Links directory to minhook and psapi targets from FetchContent
     if(WIN32)
-        target_link_libraries(ggml_ipc PUBLIC minhook psapi)
+        target_link_libraries(ggml_ipc_core PUBLIC minhook psapi)
     endif()
+    
+    # Create alias for compatibility
+    add_library(ggml_ipc ALIAS ggml_ipc_core)
 endif()
 
 add_library(ggml_hook STATIC
@@ -68,7 +78,7 @@ target_include_directories(ggml_utils
 target_link_libraries(ggml_utils
     PUBLIC 
       ggml_hook
-      ggml_ipc
+      ggml_ipc_core
       Threads::Threads
 )
 
@@ -141,7 +151,7 @@ target_compile_definitions(ggml_viz_hook
 
 target_link_libraries(ggml_viz_hook
     PUBLIC 
-      ggml_ipc
+      ggml_ipc_core
       Threads::Threads
       # Note: We intentionally don't link ggml-base to allow function interception
 )
