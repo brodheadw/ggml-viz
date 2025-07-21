@@ -200,7 +200,11 @@ private:
         
         // Allow socket reuse
         int opt = 1;
+#ifdef _WIN32
+        setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(opt));
+#else
         setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+#endif
         
         // Bind to address
         struct sockaddr_in address;
@@ -210,14 +214,30 @@ private:
         
         if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
             printf("[LiveStreamServer] Error binding to port %d\n", config_.port);
-            close(server_fd);
+#ifdef _WIN32
+            closesocket(server_fd);
+#else
+    #ifdef _WIN32
+        closesocket(server_fd);
+#else
+        close(server_fd);
+#endif
+#endif
             return;
         }
         
         // Listen for connections
         if (listen(server_fd, 10) < 0) {
             printf("[LiveStreamServer] Error listening on socket\n");
-            close(server_fd);
+#ifdef _WIN32
+            closesocket(server_fd);
+#else
+    #ifdef _WIN32
+        closesocket(server_fd);
+#else
+        close(server_fd);
+#endif
+#endif
             return;
         }
         
@@ -246,7 +266,11 @@ private:
             }
         }
         
+#ifdef _WIN32
+        closesocket(server_fd);
+#else
         close(server_fd);
+#endif
         printf("[LiveStreamServer] HTTP server stopped\n");
     }
     
@@ -257,7 +281,15 @@ private:
         char buffer[4096];
         int bytes_read = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
         if (bytes_read <= 0) {
-            close(client_fd);
+#ifdef _WIN32
+            closesocket(client_fd);
+#else
+    #ifdef _WIN32
+        closesocket(client_fd);
+#else
+        close(client_fd);
+#endif
+#endif
             connected_clients_.fetch_sub(1);
             return;
         }
@@ -323,7 +355,11 @@ private:
             send(client_fd, html.c_str(), html.length(), 0);
         }
         
+#ifdef _WIN32
+        closesocket(client_fd);
+#else
         close(client_fd);
+#endif
         connected_clients_.fetch_sub(1);
     }
     
@@ -346,7 +382,11 @@ private:
                 std::string event_data = format_event_as_json(event);
                 std::string sse_message = "data: " + event_data + "\n\n";
                 
+#ifdef _WIN32
+                int result = send(client_fd, sse_message.c_str(), (int)sse_message.length(), 0);
+#else
                 int result = send(client_fd, sse_message.c_str(), sse_message.length(), MSG_NOSIGNAL);
+#endif
                 if (result <= 0) {
                     printf("[LiveStreamServer] Client disconnected\n");
                     return;
