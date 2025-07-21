@@ -149,7 +149,6 @@ target_link_libraries(ggml_viz_hook
 # Links directory to minhook and psapi targets from FetchContent
 if(WIN32)
     target_link_libraries(ggml_viz_hook PRIVATE MinHook psapi)
-    target_include_directories(ggml_viz_hook PRIVATE ${minhook_SOURCE_DIR}/include)
 endif()
 
 # Platform-specific link options

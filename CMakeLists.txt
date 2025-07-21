@@ -26,23 +26,32 @@ if(WIN32)
     )
     FetchContent_MakeAvailable(minhook)
     
-    # Check what target MinHook actually creates and create alias
-    if(TARGET minhook)
-        add_library(MinHook ALIAS minhook)
-        set_target_properties(minhook PROPERTIES OUTPUT_NAME "MinHook")
-    elseif(TARGET MinHook)
-        # Target is already called MinHook, no alias needed
-        set_target_properties(MinHook PROPERTIES OUTPUT_NAME "MinHook")
-    elseif(TARGET libminhook)
-        add_library(MinHook ALIAS libminhook)
-        set_target_properties(libminhook PROPERTIES OUTPUT_NAME "MinHook")
+    # MinHook doesn't provide CMake targets, so we'll build it manually
+    if(EXISTS "${minhook_SOURCE_DIR}/src/buffer.c")
+        set(MINHOOK_SOURCES
+            ${minhook_SOURCE_DIR}/src/buffer.c
+            ${minhook_SOURCE_DIR}/src/hook.c
+            ${minhook_SOURCE_DIR}/src/trampoline.c
+            ${minhook_SOURCE_DIR}/src/hde/hde32.c
+            ${minhook_SOURCE_DIR}/src/hde/hde64.c
+        )
+        
+        add_library(MinHook STATIC ${MINHOOK_SOURCES})
+        target_include_directories(MinHook 
+            PUBLIC ${minhook_SOURCE_DIR}/include
+            PRIVATE ${minhook_SOURCE_DIR}/src
+        )
+        target_compile_definitions(MinHook PRIVATE MINHOOK_EXPORTS)
+        
+        # Set output name for the library
+        set_target_properties(MinHook PROPERTIES
+            OUTPUT_NAME "MinHook"
+            POSITION_INDEPENDENT_CODE ON
+        )
+        
+        message(STATUS "Successfully created MinHook target from sources")
     else()
-        message(STATUS "Available targets after MinHook FetchContent:")
-        get_property(_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
-        foreach(_target ${_targets})
-            message(STATUS "  - ${_target}")
-        endforeach()
-        message(FATAL_ERROR "MinHook target not found after FetchContent_MakeAvailable")
+        message(FATAL_ERROR "MinHook sources not found at ${minhook_SOURCE_DIR}/src/")
     endif()
     
     # Add Windows-specific compile definitions
