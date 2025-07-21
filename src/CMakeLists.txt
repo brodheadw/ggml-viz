@@ -1,21 +1,8 @@
 # src/CMakeLists.txt
-# SENTINEL: 2025-07-19T23:05Z - Diagnostic commit b81b9f03
-
-# DIAGNOSTIC: Parse guard to detect double processing
-if (DEFINED GGML_VIZ_SRC_CMAKELISTS_PARSED)
-  message(FATAL_ERROR "DIAG: SECOND PARSE of src/CMakeLists.txt")
-endif()
-set(GGML_VIZ_SRC_CMAKELISTS_PARSED TRUE)
-message(STATUS "DIAG: Processing src/CMakeLists.txt")
+cmake_minimum_required(VERSION 3.15)
 
 # Add IPC library for cross-platform shared memory
-message(STATUS "DIAG: Checking ggml_ipc_core target existence...")
-if(TARGET ggml_ipc_core)
-    message(STATUS "DIAG: ggml_ipc_core target ALREADY EXISTS")
-endif()
-
 if(NOT TARGET ggml_ipc_core)
-    message(STATUS "DIAG: Creating ggml_ipc_core target...")
     add_library(ggml_ipc_core STATIC
         ipc/ipc_common.hpp
     )
@@ -40,8 +27,6 @@ if(NOT TARGET ggml_ipc_core)
     if(WIN32)
         target_link_libraries(ggml_ipc_core PUBLIC minhook psapi)
     endif()
-    
-    message(STATUS "DIAG: Created ggml_ipc_core target successfully")
 endif()
 
 add_library(ggml_hook STATIC
