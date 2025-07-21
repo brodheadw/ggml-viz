@@ -100,7 +100,7 @@ jobs:
       run: |
         # Run the basic hook test
         if [ "${{ matrix.platform }}" = "windows" ]; then
-          ./bin/test_ggml_hook.exe
+          ./bin/$BUILD_TYPE/test_ggml_hook.exe
         else
           ./bin/test_ggml_hook
         fi
@@ -113,7 +113,7 @@ jobs:
         
         # Test trace reading
         if [ "${{ matrix.platform }}" = "windows" ]; then
-          ./bin/test_trace_reader.exe test_trace.ggmlviz
+          ./bin/$BUILD_TYPE/test_trace_reader.exe test_trace.ggmlviz
         else
           ./bin/test_trace_reader test_trace.ggmlviz
         fi
@@ -133,8 +133,8 @@ jobs:
           # Windows uses DLL injection - test the DLL loading
           echo "Testing Windows DLL loading..."
           export GGML_VIZ_OUTPUT="win_test.ggmlviz"
-          export PATH="$PWD/src:$PATH"
-          ./bin/test_ggml_hook.exe
+          export PATH="$PWD/bin/$BUILD_TYPE:$PATH"
+          ./bin/$BUILD_TYPE/test_ggml_hook.exe
         else
           export LD_PRELOAD="$PWD/src/libggml_viz_hook.so"
           ./bin/test_ggml_hook
@@ -150,7 +150,7 @@ jobs:
         unset DYLD_INSERT_LIBRARIES
         unset LD_PRELOAD
         if [ "${{ matrix.platform }}" = "windows" ]; then
-          ./bin/test_trace_reader.exe "$GGML_VIZ_OUTPUT"
+          ./bin/$BUILD_TYPE/test_trace_reader.exe "$GGML_VIZ_OUTPUT"
         else
           ./bin/test_trace_reader "$GGML_VIZ_OUTPUT"
         fi
