@@ -25,7 +25,7 @@ if(NOT TARGET ggml_ipc_core)
 
     # Links directory to minhook and psapi targets from FetchContent
     if(WIN32)
-        target_link_libraries(ggml_ipc_core PUBLIC minhook psapi)
+        target_link_libraries(ggml_ipc_core PUBLIC MinHook psapi)
     endif()
 endif()
 
@@ -148,7 +148,7 @@ target_link_libraries(ggml_viz_hook
 
 # Links directory to minhook and psapi targets from FetchContent
 if(WIN32)
-    target_link_libraries(ggml_viz_hook PRIVATE minhook psapi)
+    target_link_libraries(ggml_viz_hook PRIVATE MinHook psapi)
 endif()
 
 # Platform-specific link options
@@ -208,3 +208,8 @@ target_link_libraries(ggml-viz
       ggml_utils
       ggml_hook
 )
+
+# Add Windows-specific libraries
+if(WIN32)
+    target_link_libraries(ggml-viz PRIVATE ws2_32)
+endif()
