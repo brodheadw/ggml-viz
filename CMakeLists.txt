@@ -26,33 +26,20 @@ if(WIN32)
     )
     FetchContent_MakeAvailable(minhook)
     
-    # MinHook doesn't provide CMake targets, so we'll build it manually
-    if(EXISTS "${minhook_SOURCE_DIR}/src/buffer.c")
-        set(MINHOOK_SOURCES
-            ${minhook_SOURCE_DIR}/src/buffer.c
-            ${minhook_SOURCE_DIR}/src/hook.c
-            ${minhook_SOURCE_DIR}/src/trampoline.c
-            ${minhook_SOURCE_DIR}/src/hde/hde32.c
-            ${minhook_SOURCE_DIR}/src/hde/hde64.c
-        )
-        
-        add_library(MinHook STATIC ${MINHOOK_SOURCES})
-        target_include_directories(MinHook 
-            PUBLIC ${minhook_SOURCE_DIR}/include
-            PRIVATE ${minhook_SOURCE_DIR}/src
-        )
-        target_compile_definitions(MinHook PRIVATE MINHOOK_EXPORTS)
-        
-        # Set output name for the library
-        set_target_properties(MinHook PROPERTIES
-            OUTPUT_NAME "MinHook"
-            POSITION_INDEPENDENT_CODE ON
-        )
-        
-        message(STATUS "Successfully created MinHook target from sources")
-    else()
-        message(FATAL_ERROR "MinHook sources not found at ${minhook_SOURCE_DIR}/src/")
-    endif()
+    # Build our own static library from MinHook sources
+    add_library(MinHook STATIC
+        ${minhook_SOURCE_DIR}/src/buffer.c
+        ${minhook_SOURCE_DIR}/src/hook.c
+        ${minhook_SOURCE_DIR}/src/trampoline.c
+        ${minhook_SOURCE_DIR}/src/hde/hde32.c
+        ${minhook_SOURCE_DIR}/src/hde/hde64.c
+    )
+    target_include_directories(MinHook PUBLIC ${minhook_SOURCE_DIR}/include)
+    target_compile_definitions(MinHook PRIVATE MH_STANDALONE)
+    set_target_properties(MinHook PROPERTIES
+        OUTPUT_NAME "MinHook"
+        POSITION_INDEPENDENT_CODE ON
+    )
     
     # Add Windows-specific compile definitions
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
