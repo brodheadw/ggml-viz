@@ -191,6 +191,15 @@ private:
     }
     
     void start_http_server() {
+#ifdef _WIN32
+        // Initialize Winsock
+        WSADATA wsaData;
+        if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
+            printf("[LiveStreamServer] WSAStartup failed\n");
+            return;
+        }
+#endif
+        
         // Create socket
         int server_fd = socket(AF_INET, SOCK_STREAM, 0);
         if (server_fd < 0) {
@@ -268,6 +277,7 @@ private:
         
 #ifdef _WIN32
         closesocket(server_fd);
+        WSACleanup();
 #else
         close(server_fd);
 #endif

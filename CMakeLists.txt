@@ -25,6 +25,12 @@ if(WIN32)
         GIT_TAG        v1.3.3
     )
     FetchContent_MakeAvailable(minhook)
+
+    if (WIN32)
+        add_library(MinHook ALIAS minhook)
+        set_target_properties(minhook PROPERTIES
+            OUTPUT_NAME "MinHook")
+    endif()
     
     # Add Windows-specific compile definitions
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
