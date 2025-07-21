@@ -13,9 +13,6 @@ message(STATUS "DIAG: Checking ggml_ipc_core target existence...")
 if(TARGET ggml_ipc_core)
     message(STATUS "DIAG: ggml_ipc_core target ALREADY EXISTS")
 endif()
-if(TARGET ggml_ipc)
-    message(STATUS "DIAG: ggml_ipc target ALREADY EXISTS")  
-endif()
 
 if(NOT TARGET ggml_ipc_core)
     message(STATUS "DIAG: Creating ggml_ipc_core target...")
@@ -44,9 +41,7 @@ if(NOT TARGET ggml_ipc_core)
         target_link_libraries(ggml_ipc_core PUBLIC minhook psapi)
     endif()
     
-    # Create alias for compatibility
-    add_library(ggml_ipc ALIAS ggml_ipc_core)
-    message(STATUS "DIAG: Created ggml_ipc_core and alias ggml_ipc")
+    message(STATUS "DIAG: Created ggml_ipc_core target successfully")
 endif()
 
 add_library(ggml_hook STATIC
