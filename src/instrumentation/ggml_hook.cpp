@@ -7,7 +7,9 @@
 #include <cassert>
 #include <iostream>
 #include <iomanip>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <io.h>     // for _commit, _fileno
+#else
 #include <dlfcn.h>  // for dlopen, dlsym, dlclose
 #include <unistd.h> // for fsync
 #include <fcntl.h>  // for fcntl
@@ -148,7 +150,11 @@ void GGMLHook::start() {
         
         // Ensure header is written to disk immediately
         fflush(output_file_);
+#ifndef _WIN32
         fsync(fileno(output_file_));
+#else
+        _commit(_fileno(output_file_));
+#endif
     }
 
     std::cout << "GGML Hook started. Output: " << config_.output_filename << "\n";
@@ -290,6 +296,8 @@ void GGMLHook::flush_to_file() {
     int fd = fileno(output_file_);
 #ifdef __APPLE__
     fcntl(fd, F_FULLFSYNC, 0);
+#elif defined(_WIN32)
+    _commit(_fileno(output_file_));
 #else
     fsync(fd);
 #endif
