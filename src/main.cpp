@@ -7,38 +7,7 @@
 #include <vector>
 #include <cstring>
 #include <cstdlib>
-#ifdef _WIN32
-// Windows doesn't have getopt.h, we'll implement simple option parsing
-static int parse_windows_args(int argc, char* argv[], AppConfig& config) {
-    for (int i = 1; i < argc; i++) {
-        std::string arg = argv[i];
-        if (arg == "-h" || arg == "--help") {
-            config.show_help = true;
-        } else if (arg == "-V" || arg == "--version") {
-            config.show_version = true;
-        } else if (arg == "-v" || arg == "--verbose") {
-            config.verbose = true;
-        } else if (arg == "-l" || arg == "--live") {
-            config.live_mode = true;
-        } else if (arg == "-w" || arg == "--web") {
-            config.web_mode = true;
-        } else if (arg == "-p" || arg == "--port") {
-            if (i + 1 < argc) {
-                config.port = std::atoi(argv[++i]);
-            }
-        } else if (arg == "-c" || arg == "--config") {
-            if (i + 1 < argc) {
-                config.config_file = argv[++i];
-            }
-        } else if (arg == "--no-hook") {
-            config.no_hook = true;
-        } else if (arg[0] != '-') {
-            config.trace_file = arg;
-        }
-    }
-    return 0;
-}
-#else
+#ifndef _WIN32
 #include <getopt.h>
 #endif
 #include <memory>
@@ -62,6 +31,38 @@ namespace {
         bool no_hook = false;
         int port = 8080;
     };
+
+#ifdef _WIN32
+    // Windows doesn't have getopt.h, we'll implement simple option parsing
+    void parse_windows_args(int argc, char* argv[], Config& config) {
+        for (int i = 1; i < argc; i++) {
+            std::string arg = argv[i];
+            if (arg == "-h" || arg == "--help") {
+                config.show_help = true;
+            } else if (arg == "-V" || arg == "--version") {
+                config.show_version = true;
+            } else if (arg == "-v" || arg == "--verbose") {
+                config.verbose = true;
+            } else if (arg == "-l" || arg == "--live") {
+                config.live_mode = true;
+            } else if (arg == "-w" || arg == "--web") {
+                config.web_mode = true;
+            } else if (arg == "-p" || arg == "--port") {
+                if (i + 1 < argc) {
+                    config.port = std::atoi(argv[++i]);
+                }
+            } else if (arg == "-c" || arg == "--config") {
+                if (i + 1 < argc) {
+                    config.config_file = argv[++i];
+                }
+            } else if (arg == "--no-hook") {
+                config.no_hook = true;
+            } else if (arg[0] != '-') {
+                config.trace_file = arg;
+            }
+        }
+    }
+#endif
     
     void print_usage(const char* program_name) {
         std::cout << "Usage: " << program_name << " [OPTIONS] [TRACE_FILE]\n\n"
@@ -101,6 +102,11 @@ namespace {
         Config config;
         
         // Define long options
+        
+#ifdef _WIN32
+        // Use Windows argument parsing
+        parse_windows_args(argc, argv, config);
+#else
         static struct option long_options[] = {
             {"help",    no_argument,       0, 'h'},
             {"version", no_argument,       0, 'V'},
@@ -113,11 +119,6 @@ namespace {
             {0, 0, 0, 0}
         };
         
-        
-#ifdef _WIN32
-        // Use Windows argument parsing
-        parse_windows_args(argc, argv, config);
-#else
         int option_index = 0;
         int c;
         
@@ -218,7 +219,11 @@ namespace {
     void setup_environment(const Config& config) {
         // Set environment variables based on config
         if (config.verbose) {
+#ifdef _WIN32
+            _putenv_s("GGML_VIZ_VERBOSE", "1");
+#else
             setenv("GGML_VIZ_VERBOSE", "1", 1);
+#endif
             std::cout << "Verbose mode enabled.\n";
         }
         

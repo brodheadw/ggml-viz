@@ -20,11 +20,11 @@ find_package(OpenGL REQUIRED)
 if(WIN32)
     include(FetchContent)
     FetchContent_Declare(
-        MinHook
+        minhook
         GIT_REPOSITORY https://github.com/TsudaKageyu/minhook.git
         GIT_TAG        v1.3.3
     )
-    FetchContent_MakeAvailable(MinHook)
+    FetchContent_MakeAvailable(minhook)
     
     # Add Windows-specific compile definitions
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
