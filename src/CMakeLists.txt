@@ -9,7 +9,16 @@ set(GGML_VIZ_SRC_CMAKELISTS_PARSED TRUE)
 message(STATUS "DIAG: Processing src/CMakeLists.txt")
 
 # Add IPC library for cross-platform shared memory
+message(STATUS "DIAG: Checking ggml_ipc_core target existence...")
+if(TARGET ggml_ipc_core)
+    message(STATUS "DIAG: ggml_ipc_core target ALREADY EXISTS")
+endif()
+if(TARGET ggml_ipc)
+    message(STATUS "DIAG: ggml_ipc target ALREADY EXISTS")  
+endif()
+
 if(NOT TARGET ggml_ipc_core)
+    message(STATUS "DIAG: Creating ggml_ipc_core target...")
     add_library(ggml_ipc_core STATIC
         ipc/ipc_common.hpp
     )
@@ -37,6 +46,7 @@ if(NOT TARGET ggml_ipc_core)
     
     # Create alias for compatibility
     add_library(ggml_ipc ALIAS ggml_ipc_core)
+    message(STATUS "DIAG: Created ggml_ipc_core and alias ggml_ipc")
 endif()
 
 add_library(ggml_hook STATIC
