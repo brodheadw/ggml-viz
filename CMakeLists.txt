@@ -25,11 +25,24 @@ if(WIN32)
         GIT_TAG        v1.3.3
     )
     FetchContent_MakeAvailable(minhook)
-
-    if (WIN32)
+    
+    # Check what target MinHook actually creates and create alias
+    if(TARGET minhook)
         add_library(MinHook ALIAS minhook)
-        set_target_properties(minhook PROPERTIES
-            OUTPUT_NAME "MinHook")
+        set_target_properties(minhook PROPERTIES OUTPUT_NAME "MinHook")
+    elseif(TARGET MinHook)
+        # Target is already called MinHook, no alias needed
+        set_target_properties(MinHook PROPERTIES OUTPUT_NAME "MinHook")
+    elseif(TARGET libminhook)
+        add_library(MinHook ALIAS libminhook)
+        set_target_properties(libminhook PROPERTIES OUTPUT_NAME "MinHook")
+    else()
+        message(STATUS "Available targets after MinHook FetchContent:")
+        get_property(_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
+        foreach(_target ${_targets})
+            message(STATUS "  - ${_target}")
+        endforeach()
+        message(FATAL_ERROR "MinHook target not found after FetchContent_MakeAvailable")
     endif()
     
     # Add Windows-specific compile definitions
