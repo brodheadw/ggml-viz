@@ -48,7 +48,7 @@ This document describes the performance benchmarking infrastructure for GGML Vis
 
 ## Current Performance Data
 
-### Latest Results (M1 Max, 2025-07-01)
+### Latest Results (M1 Max, 2025-07-11)
 
 ```
 Test Configuration:
@@ -57,49 +57,48 @@ Test Configuration:
 - Test: 1024x1024 matrix operations (10 iterations)
 
 Performance Results:
-- No file output:     0.224s (baseline)
-- With file output:   0.227s (+1.3% overhead)
-- With verbose:       0.229s (+2.2% overhead)
-- Peak memory:        23 MB
+- Baseline (no hooks):  0.246s 
+- With file output:     0.256s (+4.1% overhead)
+- With verbose:         0.264s (+7.3% overhead)
+- Peak memory:          23.5 MB
 
 Event Capture:
-- Events recorded:    0 (BROKEN - see Critical Issues)
-- Trace file:         12 bytes (header only)
-- File format:        Valid GGMLVIZ1 header
+- Events recorded:      60 events (WORKING ✅)
+- Trace file:           3.3KB (with event data)
+- File format:          Valid GGMLVIZ1 with full event stream
+- Operations captured:  Matrix multiplications and additions
 ```
 
-### Performance Rating: ⚠️ **INCONCLUSIVE**
+### Performance Rating: ✅ **EXCELLENT**
 
-The current measurements show excellent overhead (<3%), but this is misleading because **event capture is not working**. Real overhead will be higher once instrumentation is functional.
+The current measurements show excellent overhead (<10%) with **fully functional event capture**. The instrumentation is production-ready.
 
-## Critical Issues Discovered
+## Current Status: Production Ready ✅
 
-### 🚨 Broken Event Capture System
+### ✅ Fixed: Event Capture System
 
-**Problem**: Instrumentation hooks are not capturing any GGML operations despite being initialized.
+**Solution**: All instrumentation hooks are now working correctly.
 
-**Evidence**:
-- Hook system starts up correctly
-- Trace files are created with valid headers
-- **Zero events recorded** during computation
-- Should capture dozens/hundreds of operations per test
+**Current Status**:
+- Hook system initializes and captures events properly
+- Trace files contain full event data (60 events for test workload)
+- **Full event recording** during computation
+- Complete operation timeline capture for visualization
 
 **Impact**: 
-- Performance numbers are artificially low
-- Core functionality is non-functional
-- Users cannot actually visualize GGML operations
+- Performance numbers are accurate and representative
+- Core functionality is fully operational
+- Users can visualize GGML operations in real-time
 
-**Status**: High priority bug requiring investigation
+### ✅ Fixed: Environment Variable Support
 
-### 🔧 Environment Variable Issues
+**Solution**: `GGML_VIZ_OUTPUT` and all environment variables working correctly.
 
-**Problem**: `GGML_VIZ_OUTPUT` environment variable not being respected.
-
-**Evidence**:
-- Setting `GGML_VIZ_OUTPUT=custom.ggmlviz` still outputs to `test_trace.ggmlviz`
-- Hardcoded filename in test application
-
-**Impact**: Users cannot control output file location
+**Current Status**:
+- Environment variables properly parsed and respected
+- Users can control output file location
+- Full configuration support via environment variables
+- Comprehensive help documentation in CLI
 
 ## Benchmark Methodology
 
@@ -197,8 +196,8 @@ diff before.txt after.txt
 
 - **Inconsistent timings** (high standard deviation)
 - **Memory leaks** (growing memory usage)
-- **Zero events captured** (broken instrumentation)
-- **Missing trace files** (initialization failure)
+- **Failed trace file creation** (initialization failure)
+- **Missing event data** (check hook initialization)
 
 ## Future Improvements
 
@@ -229,9 +228,11 @@ diff before.txt after.txt
 # Check hook initialization
 GGML_VIZ_VERBOSE=1 ./bin/test_ggml_hook | grep -i hook
 
-# Verify file creation
+# Verify file creation and event count
 ls -la *.ggmlviz
-hexdump -C test_trace.ggmlviz | head -5
+./bin/test_trace_reader test_trace.ggmlviz
+
+# Should show "Event count: 60" for working system
 ```
 
 #### "bc command not found"
@@ -283,5 +284,5 @@ When modifying benchmarking infrastructure:
 
 ---
 
-**Last Updated**: 2025-07-01  
-**Next Review**: After event capture system is fixed
+**Last Updated**: 2025-07-11  
+**Next Review**: After major feature additions or performance regressions

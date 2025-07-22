@@ -164,8 +164,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cross-platform environment variable access
   - Platform-appropriate file permission handling
 
+## [1.1.0] - 2025-07-11
 
-## [1.0.1] - 2025-07-11
+### Added - Comprehensive Logging System ✅
+- **Complete logging infrastructure** - Production-ready logging system with multiple interfaces
+  - Thread-safe singleton Logger class with configurable log levels
+  - Multiple logging interfaces: basic, formatted (printf-style), and stream-style
+  - Support for all log levels: DEBUG, INFO, WARN, ERROR, FATAL
+  - Comprehensive test suite validating all logging functionality
+- **Environment variable configuration** - Full control over logging behavior
+  - `GGML_VIZ_LOG_LEVEL` for specific log level control (DEBUG/INFO/WARN/ERROR/FATAL)
+  - `GGML_VIZ_LOG_TIMESTAMP` to enable/disable timestamps (default: true)
+  - `GGML_VIZ_LOG_THREAD_ID` to enable/disable thread IDs (default: false)
+  - `GGML_VIZ_LOG_PREFIX` for custom log prefixes (default: [GGML_VIZ])
+  - Backward compatibility with existing `GGML_VIZ_VERBOSE` variable
+- **Convenience macros** - Easy-to-use logging throughout the codebase
+  - Basic macros: `GGML_VIZ_LOG_DEBUG()`, `GGML_VIZ_LOG_INFO()`, etc.
+  - Formatted macros: `GGML_VIZ_LOG_INFO_FMT()` with printf-style formatting
+  - Stream macros: `GGML_VIZ_DEBUG << "message"` for complex formatting
+- **Complete help documentation** - All environment variables documented in CLI help
+  - Updated `--help` output to include all 12+ environment variables
+  - Organized into logical categories: Essential, Library Injection, Configuration, Logging
+  - Clear descriptions and default values for each variable
+
+### Fixed - Build System Integration
+- **Shared library build** - Logger properly integrated into hook library
+  - Added logger source files to `ggml_viz_hook` shared library target
+  - Fixed include paths for cross-component access
+  - Resolved compilation errors in instrumentation initialization
+- **CMake integration** - Logger included in build system
+  - Logger test suite integrated with CTest
+  - Proper dependency linking between components
 
 Logging system 
 
@@ -348,6 +377,7 @@ This project uses [Semantic Versioning](https://semver.org/):
 2. Update version numbers in:
    - `src/main.cpp` (VERSION constant)
    - `CMakeLists.txt` (project version)
+   - Keep versions synchronized across all project files
 3. Create git tag: `git tag -a v0.1.0 -m "Release version 0.1.0"`
 4. Push tags: `git push origin --tags`
 
