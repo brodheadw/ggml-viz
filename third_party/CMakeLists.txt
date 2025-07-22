@@ -1,62 +1,42 @@
-# third_party/CMakeLists.txt
-cmake_minimum_required(VERSION 3.15)
+# Third-party dependencies for ggml-viz
 
-# GLFW Configuration
+# GLFW - Windowing library
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-# Linux-specific: Disable Wayland to avoid wayland-scanner dependency
-if(UNIX AND NOT APPLE)
-    set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
-endif()
-
 add_subdirectory(glfw)
 
-# ImGui Configuration
-set(IMGUI_SOURCES
+# ImGui - Immediate mode GUI library
+add_library(imgui STATIC
     imgui/imgui.cpp
     imgui/imgui_demo.cpp
     imgui/imgui_draw.cpp
     imgui/imgui_tables.cpp
     imgui/imgui_widgets.cpp
-    # OpenGL backend
-    imgui/backends/imgui_impl_opengl3.cpp
+    # Platform backends
     imgui/backends/imgui_impl_glfw.cpp
+    imgui/backends/imgui_impl_opengl3.cpp
 )
 
-add_library(imgui STATIC ${IMGUI_SOURCES})
-target_include_directories(imgui 
-    PUBLIC 
-        imgui
-        imgui/backends
-        ${CMAKE_CURRENT_SOURCE_DIR}/glfw/include
-        ${CMAKE_CURRENT_SOURCE_DIR}  # For our custom opengl_loader.h
+target_include_directories(imgui PUBLIC
+    imgui/
+    imgui/backends/
 )
 
-target_link_libraries(imgui 
-    PUBLIC 
-        glfw
-)
+target_link_libraries(imgui PUBLIC glfw ${OPENGL_LIBRARIES})
 
-# Platform-specific OpenGL linking
 if(APPLE)
-    target_link_libraries(imgui PUBLIC "-framework OpenGL")
-elseif(UNIX)
-    find_package(OpenGL REQUIRED)
-    target_link_libraries(imgui PUBLIC OpenGL::GL)
-elseif(WIN32)
-    find_package(OpenGL REQUIRED)
-    target_link_libraries(imgui PUBLIC OpenGL::GL)
+    target_compile_definitions(imgui PUBLIC GL_SILENCE_DEPRECATION)
 endif()
 
-# Platform-specific OpenGL configuration
+# Create OpenGL loader files for cross-platform compatibility
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/opengl_loader.h" "#pragma once\n#include <glad/glad.h>\n")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/imgui_opengl_loader.h" "#pragma once\n#include \"opengl_loader.h\"\n")
+
 if(APPLE)
-    target_compile_definitions(imgui 
-        PUBLIC 
-            GL_SILENCE_DEPRECATION
-    )
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/opengl_loader_macos.cpp" 
+         "#include \"opengl_loader.h\"\n// OpenGL loader implementation for macOS\n")
 endif()
 
-# Don't define IMGUI_IMPL_OPENGL_ES2 or IMGUI_IMPL_OPENGL_ES3 - let ImGui use desktop OpenGL
+# Make headers available to parent project
+target_include_directories(imgui PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
