@@ -125,6 +125,7 @@ endif()
 target_include_directories(ggml_viz_hook
     PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation
+      ${CMAKE_CURRENT_SOURCE_DIR}
       ${CMAKE_SOURCE_DIR}/third_party/ggml/include
       ${CMAKE_SOURCE_DIR}/third_party/ggml/src        # for ggml-impl.h
 )
@@ -135,6 +136,11 @@ target_compile_definitions(ggml_viz_hook
       GGML_VIZ_SHARED_BUILD
     PRIVATE
       BUILDING_GGML_VIZ
+)
+
+# Add logger sources directly to ggml_viz_hook to avoid circular dependency
+target_sources(ggml_viz_hook PRIVATE 
+    utils/logger.cpp
 )
 
 target_link_libraries(ggml_viz_hook
