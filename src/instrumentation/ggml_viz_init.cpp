@@ -1,6 +1,6 @@
 // src/instrumentation/ggml_viz_init.cpp
 #include "ggml_hook.hpp"
-#include "utils/logger.hpp"
+#include "../utils/logger.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <string>

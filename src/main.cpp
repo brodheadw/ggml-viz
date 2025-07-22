@@ -242,7 +242,7 @@ namespace {
             _putenv_s("GGML_VIZ_VERBOSE", "1");
 #else
             setenv("GGML_VIZ_VERBOSE", "1", 1);
-
+#endif
             GGML_VIZ_LOG_INFO("Verbose mode enabled");
         }
         
