@@ -49,24 +49,6 @@ target_link_libraries(ggml_hook
     PUBLIC Threads::Threads
 )
 
-# Add IPC library with platform-specific sources
-add_library(ggml_ipc STATIC
-    ipc/ipc_common.hpp
-)
-
-if(WIN32)
-    target_sources(ggml_ipc PRIVATE ipc/shm_windows.cpp)
-    target_link_libraries(ggml_ipc PUBLIC psapi)
-else()
-    target_sources(ggml_ipc PRIVATE ipc/shm_posix.cpp)
-endif()
-
-target_include_directories(ggml_ipc
-    PUBLIC
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
-)
-
 # Add utils library
 add_library(ggml_utils STATIC
     utils/config.cpp
@@ -127,7 +109,7 @@ add_library(ggml_viz_hook SHARED
     instrumentation/ggml_viz_init.cpp
 )
 
-# Platform-specific interposition sources
+# Add platform-specific interposition sources
 if(WIN32)
     target_sources(ggml_viz_hook PRIVATE instrumentation/win32_interpose.cpp)
     target_compile_definitions(ggml_viz_hook PRIVATE USE_MINHOOK)
@@ -173,11 +155,9 @@ if(APPLE)
     target_link_options(ggml_viz_hook PRIVATE
         "-undefined" "dynamic_lookup")
 elseif(UNIX)
-
-# Linux linker options
+    # Linux-specific options for symbol interposition
     target_link_options(ggml_viz_hook PRIVATE
-        "-Wl,--unresolved-symbols=ignore-all")
-
+        "-Wl,--allow-shlib-undefined")
 endif()
 
 # Set shared library properties
