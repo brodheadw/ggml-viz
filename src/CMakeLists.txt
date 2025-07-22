@@ -1,20 +1,33 @@
 # src/CMakeLists.txt
-project(ggml_viz_instrumentation)
+cmake_minimum_required(VERSION 3.15)
 
-# Add IPC library
-add_library(ggml_ipc STATIC
-    ipc/ipc_common.hpp
-    ipc/shm_posix.cpp
-)
+# Add IPC library for cross-platform shared memory
+if(NOT TARGET ggml_ipc_core)
+    add_library(ggml_ipc_core STATIC
+        ipc/ipc_common.hpp
+    )
+    
+    # Add platform-specific IPC implementations
+    if(WIN32)
+        target_sources(ggml_ipc_core PRIVATE ipc/shm_windows.cpp)
+    else()
+        target_sources(ggml_ipc_core PRIVATE ipc/shm_posix.cpp)
+    endif()
 
-target_include_directories(ggml_ipc
-    PUBLIC
-      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
-)
+    target_include_directories(ggml_ipc_core
+        PUBLIC
+          ${CMAKE_CURRENT_SOURCE_DIR}/ipc
+    )
 
-target_link_libraries(ggml_ipc
-    PUBLIC Threads::Threads
-)
+    target_link_libraries(ggml_ipc_core
+        PUBLIC Threads::Threads
+    )
+
+    # Links directory to minhook and psapi targets from FetchContent
+    if(WIN32)
+        target_link_libraries(ggml_ipc_core PUBLIC MinHook psapi)
+    endif()
+endif()
 
 add_library(ggml_hook STATIC
     instrumentation/ggml_hook.cpp
@@ -33,9 +46,7 @@ target_compile_definitions(ggml_hook
 )
 
 target_link_libraries(ggml_hook
-    PUBLIC 
-      Threads::Threads
-      ggml_ipc
+    PUBLIC Threads::Threads
 )
 
 # Add utils library
@@ -57,6 +68,7 @@ target_include_directories(ggml_utils
 target_link_libraries(ggml_utils
     PUBLIC 
       ggml_hook
+      ggml_ipc_core
       Threads::Threads
 )
 
@@ -95,18 +107,24 @@ add_library(ggml_viz_hook SHARED
     instrumentation/ggml_hook.cpp
     instrumentation/ggml_hook.hpp
     instrumentation/ggml_viz_init.cpp
-    instrumentation/dyld_interpose_simple.cpp
-    instrumentation/sched_interpose.mm
-    instrumentation/linux_interpose.cpp
-    ipc/shm_posix.cpp
-    utils/logger.cpp
 )
+
+# Add platform-specific interposition sources
+if(WIN32)
+    target_sources(ggml_viz_hook PRIVATE instrumentation/win32_interpose.cpp)
+    target_compile_definitions(ggml_viz_hook PRIVATE USE_MINHOOK)
+elseif(APPLE)
+    target_sources(ggml_viz_hook PRIVATE 
+        instrumentation/dyld_interpose_simple.cpp
+        instrumentation/sched_interpose.mm
+    )
+# Linux uses the interposition functions directly from ggml_hook.cpp
+# No additional files needed - LD_PRELOAD works with the existing function definitions
+endif()
 
 target_include_directories(ggml_viz_hook
     PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/instrumentation
-      ${CMAKE_CURRENT_SOURCE_DIR}/ipc
-      ${CMAKE_CURRENT_SOURCE_DIR}                      # for utils/logger.hpp
       ${CMAKE_SOURCE_DIR}/third_party/ggml/include
       ${CMAKE_SOURCE_DIR}/third_party/ggml/src        # for ggml-impl.h
 )
@@ -121,13 +139,26 @@ target_compile_definitions(ggml_viz_hook
 
 target_link_libraries(ggml_viz_hook
     PUBLIC 
+      ggml_ipc_core
       Threads::Threads
       # Note: We intentionally don't link ggml-base to allow function interception
 )
 
-# Allow unresolved symbols for scheduler interposition
-target_link_options(ggml_viz_hook PRIVATE
-    "-undefined" "dynamic_lookup")
+# Links directory to minhook and psapi targets from FetchContent
+if(WIN32)
+    target_link_libraries(ggml_viz_hook PRIVATE MinHook psapi)
+endif()
+
+# Platform-specific link options
+if(APPLE)
+    # Allow unresolved symbols for scheduler interposition
+    target_link_options(ggml_viz_hook PRIVATE
+        "-undefined" "dynamic_lookup")
+elseif(UNIX)
+    # Linux-specific options for symbol interposition
+    target_link_options(ggml_viz_hook PRIVATE
+        "-Wl,--allow-shlib-undefined")
+endif()
 
 # Set shared library properties
 # Hide all symbols by default, only export what we explicitly mark
@@ -146,6 +177,11 @@ if(APPLE)
         MACOSX_RPATH ON
         INSTALL_RPATH "@rpath"
         BUILD_WITH_INSTALL_RPATH ON
+    )
+elseif(WIN32)
+    set_target_properties(ggml_viz_hook PROPERTIES
+        WINDOWS_EXPORT_ALL_SYMBOLS ON
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 elseif(UNIX)
     set_target_properties(ggml_viz_hook PROPERTIES
@@ -169,4 +205,10 @@ target_link_libraries(ggml-viz
       ggml_frontend
       ggml_utils
       ggml_hook
+      ggml  # Core GGML library for ggml_abort and other functions
 )
+
+# Add Windows-specific libraries
+if(WIN32)
+    target_link_libraries(ggml-viz PRIVATE ws2_32)
+endif()

@@ -30,20 +30,28 @@ make -j4
 # Linux
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
+
+# Windows (PowerShell/CMD)
+cmake .. -A x64 -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release --parallel
 ```
 
 ### Test the Installation
 
 ```bash
-# Verify build
+# Unix/Linux/macOS
 ./bin/ggml-viz --version
 ./bin/ggml-viz --help
-
-# Run basic test
 ./tests/manual/test_ggml_hook
-
-# Load sample trace file
 ./bin/ggml-viz tests/assets/test_trace.ggmlviz
+```
+
+```powershell
+# Windows (PowerShell)
+.\bin\Release\ggml-viz.exe --version
+.\bin\Release\ggml-viz.exe --help
+.\bin\Release\test_ggml_hook.exe
+.\bin\Release\ggml-viz.exe tests\assets\test_trace.ggmlviz
 ```
 
 ---
@@ -75,16 +83,33 @@ You should see:
 ```
 
 #### Step 3: Run llama.cpp with Hooks (Terminal 2)
+
+**Unix/Linux/macOS:**
 ```bash
 # Set environment variables
 export GGML_VIZ_OUTPUT=tests/traces/trace.ggmlviz
-export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib
+export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib  # macOS
+export LD_PRELOAD=build/src/libggml_viz_hook.so               # Linux
 
 # Run any llama.cpp binary with hooks
 ./third_party/llama.cpp/build/bin/llama-cli \
   -m models/your-model.gguf \
   -p "Hello, world!" \
   -n 10 \
+  --no-display-prompt
+```
+
+**Windows (PowerShell):**
+```powershell
+# Set environment variables
+$env:GGML_VIZ_OUTPUT = "tests\traces\trace.ggmlviz"
+$env:GGML_VIZ_VERBOSE = "1"
+
+# Windows uses DLL injection automatically via DllMain
+.\third_party\llama.cpp\build\bin\llama-cli.exe `
+  -m models\your-model.gguf `
+  -p "Hello, world!" `
+  -n 10 `
   --no-display-prompt
 ```
 
@@ -182,7 +207,8 @@ done
 ### Essential Variables
 - **`GGML_VIZ_OUTPUT`**: Output trace file path (required for capture)
 - **`DYLD_INSERT_LIBRARIES`**: macOS library injection path
-- **`LD_PRELOAD`**: Linux library injection path (when available)
+- **`LD_PRELOAD`**: Linux library injection path  
+- **Windows**: Uses automatic DLL injection via DllMain (no manual injection needed)
 
 ### Configuration Variables
 - **`GGML_VIZ_VERBOSE`**: Enable verbose logging output
@@ -290,12 +316,12 @@ graph TD
 
 ### Supported Platforms
 
-| Platform | CPU | GPU | Hook Method | Status |
-|----------|-----|-----|-------------|---------|
-| macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Production |
-| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | 🛠 In Progress |
-| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | DLL Injection | ❌ Planned |
-| Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | 🛠 Limited |
+| Platform | CPU | GPU | Hook Method | Build Status | Functionality |
+|----------|-----|-----|-------------|--------------|---------------|
+| macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Complete | ✅ Core features working |
+| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | ✅ Complete | ✅ Build system working |
+| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | ✅ Complete | ✅ Build system working |
+| Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | ❓ Untested | ❓ Unknown |
 
 *Metal backend requires `-DGGML_METAL=OFF` due to shader compilation issues
 
@@ -345,28 +371,36 @@ make -j4
 
 ## 📝 Status & Roadmap
 
-### ✅ **Working (Production Ready)**
-- ✅ External hook injection via DYLD_INTERPOSE
-- ✅ Scheduler interposition for modern llama.cpp
-- ✅ Real-time trace file generation and monitoring
-- ✅ ImGui desktop visualization interface
+### ✅ **Core Systems Working**
+- ✅ Build system and CI for Windows, macOS, Linux
+- ✅ Basic instrumentation and event capture system
+- ✅ ImGui desktop visualization interface (basic functionality)
 - ✅ Binary trace format with version headers
-- ✅ Cross-backend support (Metal, CPU, CUDA, Vulkan)
-- ✅ Live mode with file-based communication
-- ✅ Comprehensive CLI with --help, --version, --no-hook
+- ✅ CLI interface with --help, --version, basic options
+- ✅ External hook injection mechanisms implemented
+- ✅ Cross-platform compilation and testing infrastructure
 
-### 🛠 **In Progress**
-- 🛠 Linux LD_PRELOAD support
-- 🛠 Advanced timeline visualization
-- 🛠 Tensor inspection and statistics
-- 🛠 Memory usage tracking
+### 🚧 **Partial/Needs Work**
+- 🚧 Live mode functionality (CLI exists, backend incomplete)
+- 🚧 Real-time visualization updates (basic implementation)
+- 🚧 Cross-platform hook testing (Windows/Linux need validation)
+- 🚧 Integration with real llama.cpp workflows
+
+### ❌ **Major Features Missing**
+- ❌ Complete live mode backend implementation
+- ❌ Advanced timeline visualization
+- ❌ Tensor inspection and statistics
+- ❌ Memory usage tracking
+- ❌ Web dashboard functionality
+- ❌ Plugin system
+- ❌ Real-world integration examples (llama.cpp, whisper.cpp)
 
 ### 📋 **Planned**
-- 📋 Windows DLL injection support  
 - 📋 Web dashboard (browser-based interface)
 - 📋 Plugin system for custom visualizations
 - 📋 Export capabilities (SVG, JSON, CSV)
 - 📋 Integration with profiling tools (Tracy, perf)
+- 📋 Advanced Windows debugging tools integration
 
 ---
 

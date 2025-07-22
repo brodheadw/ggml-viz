@@ -7,6 +7,7 @@
 #include <functional>
 #include <atomic>
 #include <chrono>
+#include <mutex>
 
 struct ggml_tensor;
 struct ggml_cgraph;

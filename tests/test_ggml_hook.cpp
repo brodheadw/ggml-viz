@@ -11,11 +11,10 @@ int main() {
     size_t mem_size = 128 * 1024 * 1024; // 128 MB
     void* mem_buffer = malloc(mem_size);
 
-    struct ggml_init_params params = {
-        .mem_size = mem_size,
-        .mem_buffer = mem_buffer,
-        .no_alloc = false
-    };
+    struct ggml_init_params params = {};
+    params.mem_size = mem_size;
+    params.mem_buffer = mem_buffer;
+    params.no_alloc = false;
 
     struct ggml_context* ctx = ggml_init(params);
 
