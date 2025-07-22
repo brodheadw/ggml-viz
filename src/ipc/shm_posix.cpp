@@ -116,7 +116,6 @@ bool PosixSharedMemory::read(void* dest, size_t n) {
     uint32_t head = hdr->head.load(std::memory_order_acquire);
     uint32_t tail = hdr->tail.load(std::memory_order_relaxed);
     uint32_t cap  = hdr->capacity;
-
     uint32_t avail = (head + cap - tail) & (cap - 1);
     if (n > avail) return false;
 
