@@ -318,9 +318,9 @@ graph TD
 
 | Platform | CPU | GPU | Hook Method | Build Status | Functionality |
 |----------|-----|-----|-------------|--------------|---------------|
-| macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Working | ✅ Core features working |
-| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | 🔧 Fixed | 🚧 Needs testing |
-| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | ✅ Working | 🚧 Basic functionality |
+| macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Complete | ✅ Core features working |
+| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | ✅ Complete | ✅ Build system working |
+| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | ✅ Complete | ✅ Build system working |
 | Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | ❓ Untested | ❓ Unknown |
 
 *Metal backend requires `-DGGML_METAL=OFF` due to shader compilation issues

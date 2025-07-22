@@ -68,10 +68,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Comprehensive CI/CD covering all platforms with proper testing
   - Zero external dependency installation required on Windows
 
-### Project Maturity Check
-- **Build Systems**: ✅ Working across Windows, macOS, Linux
+### Fixed - Linux Build System Issues
+- **GLFW Wayland Dependency** - Resolved CMake configuration error
+  - Added X11 fallback configuration to avoid `wayland-scanner` dependency
+  - Linux builds now use X11 instead of Wayland for broader compatibility
+  - Updated `third_party/CMakeLists.txt` with conditional GLFW configuration
+
+- **Symbol Collision Resolution** - Fixed duplicate function definition errors  
+  - Implemented conditional compilation for interception functions
+  - Static library (`ggml_hook.a`) contains only data structures and classes
+  - Shared library (`libggml_viz_hook.so`) contains interception functions for LD_PRELOAD
+  - Main executable links against real GGML library without conflicts
+  - Used `GGML_VIZ_SHARED_BUILD` preprocessor flag for build-target-specific compilation
+
+- **Cross-Platform Format Compatibility** - Fixed integer format warnings
+  - Updated timestamp formatting from `%lu` to `%llu` for 64-bit consistency
+  - Standardized duration formatting from `%ld` to `%lld` across platforms
+  - Eliminated compiler warnings in `imgui_app.cpp` for Linux builds
+
+### Project Maturity Status Update
+- **Build Systems**: ✅ **COMPLETE** - All three platforms (Windows, macOS, Linux) building successfully
+- **Cross-Platform Architecture**: ✅ **ROBUST** - Each platform uses appropriate interposition mechanism
+  - Windows: MinHook DLL injection with runtime patching
+  - macOS: DYLD_INTERPOSE with symbol replacement macros  
+  - Linux: LD_PRELOAD with conditional compilation architecture
 - **Core Functionality**: 🚧 Basic systems in place, needs comprehensive testing
-- **Advanced Features**: ❌ Many planned features not yet implemented
+- **Advanced Features**: ❌ Many planned features not yet implemented  
 - **Integration**: ❌ Real-world llama.cpp/whisper.cpp examples missing
 
 ## [1.1.0] - 2025-07-15

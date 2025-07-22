@@ -70,10 +70,10 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 - CMake build system with proper dependency management
 - Unit tests for core instrumentation (`tests/test_ggml_hook.cpp`)
 - Git submodule integration for GGML and dependencies
-- **Complete cross-platform support** - ✅ **WINDOWS PRODUCTION READY!**
-  - macOS (arm64/x64) with DYLD_INTERPOSE
-  - Linux (x64) with LD_PRELOAD
-  - Windows 10+ with MinHook DLL injection
+- **Complete cross-platform support** - ✅ **ALL PLATFORMS BUILD SUCCESSFULLY!**
+  - macOS (arm64/x64) with DYLD_INTERPOSE - ✅ Complete
+  - Linux (x64) with LD_PRELOAD - ✅ Complete (symbol collision resolved)
+  - Windows 10+ with MinHook DLL injection - ✅ Complete
 - **GitHub Actions CI/CD** - ✅ **COMPLETE** - All platforms tested automatically
 - **Development scripts** - ✅ **COMPLETE** - lint.sh, format.sh, run_tests.sh
 - **Performance benchmarking** - ✅ **COMPLETE** - <5% overhead measured
@@ -105,14 +105,16 @@ Live mode functionality                     - CLI option exists, backend missing
 Configuration file loading                  - CLI option exists, loader missing
 ```
 
-### ✅ **Recently Completed (Windows Production Support)**
+### ✅ **Recently Completed (Cross-Platform Build Completion)**
 ```
 src/ipc/shm_windows.cpp                     - Windows shared memory ✅ COMPLETE
 src/instrumentation/win32_interpose.cpp     - MinHook integration ✅ COMPLETE
 src/main.cpp                                - Windows argument parsing ✅ COMPLETE
-.github/workflows/ci.yml                    - Windows CI/CD ✅ COMPLETE
-CMakeLists.txt                              - MinHook FetchContent ✅ COMPLETE
-All Windows API compatibility              - Socket/file APIs ✅ COMPLETE
+src/instrumentation/ggml_hook.cpp           - Linux symbol collision fix ✅ COMPLETE
+third_party/CMakeLists.txt                  - Linux GLFW X11 fallback ✅ COMPLETE
+src/frontend/imgui_app.cpp                  - Cross-platform format fixes ✅ COMPLETE
+.github/workflows/ci.yml                    - All platforms CI/CD ✅ COMPLETE
+CMakeLists.txt                              - Windows MinHook + Linux linking ✅ COMPLETE
 ```
 
 ### ❌ **Empty Stubs (Need Implementation)**
@@ -158,13 +160,13 @@ src/utils/logger.cpp                        - Logging system (partial implementa
 **Documentation**: ✅ **CURRENT** - Updated with Windows support and simplified processes
 **Testing**: ✅ **ROBUST** - Full test suite running on all platforms
 
-**Major Achievement (2025-07-21) - Windows Production Support**:
-- ✅ **WINDOWS**: Complete Windows compatibility with MinHook DLL injection
-- ✅ **CI/CD**: GitHub Actions running Windows builds and tests successfully  
-- ✅ **SIMPLIFICATION**: Eliminated vcpkg dependency, streamlined build process
-- ✅ **API COMPATIBILITY**: All Windows system call differences resolved
-- ✅ **TEST AUTOMATION**: Windows CI executing full test suite
-- ✅ **DOCUMENTATION**: Updated README and CHANGELOG with Windows instructions
+**Major Achievement (2025-07-21) - Complete Cross-Platform Build System**:
+- ✅ **WINDOWS**: Complete Windows compatibility with MinHook DLL injection and simplified build
+- ✅ **LINUX**: Resolved all build system issues (GLFW Wayland, symbol collisions, linking)
+- ✅ **ARCHITECTURE**: Robust conditional compilation system for cross-platform interception
+- ✅ **CI/CD**: GitHub Actions successfully building and testing all platforms
+- ✅ **DEPENDENCY MANAGEMENT**: Zero external dependencies (Windows MinHook, Linux X11 fallback)
+- ✅ **BUILD RELIABILITY**: Consistent CMake configuration across all platforms
 
 **Previous Fixes (2025-07-01)**:
 - ✅ **CRITICAL**: Fixed zero event recording bug in hook system

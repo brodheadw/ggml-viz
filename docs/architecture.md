@@ -23,10 +23,13 @@ GGML Visualizer is a cross-platform real-time dashboard for visualizing GGML-bas
 ## Platform Support
 
 ### Production Ready ✅
-- **Linux (x64)**: LD_PRELOAD with symbol interposition
+- **Linux (x64)**: LD_PRELOAD with conditional compilation architecture
   - POSIX shared memory (`shm_open`/`mmap`)
-  - Dynamic library loading via `dlsym(RTLD_NEXT)`
-  - Socket API with MSG_NOSIGNAL support
+  - Conditional interception functions via `GGML_VIZ_SHARED_BUILD` preprocessor flag
+  - Static library contains data structures, shared library contains interception functions
+  - Dynamic library loading via `dlsym(RTLD_NEXT)` for original function lookup
+  - X11 GLFW backend (Wayland disabled for broader compatibility)
+  - Socket API with platform-specific constants (MSG_NOSIGNAL handling)
 
 - **macOS (arm64/x64)**: DYLD_INSERT_LIBRARIES with dynamic lookup  
   - POSIX shared memory (`shm_open`/`mmap`)
@@ -39,10 +42,14 @@ GGML Visualizer is a cross-platform real-time dashboard for visualizing GGML-bas
   - Winsock2 API with proper type casting and error handling
   - Automatic DLL initialization via `DllMain`
 
-### Build System
-- **Cross-platform CMake** with platform-specific source selection
-- **Zero external dependencies** on Windows (MinHook built from source)
-- **GitHub Actions CI/CD** testing all platforms automatically
-- **Visual Studio multi-config** support with correct executable paths
+### Build System Architecture
+- **Cross-platform CMake** with platform-specific source selection and conditional compilation
+- **Robust dependency management**: 
+  - Windows: MinHook built from source (zero external dependencies)
+  - Linux: X11 fallback for GLFW (avoids Wayland scanner dependency)
+  - macOS: Accelerate framework integration with Metal backend support
+- **Symbol collision resolution** via build-target-specific compilation flags
+- **GitHub Actions CI/CD** with comprehensive cross-platform testing
+- **Multi-config build support**: Visual Studio (Windows), Makefiles (Linux/macOS)
 
 See README.md for detailed platform-specific implementation details and build instructions.
