@@ -22,8 +22,27 @@ GGML Visualizer is a cross-platform real-time dashboard for visualizing GGML-bas
 
 ## Platform Support
 
-- **Linux**: LD_PRELOAD with symbol interposition
-- **macOS**: DYLD_INSERT_LIBRARIES with dynamic lookup
-- **Windows**: MinHook API hooking (experimental)
+### Production Ready ✅
+- **Linux (x64)**: LD_PRELOAD with symbol interposition
+  - POSIX shared memory (`shm_open`/`mmap`)
+  - Dynamic library loading via `dlsym(RTLD_NEXT)`
+  - Socket API with MSG_NOSIGNAL support
 
-See README.md for detailed platform-specific implementation details.
+- **macOS (arm64/x64)**: DYLD_INSERT_LIBRARIES with dynamic lookup  
+  - POSIX shared memory (`shm_open`/`mmap`)
+  - DYLD interposition macros for guaranteed symbol replacement
+  - F_FULLFSYNC for immediate disk flushing in live mode
+
+- **Windows 10+ (x64)**: MinHook API hooking with DLL injection
+  - Windows file mapping (`CreateFileMappingW`/`MapViewOfFile`)
+  - MinHook runtime patching for `ggml_backend_sched_graph_compute`
+  - Winsock2 API with proper type casting and error handling
+  - Automatic DLL initialization via `DllMain`
+
+### Build System
+- **Cross-platform CMake** with platform-specific source selection
+- **Zero external dependencies** on Windows (MinHook built from source)
+- **GitHub Actions CI/CD** testing all platforms automatically
+- **Visual Studio multi-config** support with correct executable paths
+
+See README.md for detailed platform-specific implementation details and build instructions.

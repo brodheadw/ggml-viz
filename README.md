@@ -31,14 +31,8 @@ make -j4
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
 
-# Windows (PowerShell)
-# First install vcpkg for dependencies
-git clone https://github.com/Microsoft/vcpkg.git
-.\vcpkg\bootstrap-vcpkg.bat
-.\vcpkg\vcpkg.exe install minhook:x64-windows
-
-# Then build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=..\vcpkg\scripts\buildsystems\vcpkg.cmake
+# Windows (PowerShell/CMD)
+cmake .. -A x64 -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release --parallel
 ```
 
@@ -54,10 +48,10 @@ cmake --build . --config Release --parallel
 
 ```powershell
 # Windows (PowerShell)
-.\Release\ggml-viz.exe --version
-.\Release\ggml-viz.exe --help
-.\Release\test_ggml_hook.exe
-.\Release\ggml-viz.exe tests\assets\test_trace.ggmlviz
+.\bin\Release\ggml-viz.exe --version
+.\bin\Release\ggml-viz.exe --help
+.\bin\Release\test_ggml_hook.exe
+.\bin\Release\ggml-viz.exe tests\assets\test_trace.ggmlviz
 ```
 
 ---
@@ -322,12 +316,12 @@ graph TD
 
 ### Supported Platforms
 
-| Platform | CPU | GPU | Hook Method | Status |
-|----------|-----|-----|-------------|---------|
-| macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Production |
-| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | ✅ Production |
-| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | 🚧 Experimental |
-| Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | 🛠 Limited |
+| Platform | CPU | GPU | Hook Method | Build Status | Functionality |
+|----------|-----|-----|-------------|--------------|---------------|
+| macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Working | ✅ Core features working |
+| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | 🔧 Fixed | 🚧 Needs testing |
+| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | ✅ Working | 🚧 Basic functionality |
+| Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | ❓ Untested | ❓ Unknown |
 
 *Metal backend requires `-DGGML_METAL=OFF` due to shader compilation issues
 
@@ -377,23 +371,29 @@ make -j4
 
 ## 📝 Status & Roadmap
 
-### ✅ **Working (Production Ready)**
-- ✅ Cross-platform support (macOS, Linux, Windows)
-- ✅ External hook injection via DYLD_INTERPOSE, LD_PRELOAD, MinHook
-- ✅ Scheduler interposition for modern llama.cpp
-- ✅ Real-time trace file generation and monitoring
-- ✅ ImGui desktop visualization interface
+### ✅ **Core Systems Working**
+- ✅ Build system and CI for Windows, macOS, Linux
+- ✅ Basic instrumentation and event capture system
+- ✅ ImGui desktop visualization interface (basic functionality)
 - ✅ Binary trace format with version headers
-- ✅ Cross-backend support (Metal, CPU, CUDA, Vulkan)
-- ✅ Live mode with file-based communication
-- ✅ Comprehensive CLI with --help, --version, --no-hook
-- ✅ Windows MinHook DLL injection with automatic initialization
+- ✅ CLI interface with --help, --version, basic options
+- ✅ External hook injection mechanisms implemented
+- ✅ Cross-platform compilation and testing infrastructure
 
-### 🛠 **In Progress**
-- 🛠 Advanced timeline visualization
-- 🛠 Tensor inspection and statistics
-- 🛠 Memory usage tracking
-- 🛠 Performance optimization and overhead reduction
+### 🚧 **Partial/Needs Work**
+- 🚧 Live mode functionality (CLI exists, backend incomplete)
+- 🚧 Real-time visualization updates (basic implementation)
+- 🚧 Cross-platform hook testing (Windows/Linux need validation)
+- 🚧 Integration with real llama.cpp workflows
+
+### ❌ **Major Features Missing**
+- ❌ Complete live mode backend implementation
+- ❌ Advanced timeline visualization
+- ❌ Tensor inspection and statistics
+- ❌ Memory usage tracking
+- ❌ Web dashboard functionality
+- ❌ Plugin system
+- ❌ Real-world integration examples (llama.cpp, whisper.cpp)
 
 ### 📋 **Planned**
 - 📋 Web dashboard (browser-based interface)
