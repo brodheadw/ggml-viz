@@ -1,13 +1,16 @@
 // src/main.cpp
 #include "frontend/imgui_app.hpp"
 #include "server/live_data_collector.hpp"
+#include "utils/logger.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <cstring>
 #include <cstdlib>
+#ifndef _WIN32
 #include <getopt.h>
+#endif
 #include <memory>
 #include <signal.h>
 #include <thread>
@@ -15,7 +18,7 @@
 #include <atomic>
 
 namespace {
-    const char* VERSION = "0.1.0";
+    const char* VERSION = "1.1.0";
     const char* PROGRAM_NAME = "ggml-viz";
     
     struct Config {
@@ -29,6 +32,38 @@ namespace {
         bool no_hook = false;
         int port = 8080;
     };
+
+#ifdef _WIN32
+    // Windows doesn't have getopt.h, we'll implement simple option parsing
+    void parse_windows_args(int argc, char* argv[], Config& config) {
+        for (int i = 1; i < argc; i++) {
+            std::string arg = argv[i];
+            if (arg == "-h" || arg == "--help") {
+                config.show_help = true;
+            } else if (arg == "-V" || arg == "--version") {
+                config.show_version = true;
+            } else if (arg == "-v" || arg == "--verbose") {
+                config.verbose = true;
+            } else if (arg == "-l" || arg == "--live") {
+                config.live_mode = true;
+            } else if (arg == "-w" || arg == "--web") {
+                config.web_mode = true;
+            } else if (arg == "-p" || arg == "--port") {
+                if (i + 1 < argc) {
+                    config.port = std::atoi(argv[++i]);
+                }
+            } else if (arg == "-c" || arg == "--config") {
+                if (i + 1 < argc) {
+                    config.config_file = argv[++i];
+                }
+            } else if (arg == "--no-hook") {
+                config.no_hook = true;
+            } else if (arg[0] != '-') {
+                config.trace_file = arg;
+            }
+        }
+    }
+#endif
     
     void print_usage(const char* program_name) {
         std::cout << "Usage: " << program_name << " [OPTIONS] [TRACE_FILE]\n\n"
@@ -51,10 +86,28 @@ namespace {
                   << "  " << program_name << " --web --port 9000       # Web server on port 9000\n"
                   << "  " << program_name << " --verbose trace.ggmlviz # Load with verbose output\n\n"
                   << "Environment Variables:\n"
-                  << "  GGML_VIZ_OUTPUT         Output file for trace recording\n"
-                  << "  GGML_VIZ_VERBOSE        Enable verbose instrumentation logging\n"
-                  << "  GGML_VIZ_DISABLE        Disable instrumentation entirely\n\n"
-                  << "For more information, visit: https://github.com/your-org/ggml-visualizer\n";
+                  << "  Essential Variables:\n"
+                  << "    GGML_VIZ_OUTPUT       Output file for trace recording\n"
+                  << "    GGML_VIZ_VERBOSE      Enable verbose instrumentation logging\n"
+                  << "    GGML_VIZ_DISABLE      Disable instrumentation entirely\n"
+                  << "\n"
+                  << "  Library Injection:\n"
+                  << "    DYLD_INSERT_LIBRARIES Path to libggml_viz_hook.dylib (macOS)\n"
+                  << "    LD_PRELOAD            Path to libggml_viz_hook.so (Linux)\n"
+                  << "\n"
+                  << "  Configuration Variables:\n"
+                  << "    GGML_VIZ_MAX_EVENTS   Maximum events to capture (default: 10,000,000)\n"
+                  << "    GGML_VIZ_OP_TIMING    Enable operation timing (default: true)\n"
+                  << "    GGML_VIZ_MEMORY_TRACKING  Enable memory tracking (default: false)\n"
+                  << "    GGML_VIZ_THREAD_TRACKING  Enable thread tracking (default: false)\n"
+                  << "    GGML_VIZ_TENSOR_NAMES     Capture tensor names (default: true)\n"
+                  << "\n"
+                  << "  Logging Configuration:\n"
+                  << "    GGML_VIZ_LOG_LEVEL    Log level (DEBUG/INFO/WARN/ERROR/FATAL)\n"
+                  << "    GGML_VIZ_LOG_TIMESTAMP    Enable timestamps (default: true)\n"
+                  << "    GGML_VIZ_LOG_THREAD_ID    Enable thread IDs (default: false)\n"
+                  << "    GGML_VIZ_LOG_PREFIX   Custom log prefix (default: [GGML_VIZ])\n\n"
+                  << "For more information, visit: https://github.com/brodheadw/ggml-viz\n";
     }
     
     void print_version() {
@@ -68,6 +121,11 @@ namespace {
         Config config;
         
         // Define long options
+        
+#ifdef _WIN32
+        // Use Windows argument parsing
+        parse_windows_args(argc, argv, config);
+#else
         static struct option long_options[] = {
             {"help",    no_argument,       0, 'h'},
             {"version", no_argument,       0, 'V'},
@@ -108,8 +166,8 @@ namespace {
                             throw std::out_of_range("Port out of range");
                         }
                     } catch (const std::exception&) {
-                        std::cerr << "Error: Invalid port number: " << optarg << "\n";
-                        std::cerr << "Port must be between 1 and 65535.\n";
+                        GGML_VIZ_LOG_ERROR_FMT("Invalid port number: %s", optarg);
+                        GGML_VIZ_LOG_ERROR("Port must be between 1 and 65535");
                         exit(1);
                     }
                     break;
@@ -139,6 +197,7 @@ namespace {
                 exit(1);
             }
         }
+#endif
         
         return config;
     }
@@ -179,18 +238,25 @@ namespace {
     void setup_environment(const Config& config) {
         // Set environment variables based on config
         if (config.verbose) {
+#ifdef _WIN32
+            _putenv_s("GGML_VIZ_VERBOSE", "1");
+#else
             setenv("GGML_VIZ_VERBOSE", "1", 1);
-            std::cout << "Verbose mode enabled.\n";
+
+            GGML_VIZ_LOG_INFO("Verbose mode enabled");
         }
+        
+        // Configure logger from environment variables
+        ggml_viz::Logger::instance().configure_from_env();
         
         // Print configuration if verbose
         if (config.verbose) {
-            std::cout << "Configuration:\n";
-            std::cout << "  Trace file: " << (config.trace_file.empty() ? "(none)" : config.trace_file) << "\n";
-            std::cout << "  Config file: " << (config.config_file.empty() ? "(none)" : config.config_file) << "\n";
-            std::cout << "  Live mode: " << (config.live_mode ? "enabled" : "disabled") << "\n";
-            std::cout << "  Port: " << config.port << "\n";
-            std::cout << "  Verbose: " << (config.verbose ? "enabled" : "disabled") << "\n";
+            GGML_VIZ_LOG_INFO("Configuration:");
+            GGML_VIZ_LOG_INFO_FMT("  Trace file: %s", config.trace_file.empty() ? "(none)" : config.trace_file.c_str());
+            GGML_VIZ_LOG_INFO_FMT("  Config file: %s", config.config_file.empty() ? "(none)" : config.config_file.c_str());
+            GGML_VIZ_LOG_INFO_FMT("  Live mode: %s", config.live_mode ? "enabled" : "disabled");
+            GGML_VIZ_LOG_INFO_FMT("  Port: %d", config.port);
+            GGML_VIZ_LOG_INFO_FMT("  Verbose: %s", config.verbose ? "enabled" : "disabled");
         }
     }
 }

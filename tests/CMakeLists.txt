@@ -53,3 +53,17 @@ target_link_libraries(test_trace_reader
 
 add_test(NAME trace_reader_basic
          COMMAND test_trace_reader ${CMAKE_CURRENT_SOURCE_DIR}/assets/test_trace.ggmlviz)
+
+# test_logger
+add_executable(test_logger
+    test_logger.cpp
+)
+
+target_link_libraries(test_logger
+    PRIVATE
+      ggml_utils       # from src/CMakeLists.txt (includes logger)
+      Threads::Threads
+)
+
+add_test(NAME logger_basic
+         COMMAND test_logger)
