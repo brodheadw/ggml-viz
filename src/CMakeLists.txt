@@ -118,10 +118,8 @@ elseif(APPLE)
         instrumentation/dyld_interpose_simple.cpp
         instrumentation/sched_interpose.mm
     )
-elseif(UNIX)
-    target_sources(ggml_viz_hook PRIVATE 
-        instrumentation/linux_interpose.cpp
-    )
+# Linux uses the interposition functions directly from ggml_hook.cpp
+# No additional files needed - LD_PRELOAD works with the existing function definitions
 endif()
 
 target_include_directories(ggml_viz_hook
