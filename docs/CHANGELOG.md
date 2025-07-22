@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.0.7] - 2025-07-22
 
 ### Added - Windows Build System and Linux Build Fix ✅
 - **Full Windows Compatibility** - Complete Windows support with simplified build process
@@ -96,7 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Advanced Features**: ❌ Many planned features not yet implemented  
 - **Integration**: ❌ Real-world llama.cpp/whisper.cpp examples missing
 
-## [1.1.0] - 2025-07-15
+## [0.0.6] - 2025-07-15
 
 ### Added - Cross-Platform Implementation Progress
 - **Windows MinHook Integration** - Experimental Windows support with DLL injection skeleton
@@ -164,7 +164,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cross-platform environment variable access
   - Platform-appropriate file permission handling
 
-## [1.1.0] - 2025-07-11
+## [0.0.5] - 2025-07-11
 
 ### Added - Comprehensive Logging System ✅
 - **Complete logging infrastructure** - Production-ready logging system with multiple interfaces
@@ -198,7 +198,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Logging system 
 
-## [1.0.0] - 2025-07-10
+## [0.0.4] - 2025-07-10
 
 ### Added - Live Mode Complete ✅
 - **Op-level hooks to capture individual tensor operations** - Full operation-level instrumentation
@@ -251,7 +251,7 @@ Logging system
   - Created PERFORMANCE_REPORT.md with detailed analysis
   - Updated README.md with accurate performance claims
 
-## [0.2.0] - 2025-07-01
+## [0.0.3] - 2025-07-01
 
 ### Added
 - **Performance Benchmarking Infrastructure** - Complete benchmarking system with statistical analysis
@@ -281,7 +281,7 @@ Logging system
 - **Broken Event Capture System** - Instrumentation hooks not recording GGML operations (0 events captured)
 - **Environment Variable Issues** - GGML_VIZ_OUTPUT not being respected by test applications
 
-## [0.1.0] - 2025-07-01
+## [0.0.2] - 2025-07-01
 
 ### Added
 - **Core Instrumentation System** (498 LOC) - Complete GGML hook infrastructure

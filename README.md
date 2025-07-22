@@ -198,7 +198,7 @@ done
 ./scripts/benchmark.sh
 ```
 
-**Performance Impact**: Benchmarking shows **< 5% overhead** with negligible memory impact. See [PERFORMANCE_REPORT.md](PERFORMANCE_REPORT.md) for detailed analysis.
+**Performance Impact**: Overhead measurement in progress.
 
 ---
 
@@ -309,7 +309,7 @@ graph TD
 ```
 
 - **Scheduler Interposition**: DYLD_INTERPOSE for guaranteed symbol replacement
-- **Event Capture**: Lock-free ring buffer for high-performance recording (< 5% overhead)
+- **Event Capture**: Lock-free ring buffer for high-performance recording
 - **Binary Format**: Efficient `.ggmlviz` format with version headers
 - **Live Monitoring**: File-based communication between processes
 - **Cross-Platform**: Works with Metal, CUDA, CPU, and Vulkan backends

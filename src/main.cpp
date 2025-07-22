@@ -18,7 +18,7 @@
 #include <atomic>
 
 namespace {
-    const char* VERSION = "1.1.0";
+    const char* VERSION = "0.0.7";
     const char* PROGRAM_NAME = "ggml-viz";
     
     struct Config {
