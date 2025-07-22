@@ -13,8 +13,8 @@ public:
         if (hmap_)  CloseHandle(hmap_);
     }
 
-    bool   write(const void* data, size_t nbytes) override;
-    size_t read (void* dest,      size_t nbytes) override;
+    bool write(const void* data, size_t nbytes) override;
+    bool read(void* dest, size_t nbytes) override;
     void*  get_address() const override          { return view_; }
     size_t get_size() const override             { return map_size_; }
     bool   is_valid() const override             { return view_ != nullptr; }
@@ -79,7 +79,7 @@ WinSharedMemory::createImpl(std::wstring_view name, size_t sz, bool create) {
         hdr->capacity = static_cast<uint32_t>(sz);
     }
 
-    auto ptr   = std::make_unique<WinSharedMemory>();
+    auto ptr = std::unique_ptr<WinSharedMemory>(new WinSharedMemory());
     ptr->hmap_ = h;
     ptr->view_ = v;
     ptr->map_size_ = map_size;
@@ -104,21 +104,23 @@ bool WinSharedMemory::write(const void* data, size_t n) {
     return true;
 }
 
-size_t WinSharedMemory::read(void* dest, size_t n) {
+bool WinSharedMemory::read(void* dest, size_t n) {
     auto* hdr = static_cast<RingHeader*>(view_);
     uint32_t head = hdr->head.load(std::memory_order_acquire);
     uint32_t tail = hdr->tail.load(std::memory_order_relaxed);
     uint32_t cap  = hdr->capacity;
 
     uint32_t avail = (head + cap - tail) & (cap - 1);
-    size_t to_copy = std::min<size_t>(n, avail);
+    if (avail < n) {
+        return false;  // Not enough data available
+    }
 
     auto* base = static_cast<uint8_t*>(view_) + sizeof(RingHeader);
-    for (size_t i = 0; i < to_copy; ++i)
+    for (size_t i = 0; i < n; ++i)
         static_cast<uint8_t*>(dest)[i] = base[(tail + i) & (cap - 1)];
 
-    hdr->tail.store((tail + to_copy) & (cap - 1), std::memory_order_release);
-    return to_copy;
+    hdr->tail.store((tail + n) & (cap - 1), std::memory_order_release);
+    return true;
 }
 
 uint32_t WinSharedMemory::available_space() const {

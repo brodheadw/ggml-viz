@@ -1,4 +1,5 @@
 # examples/whisper_demo/CMakeLists.txt
+cmake_minimum_required(VERSION 3.15)
 
 # Create whisper demo executable (placeholder implementation)
 add_executable(run_whisper_vis

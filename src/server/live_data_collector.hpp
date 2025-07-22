@@ -9,9 +9,14 @@
 #include <functional>
 #include <chrono>
 #include <queue>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#endif
 #include <cstring>
 #include <cstdio>
 
@@ -186,6 +191,15 @@ private:
     }
     
     void start_http_server() {
+#ifdef _WIN32
+        // Initialize Winsock
+        WSADATA wsaData;
+        if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
+            printf("[LiveStreamServer] WSAStartup failed\n");
+            return;
+        }
+#endif
+        
         // Create socket
         int server_fd = socket(AF_INET, SOCK_STREAM, 0);
         if (server_fd < 0) {
@@ -195,7 +209,11 @@ private:
         
         // Allow socket reuse
         int opt = 1;
+#ifdef _WIN32
+        setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(opt));
+#else
         setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+#endif
         
         // Bind to address
         struct sockaddr_in address;
@@ -205,14 +223,30 @@ private:
         
         if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
             printf("[LiveStreamServer] Error binding to port %d\n", config_.port);
-            close(server_fd);
+#ifdef _WIN32
+            closesocket(server_fd);
+#else
+    #ifdef _WIN32
+        closesocket(server_fd);
+#else
+        close(server_fd);
+#endif
+#endif
             return;
         }
         
         // Listen for connections
         if (listen(server_fd, 10) < 0) {
             printf("[LiveStreamServer] Error listening on socket\n");
-            close(server_fd);
+#ifdef _WIN32
+            closesocket(server_fd);
+#else
+    #ifdef _WIN32
+        closesocket(server_fd);
+#else
+        close(server_fd);
+#endif
+#endif
             return;
         }
         
@@ -241,7 +275,12 @@ private:
             }
         }
         
+#ifdef _WIN32
+        closesocket(server_fd);
+        WSACleanup();
+#else
         close(server_fd);
+#endif
         printf("[LiveStreamServer] HTTP server stopped\n");
     }
     
@@ -252,7 +291,15 @@ private:
         char buffer[4096];
         int bytes_read = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
         if (bytes_read <= 0) {
-            close(client_fd);
+#ifdef _WIN32
+            closesocket(client_fd);
+#else
+    #ifdef _WIN32
+        closesocket(client_fd);
+#else
+        close(client_fd);
+#endif
+#endif
             connected_clients_.fetch_sub(1);
             return;
         }
@@ -318,7 +365,11 @@ private:
             send(client_fd, html.c_str(), html.length(), 0);
         }
         
+#ifdef _WIN32
+        closesocket(client_fd);
+#else
         close(client_fd);
+#endif
         connected_clients_.fetch_sub(1);
     }
     
@@ -341,7 +392,11 @@ private:
                 std::string event_data = format_event_as_json(event);
                 std::string sse_message = "data: " + event_data + "\n\n";
                 
+#ifdef _WIN32
+                int result = send(client_fd, sse_message.c_str(), (int)sse_message.length(), 0);
+#else
                 int result = send(client_fd, sse_message.c_str(), sse_message.length(), MSG_NOSIGNAL);
+#endif
                 if (result <= 0) {
                     printf("[LiveStreamServer] Client disconnected\n");
                     return;

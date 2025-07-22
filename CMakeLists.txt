@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
-project(ggml-viz VERSION 0.1 LANGUAGES C CXX OBJC)
+project(ggml-viz VERSION 0.1 LANGUAGES C CXX)
+
+# Enable Objective-C only on Apple platforms
+if(APPLE)
+    enable_language(OBJC)
+endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Enforce C++17
@@ -15,11 +20,26 @@ find_package(OpenGL REQUIRED)
 if(WIN32)
     include(FetchContent)
     FetchContent_Declare(
-        MinHook
+        minhook
         GIT_REPOSITORY https://github.com/TsudaKageyu/minhook.git
         GIT_TAG        v1.3.3
     )
-    FetchContent_MakeAvailable(MinHook)
+    FetchContent_MakeAvailable(minhook)
+    
+    # Build our own static library from MinHook sources
+    add_library(MinHook STATIC
+        ${minhook_SOURCE_DIR}/src/buffer.c
+        ${minhook_SOURCE_DIR}/src/hook.c
+        ${minhook_SOURCE_DIR}/src/trampoline.c
+        ${minhook_SOURCE_DIR}/src/hde/hde32.c
+        ${minhook_SOURCE_DIR}/src/hde/hde64.c
+    )
+    target_include_directories(MinHook PUBLIC ${minhook_SOURCE_DIR}/include)
+    target_compile_definitions(MinHook PRIVATE MH_STANDALONE)
+    set_target_properties(MinHook PROPERTIES
+        OUTPUT_NAME "MinHook"
+        POSITION_INDEPENDENT_CODE ON
+    )
     
     # Add Windows-specific compile definitions
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)

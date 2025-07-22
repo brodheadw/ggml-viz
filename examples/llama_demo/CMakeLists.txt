@@ -1,4 +1,5 @@
 # examples/llama_demo/CMakeLists.txt
+cmake_minimum_required(VERSION 3.15)
 
 # Build llama.cpp first
 add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/llama.cpp 
