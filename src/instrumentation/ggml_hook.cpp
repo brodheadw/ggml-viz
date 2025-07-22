@@ -437,8 +437,8 @@ static enum ggml_status (*original_graph_compute_with_ctx)(struct ggml_context*,
 static enum ggml_status (*original_metal_graph_compute)(ggml_backend_t, struct ggml_cgraph*) = nullptr;
 static bool hooks_initialized = false;
 
-// Our intercepted functions - only for production (non-test) builds
-#ifndef GGML_VIZ_TEST_MODE
+// Our intercepted functions - only for shared library builds (not static library or test builds)
+#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
 extern "C" {
     // Override ggml_backend_graph_compute
     GGML_VIZ_API enum ggml_status ggml_backend_graph_compute(ggml_backend_t backend, struct ggml_cgraph* cgraph) {
@@ -663,8 +663,8 @@ bool install_ggml_hooks() {
         auto metal_func = (enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*))
             dlsym(handle, "ggml_backend_metal_graph_compute");
             
-        // Only store if they're different from our overrides (production mode only)
-#ifndef GGML_VIZ_TEST_MODE
+        // Only store if they're different from our overrides (shared library builds only)
+#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
         if (backend_func && backend_func != ggml_backend_graph_compute) {
             original_backend_graph_compute = backend_func;
             printf("[GGML_VIZ] Found original ggml_backend_graph_compute\n");
