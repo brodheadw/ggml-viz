@@ -1,23 +1,35 @@
 // src/utils/logger.hpp
 #pragma once
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#undef ERROR  // Windows defines ERROR as a macro, which conflicts with our enum
+#endif
+
 #include <string>
 #include <iostream>
 #include <mutex>
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include <memory>
 
 namespace ggml_viz {
 
 /**
  * Log levels in order of severity
  */
-enum class LogLevel {
+enum class LogLevel : int {
     DEBUG = 0,    // Detailed debug information
     INFO = 1,     // General information  
     WARN = 2,     // Warning messages
-    ERROR = 3,    // Error messages
+    ERROR_LEVEL = 3,    // Error messages (renamed to avoid Windows ERROR macro conflict)
     FATAL = 4     // Fatal errors
 };
 
@@ -101,8 +113,8 @@ public:
 
     template<typename... Args>
     void error(const std::string& format, Args... args) {
-        if (should_log(LogLevel::ERROR)) {
-            log(LogLevel::ERROR, format_string(format, args...));
+        if (should_log(LogLevel::ERROR_LEVEL)) {
+            log(LogLevel::ERROR_LEVEL, format_string(format, args...));
         }
     }
 

@@ -65,7 +65,7 @@ void Logger::configure_from_env() {
         } else if (level_str == "WARN" || level_str == "warn") {
             current_level_ = LogLevel::WARN;
         } else if (level_str == "ERROR" || level_str == "error") {
-            current_level_ = LogLevel::ERROR;
+            current_level_ = LogLevel::ERROR_LEVEL;
         } else if (level_str == "FATAL" || level_str == "fatal") {
             current_level_ = LogLevel::FATAL;
         }
@@ -99,7 +99,7 @@ std::string Logger::level_to_string(LogLevel level) const {
         case LogLevel::DEBUG: return "DEBUG";
         case LogLevel::INFO:  return "INFO";
         case LogLevel::WARN:  return "WARN";
-        case LogLevel::ERROR: return "ERROR";
+        case LogLevel::ERROR_LEVEL: return "ERROR";
         case LogLevel::FATAL: return "FATAL";
         default: return "UNKNOWN";
     }
@@ -154,7 +154,7 @@ void Logger::log(LogLevel level, const std::string& message) {
     oss << message;
     
     // Output to appropriate stream
-    if (level >= LogLevel::ERROR) {
+    if (level >= LogLevel::ERROR_LEVEL) {
         std::cerr << oss.str() << std::endl;
     } else {
         std::cout << oss.str() << std::endl;
@@ -174,7 +174,7 @@ void Logger::warn(const std::string& message) {
 }
 
 void Logger::error(const std::string& message) {
-    log(LogLevel::ERROR, message);
+    log(LogLevel::ERROR_LEVEL, message);
 }
 
 void Logger::fatal(const std::string& message) {
@@ -205,7 +205,7 @@ Logger::LogStream Logger::warn_stream() {
 }
 
 Logger::LogStream Logger::error_stream() {
-    return LogStream(*this, LogLevel::ERROR);
+    return LogStream(*this, LogLevel::ERROR_LEVEL);
 }
 
 Logger::LogStream Logger::fatal_stream() {
