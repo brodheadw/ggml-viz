@@ -205,6 +205,7 @@ target_link_libraries(ggml-viz
       ggml_frontend
       ggml_utils
       ggml_hook
+      ggml  # Core GGML library for ggml_abort and other functions
 )
 
 # Add Windows-specific libraries
