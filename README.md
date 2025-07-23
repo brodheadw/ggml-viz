@@ -380,27 +380,29 @@ make -j4
 - ✅ External hook injection mechanisms implemented
 - ✅ Cross-platform compilation and testing infrastructure
 
-### 🚧 **Partial/Needs Work**
-- 🚧 Live mode functionality (CLI exists, backend incomplete)
-- 🚧 Real-time visualization updates (basic implementation)
-- 🚧 Cross-platform hook testing (Windows/Linux need validation)
-- 🚧 Integration with real llama.cpp workflows
+### ✅ **Live Mode Features Working**
+- ✅ Live mode functionality with real-time event capture
+- ✅ File monitoring and automatic updates (100ms polling)
+- ✅ Live timeline and graph visualization
+- ✅ Cross-platform hook testing (all platforms validated in CI)
+
+### 🚧 **Partial/Needs Enhancement**
+- 🚧 Advanced timeline visualization (basic implementation working)
+- 🚧 Web dashboard functionality (server exists, needs frontend polish)
+- 🚧 Integration with real llama.cpp workflows (examples need expansion)
 
 ### ❌ **Major Features Missing**
-- ❌ Complete live mode backend implementation
-- ❌ Advanced timeline visualization
-- ❌ Tensor inspection and statistics
-- ❌ Memory usage tracking
-- ❌ Web dashboard functionality
-- ❌ Plugin system
-- ❌ Real-world integration examples (llama.cpp, whisper.cpp)
+- ❌ Advanced tensor inspection and statistics
+- ❌ Memory usage tracking and visualization
+- ❌ Plugin system architecture
+- ❌ Export capabilities (SVG, JSON, CSV)
 
-### 📋 **Planned**
-- 📋 Web dashboard (browser-based interface)
+### 📋 **Planned Enhancements**
+- 📋 Enhanced web dashboard frontend
 - 📋 Plugin system for custom visualizations
 - 📋 Export capabilities (SVG, JSON, CSV)
 - 📋 Integration with profiling tools (Tracy, perf)
-- 📋 Advanced Windows debugging tools integration
+- 📋 Advanced tensor analysis and memory profiling
 
 ---
 
