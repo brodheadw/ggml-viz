@@ -200,16 +200,26 @@ Logging system
 
 ## [0.0.4] - 2025-07-10
 
-### Added - Live Mode Complete ✅
+### Added - Complete Live Mode System ✅
+- **Full live mode implementation** - Production-ready real-time visualization
+  - Complete `enable_live_mode()` and `disable_live_mode()` functionality
+  - Real-time file monitoring with modification time tracking (100ms polling)
+  - Automatic incremental event loading from external trace files
+  - Memory-managed event buffering with 50,000 event limit and automatic cleanup
+  - Cross-platform file stat monitoring with error handling
+  
+- **Real-time GUI integration** - Live visualization working across all platforms
+  - Live timeline visualization with automatic updates
+  - Live graph view rendering as events arrive from external processes
+  - Dual data sources: in-process hooks + external file monitoring
+  - Thread-safe atomic flags for live data availability
+  - Seamless switching between loaded traces and live mode
+
 - **Op-level hooks to capture individual tensor operations** - Full operation-level instrumentation
   - Individual tensor operation begin/end events in scheduler interposition
   - Enhanced event capture for both sync and async compute paths
   - Complete operation timeline tracking for detailed profiling
-- **Live functionality working completely on macOS** - Production-ready live visualization
-  - Real-time graph view with live trace reader integration
-  - Timeline views fixed and working with live data
-  - Automatic file monitoring and reload for external applications
-  - Immediate disk flushing for live mode visibility (`F_FULLFSYNC` on macOS)
+
 - **USER_GUIDE2.md** - Comprehensive setup guide for live mode workflows
   - Step-by-step terminal setup instructions
   - Environment variable configuration examples
@@ -220,10 +230,11 @@ Logging system
   - Timeline widget now uses correct trace reader for live data
   - Graph widget properly displays live computation graphs
   - Eliminated "No trace data available" errors in live mode
-- **Enhanced live data monitoring** - Improved file change detection and event loading
+- **Enhanced live data monitoring** - Production-ready file change detection
+  - File size and modification time change detection
+  - Incremental event loading (only new events, not full reload)
+  - Buffer overflow protection with automatic cleanup
   - Better logging for live mode debugging (call count throttling)
-  - File size monitoring with detailed change notifications
-  - Improved new event detection and loading from external files
 - **Immediate file flushing** - Critical for live mode responsiveness
   - Force disk sync after each graph computation
   - Platform-specific sync calls (F_FULLFSYNC on macOS, fsync on Linux)
@@ -234,10 +245,11 @@ Logging system
   - `viz_sched_graph_compute` and `viz_sched_graph_compute_async` 
   - `viz_backend_graph_compute` and `viz_backend_graph_compute_async`
   - Individual node iteration with proper operation event recording
-- **Live mode architecture** - Robust real-time data pipeline
+- **Production live mode architecture** - Robust real-time data pipeline
   - Dual trace reader system (live vs static)
   - Event synchronization between widgets and data sources
   - File monitoring with size-based change detection
+  - Cross-platform live mode testing in CI
 
 ### Added
 - **Development Scripts Infrastructure** - Complete suite of development tools
