@@ -40,22 +40,6 @@ if(WIN32)
         OUTPUT_NAME "MinHook"
         POSITION_INDEPENDENT_CODE ON
     )
-    
-    # Add Windows-specific compile definitions
-    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
-    if(MSVC)
-        add_compile_options(/EHsc)
-    endif()
-endif()
-
-# Build GUI dependencies first
-add_subdirectory(third_party)
-
-# Enable visualization hooks in GGML
-set(GGML_VIZ_ENABLE_HOOKS ON CACHE BOOL "Enable hooks for ggml-viz visualization" FORCE)
-
-# Bring in ggml submodule (will define a 'ggml' target)
-add_subdirectory(third_party/ggml EXCLUDE_FROM_ALL)
 
 # Build our instrumentation library
 add_subdirectory(src)

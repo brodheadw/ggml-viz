@@ -1,454 +1,80 @@
 # GGML Visualizer
 
-> **A cross-platform, real-time dashboard for visualizing GGML-based LLM runtimes like llama.cpp and whisper.cpp with Metal, CUDA, and CPU backend support.**
+[ggmlviz](docs/ggmlviz.md) / [build](docs/BUILD.md) / [ring buffer analysis](docs/RING_BUFFER_ANALYSIS.md)
 
----
+**Real-time performance visualization for GGML-based LLM runtimes**
 
-## 🚀 Quick Start (2 Minutes)
+## What is GGML Visualizer?
 
-### Prerequisites
+GGML Visualizer is a performance analysis toolkit designed to make understanding Large Language Model inference as simple as watching your model run. The project emerged from the need to debug and optimize GGML-based applications like llama.cpp and whisper.cpp without the traditional complexity of profiling tools that require recompilation, source modifications, or deep systems knowledge.
 
-```bash
-# macOS
-brew install cmake glfw
+The core of the tool is **zero-recompilation tracing** through platform-specific function interposition. By using mechanisms like `LD_PRELOAD` on Linux, `DYLD_INSERT_LIBRARIES` on macOS, and MinHook DLL injection on Windows, ggml-viz can intercept GGML function calls in any existing binary and capture detailed execution traces with nanosecond precision. This means you can take any llama.cpp binary you've already built, set a few environment variables, and immediately get real-time visualization of graph computations, individual operation timing, memory allocations, and backend utilization across CPU, Metal, CUDA, and Vulkan.
 
-# Ubuntu/Debian
-sudo apt update && sudo apt install -y git cmake build-essential libgl1-mesa-dev libxinerama-dev libxcursor-dev libxi-dev libxrandr-dev
-```
+The captured events flow through a ring buffer architecture into a custom binary streaming format called GGMLVIZ, designed for high-frequency event capture with minimal overhead. The format uses an 8-byte magic header ("GGMLVIZ1"), version information for backward compatibility, and union-based event structures that can be written incrementally during execution and read efficiently during analysis. This enables both post-mortem analysis of saved traces and live monitoring where the visualization GUI updates in real-time as your model runs.
 
-### Build
+## Project Status and Goals
 
-```bash
-git clone --recursive https://github.com/your-org/ggml-visualizer
-cd ggml-visualizer
-mkdir build && cd build
+The project is production-ready on macOS and Linux with a working ImGui-based desktop interface, real-time live mode, and comprehensive build system. The Windows implementation exists but remains experimental due to the complexity of DLL injection mechanisms. The ring buffer implementation, while functional, currently uses mutexes despite claims of being "lock-free" - an issue documented in our [ring buffer analysis](docs/RING_BUFFER_ANALYSIS.md) with a clear path to a true lock-free SPSC design.
 
-# macOS (Metal disabled due to shader issues)
-cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=OFF
-make -j4
+The primary goal is to make GGML model performance analysis straightforward and accessible for anyone working with GGML-based applications. It's designed to provide clear, real-time insight into tensor computations, operation timings, memory allocations, and backend utilization—without requiring deep systems knowledge or complex profiling setups. The toolkit enables users to observe exactly how their models execute, identify bottlenecks, and understand resource usage at a granular level.
 
-# Linux
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$(nproc)
+A secondary goal is to showcase advanced C++ techniques for runtime instrumentation, cross-platform interposition, and high-performance event capture. The project demonstrates practical approaches to tracing and visualization in modern C++, serving as both a useful tool and a reference implementation for developers interested in systems programming and performance analysis within the GGML ecosystem.
 
-# Windows (PowerShell/CMD)
-cmake .. -A x64 -DCMAKE_BUILD_TYPE=Release
-cmake --build . --config Release --parallel
-```
-
-### Test the Installation
+## Quick Start
 
 ```bash
-# Unix/Linux/macOS
-./bin/ggml-viz --version
-./bin/ggml-viz --help
-./tests/manual/test_ggml_hook
-./bin/ggml-viz tests/assets/test_trace.ggmlviz
+# Build from source (see docs/BUILD.md for details)
+git clone --recursive https://github.com/brodheadw/ggml-viz.git
+cd ggml-viz && mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc)
+
+# Visualize any GGML application (no recompilation needed)
+export GGML_VIZ_OUTPUT=trace.ggmlviz
+export LD_PRELOAD=build/src/libggml_viz_hook.so  # Linux
+# export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib  # macOS
+./your_llama_cpp_binary -m model.gguf -p "Hello world" -n 10
+
+# View the trace
+./bin/ggml-viz trace.ggmlviz
 ```
 
-```powershell
-# Windows (PowerShell)
-.\bin\Release\ggml-viz.exe --version
-.\bin\Release\ggml-viz.exe --help
-.\bin\Release\test_ggml_hook.exe
-.\bin\Release\ggml-viz.exe tests\assets\test_trace.ggmlviz
-```
+## Integration Approaches
 
----
+**Function Interposition (Recommended)**: Works with any existing GGML binary by intercepting function calls at runtime. Set environment variables to specify the interposition library path (`LD_PRELOAD` or `DYLD_INSERT_LIBRARIES`) and output trace file (`GGML_VIZ_OUTPUT`), then run your application normally. The interposition library captures events transparently and writes them to the GGMLVIZ format.
 
-## 📖 Complete Tutorial
+**Direct Integration**: For custom applications or when you need programmatic control over tracing, link against the ggml-viz library and use the C++ API to start/stop tracing, configure event types, and control output. This approach provides the most flexibility but requires recompilation of your application.
 
-### Method 1: Dynamic Symbol Interposition (Recommended)
+**Live Monitoring**: Run the GUI in live mode (`--live trace.ggmlviz`) to watch events appear in real-time as your application executes. The GUI polls the trace file and updates the visualization automatically, making it possible to see exactly what your model is doing as it processes each token.
 
-This method works with **any existing llama.cpp installation** without recompiling using platform-specific function hooking.
+## Architecture and Technical Details
 
-#### Step 1: Download a Test Model
-```bash
-# Download a small model for testing
-mkdir -p models && cd models
-wget https://huggingface.co/microsoft/DialoGPT-medium/resolve/main/pytorch_model.bin
-# Or use any .gguf model you have
-```
+The system consists of four main layers: 
+- instrumentation (event capture via platform-specific interposition)
+- IPC (shared memory communication for cross-process operation)
+- Data collection (ring buffer storage and GGMLVIZ format serialization)
+- Frontend (ImGui-based real-time visualization) 
 
-#### Step 2: Start the GUI (Terminal 1)
-```bash
-# Start GUI in live mode, monitoring trace.ggmlviz
-./bin/ggml-viz --live tests/traces/trace.ggmlviz --no-hook --verbose
-```
+Events are captured with nanosecond timestamps, stored in a ring buffer with atomic operations, and periodically flushed to disk in a binary format optimized for both write performance during capture and read performance during analysis.
 
-You should see:
-```
-[ImGuiApp] Live mode enabled with built-in hook disabled (--no-hook)
-[ImGuiApp] Monitoring specified trace file: tests/traces/trace.ggmlviz
-```
+The interposition mechanisms differ by platform but achieve the same goal: intercepting calls to key GGML functions like `ggml_backend_graph_compute()` without modifying the original application. On macOS, this uses Apple's `DYLD_INTERPOSE` mechanism with symbol replacement in the `__DATA,__interpose` section. On Linux, it uses `LD_PRELOAD` for shared library symbol precedence. On Windows, it uses the MinHook library for runtime API patching, though this implementation remains experimental.
 
-#### Step 3: Run llama.cpp with Hooks (Terminal 2)
+Performance impact is designed to be minimal through careful optimization of the event capture path. The ring buffer uses atomic operations for thread safety, cache line alignment to prevent false sharing, and batch writing to minimize file I/O overhead. Event filtering allows you to capture only the operations you care about, and the binary format avoids expensive serialization during the critical path.
 
-**macOS:**
-```bash
-# Set environment variables for macOS symbol interposition
-export GGML_VIZ_OUTPUT=tests/traces/trace.ggmlviz
-export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib
+## Current Limitations and Development
 
-# Run any llama.cpp binary with hooks
-./third_party/llama.cpp/build/bin/llama-cli \
-  -m models/your-model.gguf \
-  -p "Hello, world!" \
-  -n 10 \
-  --no-display-prompt
-```
+The project successfully demonstrates the core concept and provides working visualization for GGML applications, but several areas need continued development. The ring buffer implementation needs to be converted from mutex-protected to truly lock-free as documented in our analysis. The Windows implementation requires more robust testing and potentially alternative approaches to DLL injection. The web dashboard server exists but needs frontend development for browser-based visualization.
 
-**Linux:**
-```bash
-# Set environment variables for Linux symbol preloading
-export GGML_VIZ_OUTPUT=tests/traces/trace.ggmlviz
-export LD_PRELOAD=build/src/libggml_viz_hook.so
+Advanced features like memory usage tracking, thread synchronization analysis, and plugin-based visualizations are partially implemented but not yet production-ready. Export capabilities to formats like Chrome Trace and Tracy profiler are planned but not yet available. Integration with real-world llama.cpp workflows has been tested manually but needs more comprehensive examples and documentation.
 
-# Run any llama.cpp binary with hooks
-./third_party/llama.cpp/build/bin/llama-cli \
-  -m models/your-model.gguf \
-  -p "Hello, world!" \
-  -n 10 \
-  --no-display-prompt
-```
+## Contributing and Documentation
 
-**Windows (PowerShell) - ⚠️ Experimental:**
-```powershell
-# Set environment variables
-$env:GGML_VIZ_OUTPUT = "tests\traces\trace.ggmlviz"
-$env:GGML_VIZ_VERBOSE = "1"
+The project welcomes contributions across all skill levels, from documentation improvements to core systems programming. The build system is based on CMake with comprehensive CI/CD testing on all supported platforms. The codebase uses modern C++17 with careful attention to cross-platform compatibility and performance optimization.
 
-# Note: Windows implementation uses MinHook DLL injection
-# Current implementation is experimental - ensure ggml_viz_hook.dll is in PATH
-.\third_party\llama.cpp\build\bin\llama-cli.exe `
-  -m models\your-model.gguf `
-  -p "Hello, world!" `
-  -n 10 `
-  --no-display-prompt
-```
+Key documentation includes the [GGMLVIZ format specification](docs/ggmlviz.md) with complete technical details, the [build guide](docs/BUILD.md) with platform-specific instructions, and the [ring buffer analysis](docs/RING_BUFFER_ANALYSIS.md) documenting current performance issues and solutions. The project follows standard GitHub workflows with issues, pull requests, and releases managed through the repository.
 
-#### Step 4: Watch Real-Time Visualization
-The GUI automatically updates as events are captured. You should see:
-- **Hook Output**: `[GGML_VIZ] *** SCHEDULER INTERPOSED ***` messages
-- **GUI Updates**: `[ImGuiApp] Loaded X new events from external file`
-- **Live Dashboard**: Real-time graph and timeline visualization
-
-### Method 2: Direct Integration (Advanced)
-
-For custom GGML applications or development purposes.
-
-#### Step 1: Link Against ggml-viz
-```cmake
-# In your CMakeLists.txt
-find_package(ggml_viz REQUIRED)
-target_link_libraries(your_app ggml_viz_hook)
-```
-
-#### Step 2: Initialize in Code
-```cpp
-#include "ggml_hook.hpp"
-
-int main() {
-    // Start instrumentation
-    auto& hook = ggml_viz::GGMLHook::instance();
-    hook.start();
-    
-    // Your GGML code here
-    ggml_graph_compute(ctx, graph);
-    
-    // Stop instrumentation
-    hook.stop();
-    return 0;
-}
-```
-
-#### Step 3: Set Output and Run
-```bash
-export GGML_VIZ_OUTPUT=my_trace.ggmlviz
-./your_app
-
-# Visualize results
-./bin/ggml-viz my_trace.ggmlviz
-```
-
----
-
-## 🛠 Advanced Usage
-
-### Live Mode with Custom File Paths
-
-**Terminal 1 (GUI):**
-```bash
-./bin/ggml-viz --live /path/to/my_trace.ggmlviz --no-hook
-```
-
-**Terminal 2 (Application with hooks):**
-```bash
-# macOS
-export GGML_VIZ_OUTPUT=/path/to/my_trace.ggmlviz
-export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib
-./your_ggml_app
-
-# Linux  
-export GGML_VIZ_OUTPUT=/path/to/my_trace.ggmlviz
-export LD_PRELOAD=build/src/libggml_viz_hook.so
-./your_ggml_app
-```
-
-### Web Server Mode (Experimental)
-```bash
-# Start web server
-./bin/ggml-viz --web --port 8080
-
-# Access dashboard at http://localhost:8080
-```
-
-### Batch Processing Multiple Traces
-```bash
-# Process all traces in directory
-for trace in tests/traces/*.ggmlviz; do
-    echo "Processing $trace..."
-    ./bin/ggml-viz "$trace" --export-stats
-done
-```
-
-### Performance Benchmarking
-```bash
-# Quick performance check
-./scripts/simple_benchmark.sh
-
-# Detailed benchmarking with overhead measurement
-./scripts/benchmark.sh
-```
-
-**Performance Impact**: Overhead measurement in progress.
-
----
-
-## 🎯 Environment Variables
-
-### Essential Variables
-- **`GGML_VIZ_OUTPUT`**: Output trace file path (required for capture)
-
-### Platform-Specific Hook Variables
-- **`DYLD_INSERT_LIBRARIES`**: macOS dynamic library interposition path
-- **`LD_PRELOAD`**: Linux shared library preloading path  
-- **Windows**: Uses MinHook DLL injection (experimental - ensure DLL is in PATH)
-
-### Configuration Variables
-- **`GGML_VIZ_VERBOSE`**: Enable verbose logging output
-- **`GGML_VIZ_DISABLE`**: Disable instrumentation entirely  
-- **`GGML_VIZ_MAX_EVENTS`**: Maximum events to capture (default: 10,000,000)
-
-### Advanced Debugging
-- **`GGML_VIZ_OP_TIMING`**: Enable operation timing (default: true)
-- **`GGML_VIZ_MEMORY_TRACKING`**: Enable memory tracking (default: false)
-- **`GGML_VIZ_THREAD_TRACKING`**: Enable thread tracking (default: false)
-- **`GGML_VIZ_TENSOR_NAMES`**: Capture tensor names (default: true)
-
----
-
-## 📊 Understanding the Output
-
-### Trace File Format
-Generated `.ggmlviz` files contain:
-- **Header**: Magic bytes "GGMLVIZ1" + metadata
-- **Events**: Binary event stream with timestamps
-- **Statistics**: Performance metrics and summaries
-
-### Event Types Captured
-- **Graph Compute**: Begin/end of graph execution
-- **Operation Timing**: Individual operation performance
-- **Memory Events**: Allocation/deallocation tracking
-- **Backend Events**: GPU kernel launches and synchronization
-
-### GUI Components
-- **Timeline View**: Flame chart showing operation execution
-- **Graph View**: Static computation graph visualization  
-- **Memory View**: Memory usage and allocation patterns
-- **Statistics Panel**: Performance metrics and bottlenecks
-
----
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-#### "No events captured"
-```bash
-# Check if hooks are loaded
-export GGML_VIZ_VERBOSE=1
-# Look for "[GGML_VIZ] Hook started" messages
-```
-
-#### "Failed to read trace header"
-```bash
-# Verify file exists and has correct format
-hexdump -C your_trace.ggmlviz | head -1
-# Should start with: 47 47 4d 4c 56 49 5a 31 (GGMLVIZ1)
-```
-
-#### macOS "Library not loaded"
-```bash
-# Fix library path
-export DYLD_INSERT_LIBRARIES=$(pwd)/build/src/libggml_viz_hook.dylib
-# Use absolute path instead of relative
-```
-
-#### GUI not updating in live mode
-```bash
-# Ensure both processes use the same file path
-./bin/ggml-viz --live trace.ggmlviz --no-hook  # Terminal 1
-export GGML_VIZ_OUTPUT=trace.ggmlviz           # Terminal 2
-```
-
-### Debug Commands
-```bash
-# Test hook system
-./tests/manual/test_ggml_hook
-
-# Verify library symbols
-nm build/src/libggml_viz_hook.dylib | grep viz_sched
-
-# Check file permissions
-ls -la tests/traces/trace.ggmlviz
-
-# Monitor file changes
-tail -f tests/traces/trace.ggmlviz
-```
-
----
-
-## 🏗 Architecture
-
-### Core Components
-
-```mermaid
-graph TD
-    A[GGML Application] -->|Platform-Specific Hook| B[Scheduler Hooks]
-    B --> C[Event Capture]
-    C --> D[Ring Buffer]
-    D --> E[Binary Trace File]
-    E --> F[GUI Monitoring]
-    F --> G[Real-time Visualization]
-```
-
-- **Platform-Specific Hooking**: 
-  - **macOS**: DYLD_INTERPOSE for symbol replacement in `__DATA,__interpose` section
-  - **Linux**: LD_PRELOAD for shared library symbol precedence  
-  - **Windows**: MinHook for runtime API patching (experimental)
-- **Event Capture**: Lock-free ring buffer for high-performance recording
-- **Binary Format**: Efficient `.ggmlviz` format with version headers
-- **Live Monitoring**: File-based communication between processes
-- **Cross-Platform**: Works with Metal, CUDA, CPU, and Vulkan backends
-
-### Supported Platforms
-
-| Platform | CPU | GPU | Hook Method | Build Status | Hook Implementation |
-|----------|-----|-----|-------------|--------------|---------------------|
-| macOS (arm64/x64) | ✅ AVX2/NEON | ✅ Metal* | DYLD_INTERPOSE | ✅ Complete | ✅ Production ready |
-| Linux (x64) | ✅ AVX2/AVX-512 | ✅ CUDA/Vulkan | LD_PRELOAD | ✅ Complete | ✅ Production ready |
-| Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | ✅ Complete | ⚠️ Experimental |
-| Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | ❓ Untested | ❓ Unknown |
-
-*Metal backend requires `-DGGML_METAL=OFF` due to shader compilation issues
-
----
-
-## 🧪 Development
-
-### Running Tests
-```bash
-# Unit tests
-cd build && ctest
-
-# Manual tests
-./tests/manual/test_ggml_hook
-./tests/manual/test_interpose
-
-# Integration tests
-./tests/integration/demo_live_mode_with_llama.sh
-```
-
-### Contributing
-
-We welcome contributions! Please see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for:
-
-- Development setup instructions
-- Code style guidelines and automated formatting tools
-- Testing procedures
-- Current development priorities (see [TODO.md](TODO.md))
-- Pull request process
-
-### Development Commands
-```bash
-# Code quality
-./scripts/format.sh     # Auto-format C++ and CMake files
-./scripts/lint.sh       # Static analysis and code linting
-./scripts/run_tests.sh  # Run test suite
-
-# Build with debug symbols
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DGGML_METAL=OFF
-make -j4
-
-# Test with verbose output
-./bin/ggml-viz --verbose tests/traces/trace.ggmlviz
-```
-
----
-
-## 📝 Status & Roadmap
-
-### ✅ **Core Systems Working**
-- ✅ Build system and CI for Windows, macOS, Linux
-- ✅ Basic instrumentation and event capture system
-- ✅ ImGui desktop visualization interface (basic functionality)
-- ✅ Binary trace format with version headers
-- ✅ CLI interface with --help, --version, basic options
-- ✅ External hook injection mechanisms implemented
-- ✅ Cross-platform compilation and testing infrastructure
-
-### ✅ **Live Mode Features Working**
-- ✅ Live mode functionality with real-time event capture
-- ✅ File monitoring and automatic updates (100ms polling)
-- ✅ Live timeline and graph visualization
-- ✅ Cross-platform hook testing (all platforms validated in CI)
-
-### 🚧 **Partial/Needs Enhancement**
-- 🚧 Advanced timeline visualization (basic implementation working)
-- 🚧 Web dashboard functionality (server exists, needs frontend polish)
-- 🚧 Integration with real llama.cpp workflows (examples need expansion)
-
-### ❌ **Major Features Missing**
-- ❌ Advanced tensor inspection and statistics
-- ❌ Memory usage tracking and visualization
-- ❌ Plugin system architecture
-- ❌ Export capabilities (SVG, JSON, CSV)
-
-### 📋 **Planned Enhancements**
-- 📋 Enhanced web dashboard frontend
-- 📋 Plugin system for custom visualizations
-- 📋 Export capabilities (SVG, JSON, CSV)
-- 📋 Integration with profiling tools (Tracy, perf)
-- 📋 Advanced tensor analysis and memory profiling
-
----
-
-## 📄 License
-
-Licensed under **Apache 2.0**. See [LICENSE](LICENSE) for details.
-
-Third-party dependencies are listed in [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md).
-
----
-
-## 🙏 Credits
-
-- **Georgi Gerganov** and the GGML community for the foundation
-- **llama.cpp contributors** for the excellent inference engine
-- **ImGui team** for the immediate mode GUI framework
-- **Tracy profiler** for real-time profiling inspiration
-
----
-
-*"The best way to understand your model is to watch it run."*
+| Platform | Status | Interposition Method | Notes |
+|----------|--------|-------------|-------|
+| **macOS** (arm64/x64) | ✅ Production | DYLD_INTERPOSE | Full functionality, CI tested |
+| **Linux** (x64) | ✅ Production | LD_PRELOAD | Full functionality, CI tested |
+| **Windows** 10+ | ⚠️ Experimental | MinHook DLL | Basic functionality, needs testing |
+| **Raspberry Pi** | ❓ Untested | LD_PRELOAD | Should work but unverified |
