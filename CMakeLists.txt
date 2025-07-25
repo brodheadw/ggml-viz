@@ -16,6 +16,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
 
+# Build third-party dependencies
+add_subdirectory(third_party)
+
+# Build GGML submodule
+add_subdirectory(third_party/ggml)
+
 # Windows-specific dependencies
 if(WIN32)
     include(FetchContent)
