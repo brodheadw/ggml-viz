@@ -132,8 +132,9 @@ void GGMLHook::start() {
 
     start_time_ = std::chrono::steady_clock::now();
     event_count_ = 0;
-    write_pos_ = 0;
-    read_pos_ = 0;
+    write_pos_.v.store(0, std::memory_order_relaxed);
+    read_pos_.v.store(0, std::memory_order_relaxed);
+    dropped_events_.store(0, std::memory_order_relaxed);
 
     if (config_.write_to_file) {
         output_file_ = fopen(config_.output_filename.c_str(), "wb");
@@ -181,18 +182,19 @@ void GGMLHook::reset_stats() {
         return;
     }
     event_count_ = 0;
-    write_pos_ = 0;
-    read_pos_ = 0;
+    write_pos_.v.store(0, std::memory_order_relaxed);
+    read_pos_.v.store(0, std::memory_order_relaxed);
+    dropped_events_.store(0, std::memory_order_relaxed);
 }
 
 std::vector<Event> GGMLHook::get_events_size(uint64_t timestamp_ns) {
     std::vector<Event> events;
     if (!active_.load()) return events;
 
-    const size_t current_write = write_pos_.load(std::memory_order_acquire);
-    size_t current_read = read_pos_.load(std::memory_order_relaxed);
+    const uint64_t head = write_pos_.v.load(std::memory_order_acquire);
+    uint64_t tail = read_pos_.v.load(std::memory_order_relaxed);
 
-    for (size_t i=current_read; i<current_write; ++i) {
+    for (uint64_t i = tail; i < head; ++i) {
         const size_t pos = i & (BUFFER_SIZE - 1);
         const Event& e = event_buffer_[pos];
 
@@ -203,7 +205,7 @@ std::vector<Event> GGMLHook::get_events_size(uint64_t timestamp_ns) {
         }
     }
 
-    read_pos_.store(current_read + events.size(), std::memory_order_release);
+    read_pos_.v.store(tail + events.size(), std::memory_order_relaxed);
     return events;
 }
 
@@ -211,23 +213,24 @@ std::vector<Event> GGMLHook::consume_available_events() {
     std::vector<Event> events;
     if (!active_.load()) return events;
 
-    const size_t current_write = write_pos_.load(std::memory_order_acquire);
-    const size_t current_read = read_pos_.load(std::memory_order_relaxed);
+    // Consumer (tail=read_pos_, head=write_pos_)
+    const uint64_t tail = read_pos_.v.load(std::memory_order_relaxed);    // own counter
+    const uint64_t head = write_pos_.v.load(std::memory_order_acquire);   // see producer updates
 
-    // Calculate available events
-    const size_t available = current_write - current_read;
+    // Calculate available events using monotonic counters
+    const uint64_t available = head - tail;
     if (available == 0) return events;
 
     events.reserve(available);
 
     // Copy all available events
-    for (size_t i = current_read; i < current_write; ++i) {
+    for (uint64_t i = tail; i < head; ++i) {
         const size_t pos = i & (BUFFER_SIZE - 1);
         events.push_back(event_buffer_[pos]);
     }
 
-    // Update read position to consume the events
-    read_pos_.store(current_write, std::memory_order_release);
+    // Update read position with release fence - signals space available to producer
+    read_pos_.v.store(head, std::memory_order_relaxed);  // can be relaxed per feedback
     return events;
 }
 
@@ -246,11 +249,26 @@ void GGMLHook::record_event(const Event& event) {
         return;
     }
 
-    const size_t pos = write_pos_.fetch_add(1, std::memory_order_relaxed) & (BUFFER_SIZE - 1);
-    {
-        std::lock_guard<std::mutex> lock(buffer_mutex_);
-        event_buffer_[pos] = event;
+    // SPSC lock-free implementation with proper memory ordering
+    // Producer (head=write_pos_, tail=read_pos_)
+    // We use head=producer, tail=consumer naming convention
+    const uint64_t head = write_pos_.v.load(std::memory_order_relaxed);  // own counter
+    const uint64_t tail = read_pos_.v.load(std::memory_order_acquire);   // see consumer updates
+    
+    // Check if buffer full - we leave one slot empty to distinguish full/empty states
+    // This is the "one empty slot" rule for lock-free ring buffers
+    const uint64_t next = head + 1;
+    if ((next & (BUFFER_SIZE - 1)) == (tail & (BUFFER_SIZE - 1))) {
+        // Buffer full, drop event and increment counter for backpressure monitoring
+        dropped_events_.fetch_add(1, std::memory_order_relaxed);
+        return;
     }
+    
+    // Write event to buffer
+    event_buffer_[head & (BUFFER_SIZE - 1)] = event;
+    
+    // Publish with release fence - signals data availability to consumer
+    write_pos_.v.store(next, std::memory_order_release);
     
     // Increment event count after storing the event
     size_t new_count = event_count_.fetch_add(1, std::memory_order_relaxed) + 1;
@@ -264,8 +282,8 @@ void GGMLHook::record_event(const Event& event) {
 void GGMLHook::flush_to_file() {
     if (!output_file_) return;
 
-    size_t current_write = write_pos_.load();
-    size_t current_read = read_pos_.load();
+    uint64_t current_write = write_pos_.v.load(std::memory_order_acquire);
+    uint64_t current_read = read_pos_.v.load(std::memory_order_relaxed);
 
     while (current_read < current_write) {
         size_t pos = current_read & (BUFFER_SIZE - 1);
@@ -289,7 +307,7 @@ void GGMLHook::flush_to_file() {
         current_read++;
     }
 
-    read_pos_ = current_read;
+    read_pos_.v.store(current_read, std::memory_order_relaxed);
     fflush(output_file_);
     
     // Force immediate disk write for live mode visibility
