@@ -43,9 +43,9 @@ int main() {
     ggml_set_name(B, "matrix_B");
     ggml_set_name(C, "matrix_C");
 
-    float* a_data = (float*)A->data;
-    float* b_data = (float*)B->data;
-    float* c_data = (float*)C->data;
+    float* a_data = static_cast<float*>(A->data);
+    float* b_data = static_cast<float*>(B->data);
+    float* c_data = static_cast<float*>(C->data);
 
     for (int i=0; i<n*n; i++) {
         a_data[i] = rand() / (float)RAND_MAX;

@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.15)
+
 # Third-party dependencies for ggml-viz
 
 # GLFW - Windowing library
