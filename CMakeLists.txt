@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(ggml-viz VERSION 0.0.7 LANGUAGES C CXX)
+project(ggml-viz VERSION 0.0.8 LANGUAGES C CXX)
 
 # Enable Objective-C only on Apple platforms
 if(APPLE)
@@ -15,6 +15,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Find required packages
 find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
+
+# Build third-party dependencies
+add_subdirectory(third_party)
+
+# Build GGML submodule
+add_subdirectory(third_party/ggml)
 
 # Windows-specific dependencies
 if(WIN32)
@@ -40,22 +46,7 @@ if(WIN32)
         OUTPUT_NAME "MinHook"
         POSITION_INDEPENDENT_CODE ON
     )
-    
-    # Add Windows-specific compile definitions
-    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
-    if(MSVC)
-        add_compile_options(/EHsc)
-    endif()
 endif()
-
-# Build GUI dependencies first
-add_subdirectory(third_party)
-
-# Enable visualization hooks in GGML
-set(GGML_VIZ_ENABLE_HOOKS ON CACHE BOOL "Enable hooks for ggml-viz visualization" FORCE)
-
-# Bring in ggml submodule (will define a 'ggml' target)
-add_subdirectory(third_party/ggml EXCLUDE_FROM_ALL)
 
 # Build our instrumentation library
 add_subdirectory(src)

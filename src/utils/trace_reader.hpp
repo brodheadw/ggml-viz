@@ -17,6 +17,10 @@ public:
 
     explicit TraceReader(const std::string& filename);
     ~TraceReader();
+    
+    // Delete copy constructor and assignment operator since we manage a FILE* resource
+    TraceReader(const TraceReader&) = delete;
+    TraceReader& operator=(const TraceReader&) = delete;
 
     bool is_valid() const { return valid_; }
     size_t event_count() const { return events_.size(); }
