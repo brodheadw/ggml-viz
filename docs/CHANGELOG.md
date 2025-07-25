@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.9] - 2025-07-25
+
+### Fixed - Build System and Code Quality Improvements
+- **Resolved All CI Build Failures** - Fixed missing dependencies across all platforms
+  - Added `add_subdirectory(third_party)` and `add_subdirectory(third_party/ggml)` to main CMakeLists.txt
+  - Fixed GGML library linking issues preventing test compilation
+  - Added GLFW dependency to frontend library target for proper GUI linking
+  - Resolved "library 'ggml' not found" and "'GLFW/glfw3.h' file not found" errors across macOS, Linux, Windows
+
+- **Major Code Quality Improvements** - Reduced lint issues from 200 to 79 (60% improvement)
+  - Fixed uninitialized member variables in GGMLHook constructor with proper initialization list
+  - Added explicit copy constructor/assignment operator deletion to TraceReader (manages FILE* resource)
+  - Fixed void pointer arithmetic warnings in logger.hpp string formatting
+  - Replaced C-style casts with static_cast/reinterpret_cast throughout codebase
+  - Improved const correctness and RAII practices
+
+- **Enhanced Memory Safety and Platform Compatibility**
+  - Fixed platform-specific file descriptor usage to prevent unused variable warnings
+  - Added cmake_minimum_required to third_party/CMakeLists.txt for proper CMake compliance
+  - Improved cross-platform build reliability and consistency
+
+### Verification
+- **All Tests Pass** - 4/4 tests pass via CTest after build system fixes
+- **Ring Buffer Implementation Validated** - 5/5 SPSC tests continue to pass
+- **Cross-Platform CI Success** - GitHub Actions now builds successfully on all platforms
+
 ## [0.0.8] - 2025-07-25
 
 ### Added - Lock-Free SPSC Ring Buffer Implementation ✅
