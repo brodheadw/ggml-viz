@@ -311,12 +311,13 @@ void GGMLHook::flush_to_file() {
     fflush(output_file_);
     
     // Force immediate disk write for live mode visibility
-    int fd = fileno(output_file_);
 #ifdef __APPLE__
+    int fd = fileno(output_file_);
     fcntl(fd, F_FULLFSYNC, 0);
 #elif defined(_WIN32)
     _commit(_fileno(output_file_));
 #else
+    int fd = fileno(output_file_);
     fsync(fd);
 #endif
 }
