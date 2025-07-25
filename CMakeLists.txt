@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(ggml-viz VERSION 0.0.7 LANGUAGES C CXX)
+project(ggml-viz VERSION 0.0.8 LANGUAGES C CXX)
 
 # Enable Objective-C only on Apple platforms
 if(APPLE)
@@ -15,6 +15,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Find required packages
 find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
+
+# Build third-party dependencies
+add_subdirectory(third_party)
+
+# Build GGML submodule
+add_subdirectory(third_party/ggml)
 
 # Windows-specific dependencies
 if(WIN32)
@@ -40,6 +46,7 @@ if(WIN32)
         OUTPUT_NAME "MinHook"
         POSITION_INDEPENDENT_CODE ON
     )
+endif()
 
 # Build our instrumentation library
 add_subdirectory(src)

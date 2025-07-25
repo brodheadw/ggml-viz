@@ -184,6 +184,26 @@ for (const auto& timing : timings) {
 }
 ```
 
+## Ring Buffer Implementation
+
+### Lock-Free SPSC Design
+The trace capture system uses a high-performance lock-free SPSC (Single Producer, Single Consumer) ring buffer:
+
+- **Zero Mutex Overhead**: Event capture uses only atomic operations with proper memory ordering
+- **Cache-Line Alignment**: Producer and consumer positions are cache-line aligned to prevent false sharing
+- **Monotonic Counters**: Uses uint64_t counters with efficient masking for wraparound handling
+- **Backpressure Monitoring**: Dropped event counters track buffer overflow for capacity planning
+- **Memory Ordering Contract**: 
+  - **Producer**: head load (relaxed), tail load (acquire), head store (release)
+  - **Consumer**: tail load (relaxed), head load (acquire), tail store (relaxed)
+
+### Performance Characteristics
+- **Buffer Size**: 65,536 events (power of 2 for efficient masking)
+- **Event Size**: ~104 bytes per event (varies with label length)
+- **Throughput**: Optimized for high-frequency event capture (>1M events/sec)
+- **Latency**: Sub-microsecond event recording overhead
+- **Memory Usage**: ~6.8MB ring buffer + event data
+
 ## Format Considerations
 
 ### Endianness
@@ -372,15 +392,15 @@ graph TD
     B --> C[Begin Event Generation]
     C --> D[Original Function Execution]
     D --> E[End Event Generation]
-    E --> F[Ring Buffer Storage]
+    E --> F[Lock-Free SPSC Ring Buffer]
     F --> G[File Flush]
     G --> H[GGMLVIZ Trace File]
 ```
 
 1. **Function Interposition**: Platform-specific interposition intercepts GGML function calls
 2. **Event Generation**: Begin/end events are created with timestamps
-3. **Ring Buffer Storage**: Events are stored in a high-performance ring buffer
-4. **File Writing**: Events are periodically flushed to the GGMLVIZ file
+3. **Lock-Free Ring Buffer Storage**: Events are stored in a high-performance SPSC ring buffer with proper memory ordering
+4. **File Writing**: Events are periodically flushed to the GGMLVIZ file with minimal overhead
 
 ### Integration Methods
 

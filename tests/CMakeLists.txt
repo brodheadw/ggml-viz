@@ -67,3 +67,17 @@ target_link_libraries(test_logger
 
 add_test(NAME logger_basic
          COMMAND test_logger)
+
+# test_ring_buffer
+add_executable(test_ring_buffer
+    test_ring_buffer.cpp
+)
+
+target_link_libraries(test_ring_buffer
+    PRIVATE
+      ggml_hook_test   # Use test-specific version
+      Threads::Threads
+)
+
+add_test(NAME ring_buffer_spsc
+         COMMAND test_ring_buffer)
