@@ -40,6 +40,7 @@ if(WIN32)
         OUTPUT_NAME "MinHook"
         POSITION_INDEPENDENT_CODE ON
     )
+endif()
 
 # Build our instrumentation library
 add_subdirectory(src)

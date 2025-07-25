@@ -124,7 +124,14 @@ private:
     GGMLHook(const GGMLHook&) = delete;
     GGMLHook& operator=(const GGMLHook&) = delete;
 
+public:
+    // Test access (only enabled in test mode)
+    #ifdef GGML_VIZ_TEST_MODE
     void record_event(const Event& event);
+    #else
+private:
+    void record_event(const Event& event);
+    #endif
     void flush_to_file();
 
     HookConfig config_;

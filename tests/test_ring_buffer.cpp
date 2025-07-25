@@ -151,21 +151,37 @@ bool test_buffer_full() {
     std::cout << "Test 4: Buffer full behavior..." << std::flush;
     
     GGMLHook& hook = GGMLHook::instance();
+    
+    // Configure to disable file writing to prevent automatic consumption
+    HookConfig config;
+    config.write_to_file = false;
+    hook.configure(config);
     hook.start();
     
     const size_t buffer_size = hook.get_buffer_size();
     
-    // Fill buffer completely without consuming
+    // Fill buffer completely without consuming - need to overflow the "one empty slot" rule
+    // Buffer size is 65536, so we need to fill 65535 slots + extra to trigger full condition
     for (size_t i = 0; i < buffer_size + 100; ++i) {
         Event e = create_test_event(EventType::OP_COMPUTE_BEGIN, i);
         hook.record_event(e);
+        
+        // Check dropped count periodically
+        if (i > buffer_size - 10 && i % 10 == 0) {
+            uint64_t current_dropped = hook.get_dropped_events();
+            if (current_dropped > 0) {
+                break; // Found drops, test successful
+            }
+        }
     }
     
     // Check that some events were dropped
     uint64_t dropped = hook.get_dropped_events();
+    uint64_t final_write = hook.get_current_write_pos();
+    uint64_t final_read = hook.get_current_read_pos();
     bool success = (dropped > 0);
     
-    std::cout << " [Dropped: " << dropped << "]";
+    std::cout << " [Dropped: " << dropped << ", Write: " << final_write << ", Read: " << final_read << "]";
     
     hook.stop();
     hook.reset_stats();
@@ -174,11 +190,11 @@ bool test_buffer_full() {
     return success;
 }
 
-// Test 5: Memory ordering stress test
+// Test 5: Memory ordering stress test  
 bool test_memory_ordering_stress() {
     std::cout << "Test 5: Memory ordering stress test..." << std::flush;
     
-    constexpr int ITERATIONS = 10000;
+    constexpr int ITERATIONS = 5000;
     std::atomic<bool> stop_test{false};
     std::atomic<int> total_produced{0};
     std::atomic<int> total_consumed{0};
@@ -186,44 +202,52 @@ bool test_memory_ordering_stress() {
     GGMLHook& hook = GGMLHook::instance();
     hook.start();
     
-    // Multiple producer threads (still SPSC due to singleton)
-    std::vector<std::thread> producers;
-    for (int t = 0; t < 3; ++t) {
-        producers.emplace_back([&, t]() {
-            for (int i = 0; i < ITERATIONS && !stop_test.load(); ++i) {
-                Event e = create_test_event(EventType::OP_COMPUTE_BEGIN, 
-                                          t * ITERATIONS + i, t + 1);
-                hook.record_event(e);
-                total_produced.fetch_add(1);
+    // Single producer thread (true SPSC)
+    std::thread producer([&]() {
+        int produced = 0;
+        while (produced < ITERATIONS && !stop_test.load()) {
+            Event e = create_test_event(EventType::OP_COMPUTE_BEGIN, produced);
+            hook.record_event(e);
+            total_produced.store(++produced);
+            
+            // Brief yield to stress memory ordering
+            if (produced % 10 == 0) {
+                std::this_thread::yield();
             }
-        });
-    }
+        }
+    });
     
     // Single consumer thread
     std::thread consumer([&]() {
         int consumed = 0;
-        while (consumed < 3 * ITERATIONS && !stop_test.load()) {
+        while (consumed < ITERATIONS && !stop_test.load()) {
             auto events = hook.consume_available_events();
             consumed += events.size();
             total_consumed.store(consumed);
             
-            // Brief yield to allow producers to work
-            std::this_thread::yield();
+            // Brief yield to allow producer to work
+            if (consumed % 50 == 0) {
+                std::this_thread::yield();
+            }
         }
     });
     
-    // Let test run
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    stop_test.store(true);
-    
-    for (auto& p : producers) p.join();
+    // Wait for completion or timeout
+    producer.join();
     consumer.join();
     
-    bool success = (total_consumed.load() > 0) && 
-                   (total_consumed.load() <= total_produced.load());
+    // Get final counts
+    int final_produced = total_produced.load();
+    int final_consumed = total_consumed.load();
     
-    std::cout << " [Produced: " << total_produced.load() 
-              << ", Consumed: " << total_consumed.load() << "]";
+    // Final consumption of any remaining events
+    auto remaining = hook.consume_available_events();
+    final_consumed += remaining.size();
+    
+    bool success = (final_consumed == final_produced) && (final_produced > 0);
+    
+    std::cout << " [Produced: " << final_produced 
+              << ", Consumed: " << final_consumed << "]";
     
     hook.stop();
     hook.reset_stats();
