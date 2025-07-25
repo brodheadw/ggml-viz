@@ -61,8 +61,8 @@ namespace {
     }
 }
 
-// Private constructor with environment variable initialization
-GGMLHook::GGMLHook() {
+// Private constructor with environment variable initialization  
+GGMLHook::GGMLHook() : event_buffer_{}, write_pos_{}, read_pos_{} {
     // Initialize config with defaults, then override with environment variables
     config_.enable_op_timing = true;
     config_.enable_memory_tracking = false;
