@@ -672,15 +672,15 @@ bool install_ggml_hooks() {
     void* handle = dlopen(NULL, RTLD_LAZY);
     if (handle) {
         // Look for the original functions in case they're not weak symbols
-        auto backend_func = (enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*))
-            dlsym(handle, "ggml_backend_graph_compute");
-        auto graph_func = (void (*)(struct ggml_context*, struct ggml_cgraph*))
-            dlsym(handle, "ggml_graph_compute");
-        auto graph_with_ctx_func = (enum ggml_status (*)(struct ggml_context*, struct ggml_cgraph*, int))
-            dlsym(handle, "ggml_graph_compute_with_ctx");
-        auto metal_func = (enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*))
-            dlsym(handle, "ggml_backend_metal_graph_compute");
-            
+        auto backend_func = reinterpret_cast<enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*)>
+            (dlsym(handle, "ggml_backend_graph_compute"));
+        auto graph_func = reinterpret_cast<void (*)(struct ggml_context*, struct ggml_cgraph*)>
+            (dlsym(handle, "ggml_graph_compute"));
+        auto graph_with_ctx_func = reinterpret_cast<enum ggml_status (*)(struct ggml_context*, struct ggml_cgraph*, int)>
+            (dlsym(handle, "ggml_graph_compute_with_ctx"));
+        auto metal_func = reinterpret_cast<enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*)>
+            (dlsym(handle, "ggml_backend_metal_graph_compute"));
+
         // Only store if they're different from our overrides (shared library builds only)
 #if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
         if (backend_func && backend_func != ggml_backend_graph_compute) {
