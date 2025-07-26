@@ -41,6 +41,8 @@ if(WIN32)
         POSITION_INDEPENDENT_CODE ON
     )
 
+endif()
+
 # Build our instrumentation library
 add_subdirectory(src)
 
