@@ -120,6 +120,49 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_CUDA=ON
 cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_VIZ_BUILD_TESTS=OFF -DGGML_VIZ_BUILD_EXAMPLES=OFF
 ```
 
+## Building llama.cpp for Testing
+
+To test ggml-viz with real workloads, you'll need to build llama.cpp:
+
+### Download and Build llama.cpp
+```bash
+# Clone llama.cpp in the third_party directory (from ggml-viz root)
+cd third_party
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+
+# Build llama.cpp
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc)  # Linux
+# make -j$(sysctl -n hw.ncpu)  # macOS
+```
+
+### Download a Test Model
+```bash
+# Download a small model for testing (from llama.cpp directory)
+cd models
+wget https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGML/resolve/main/tinyllama-1.1b-chat-v1.0.q4_k_m.gguf
+
+# Or use huggingface-cli if available
+# huggingface-cli download TheBloke/TinyLlama-1.1B-Chat-v1.0-GGML tinyllama-1.1b-chat-v1.0.q4_k_m.gguf --local-dir models/
+```
+
+### Test with ggml-viz
+```bash
+# From ggml-viz root directory
+# Terminal 1: Run llama.cpp with ggml-viz instrumentation
+env GGML_VIZ_OUTPUT=test_live_trace.ggmlviz \
+    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \  # macOS
+    # LD_PRELOAD=./build/src/libggml_viz_hook.so \              # Linux
+    ./third_party/llama.cpp/build/bin/llama-cli \
+    -m ./third_party/llama.cpp/models/tinyllama-1.1b-chat-v1.0.q4_k_m.gguf \
+    -p "Hello world" -n 10 --verbose-prompt
+
+# Terminal 2: View live trace
+./build/bin/ggml-viz --live test_live_trace.ggmlviz --no-hook
+```
+
 ## Testing the Build
 
 ### Basic Functionality Tests
@@ -260,16 +303,3 @@ cpack -G TGZ  # Tarball
 cpack -G DEB  # Debian package (Linux)
 cpack -G ZIP  # ZIP archive (Windows)
 ```
-
-## Docker Build
-
-### Using Docker
-```bash
-# Build Docker image
-docker build -t ggml-viz .
-
-# Run container
-docker run -it ggml-viz ggml-viz --help
-```
-
-See [Docker documentation](DOCKER.md) for detailed container usage.

@@ -107,8 +107,9 @@ public:
     std::vector<Event> consume_available_events();
     Event* get_ring_buffer() { return event_buffer_; }
     size_t get_buffer_size() const { return BUFFER_SIZE; }
-    size_t get_current_write_pos() const { return write_pos_.load(std::memory_order_acquire); }
-    size_t get_current_read_pos() const { return read_pos_.load(std::memory_order_acquire); }
+    size_t get_current_write_pos() const { return write_pos_.v.load(std::memory_order_acquire); }
+    size_t get_current_read_pos() const { return read_pos_.v.load(std::memory_order_acquire); }
+    size_t get_dropped_events() const { return dropped_events_.load(std::memory_order_relaxed); }
 
     void on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
     void on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
@@ -130,14 +131,24 @@ private:
     std::atomic<bool> active_{false};
     std::atomic<size_t> event_count_{0};
 
-    // Ring buffer for events
+    // Lock-free SPSC ring buffer
+    // Cache-line aligned atomics to prevent false sharing  
+    struct alignas(64) IndexPad {
+        std::atomic<uint64_t> v{0};
+        char _pad[64 - sizeof(std::atomic<uint64_t>)];
+    };
+    
     static constexpr size_t BUFFER_SIZE = 65536; // Must be pow of 2
     Event event_buffer_[BUFFER_SIZE];
-    std::mutex buffer_mutex_;
+    
+    // head = producer write position, tail = consumer read position
+    IndexPad write_pos_;  // head (producer)
+    IndexPad read_pos_;   // tail (consumer) 
+    
+    // Dropped events counter for backpressure monitoring
+    std::atomic<uint64_t> dropped_events_{0};
+    
     std::mutex file_mutex_;
-
-    std::atomic<size_t> write_pos_{0};
-    std::atomic<size_t> read_pos_{0};
 
     FILE* output_file_ = nullptr;
 

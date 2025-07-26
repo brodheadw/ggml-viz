@@ -16,6 +16,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
 
+add_subdirectory(third_party)
+add_subdirectory(third_party/ggml)
+
 # Windows-specific dependencies
 if(WIN32)
     include(FetchContent)
@@ -40,6 +43,8 @@ if(WIN32)
         OUTPUT_NAME "MinHook"
         POSITION_INDEPENDENT_CODE ON
     )
+
+endif()
 
 # Build our instrumentation library
 add_subdirectory(src)

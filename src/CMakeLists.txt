@@ -92,6 +92,7 @@ target_link_libraries(ggml_frontend
     PUBLIC
       ggml_utils
       imgui
+      glfw
       OpenGL::GL
       Threads::Threads
 )
