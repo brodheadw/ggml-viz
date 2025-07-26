@@ -143,6 +143,34 @@ std::vector<Event> consume_available_events() {
 3. **Clarity**: Accurate documentation matches implementation
 4. **Maintainability**: Simpler SPSC design vs complex MPMC
 
+## Memory Ordering Contract
+
+The SPSC ring buffer implementation uses the following memory ordering contract:
+
+### Producer (record_event):
+- **head load**: `memory_order_relaxed` (reading own counter)
+- **tail load**: `memory_order_acquire` (seeing consumer updates)
+- **head store**: `memory_order_release` (publishing data to consumer)
+
+### Consumer (consume_available_events):
+- **tail load**: `memory_order_relaxed` (reading own counter)  
+- **head load**: `memory_order_acquire` (seeing producer updates)
+- **tail store**: `memory_order_relaxed` (can be relaxed since producer doesn't depend on consumer metadata)
+
+This minimal ordering ensures:
+1. Producer sees all consumer position updates
+2. Consumer sees all producer data and position updates
+3. No unnecessary synchronization overhead
+4. Correct visibility of data across threads
+
+## Future MPMC Upgrade Path
+
+For applications requiring Multiple Producer, Multiple Consumer support:
+- Consider [Vyukov's bounded MPMC queue](https://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue)
+- Uses per-slot sequence numbers to eliminate ABA problems
+- Still bounded and lock-free
+- More complex but handles arbitrary producer/consumer counts
+
 ## Alternative: Keep Mutex (Minimal Change)
 
 If lock-free is not desired:
