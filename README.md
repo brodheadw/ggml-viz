@@ -1,6 +1,6 @@
 # GGML Visualizer
 
-[ggmlviz](docs/ggmlviz.md) / [build](docs/BUILD.md) / [ring buffer analysis](docs/RING_BUFFER_ANALYSIS.md)
+[ggmlviz](docs/ggmlviz.md) / [build](docs/BUILD.md)
 
 **Real-time performance visualization for GGML-based LLM runtimes**
 
