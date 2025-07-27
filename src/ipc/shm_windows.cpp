@@ -74,6 +74,14 @@ WinSharedMemory::createImpl(std::wstring_view name, size_t sz, bool create) {
 
     if (create && GetLastError() != ERROR_ALREADY_EXISTS) {
         auto* hdr = static_cast<RingHeader*>(v);
+        
+        // Verify atomics are lock-free for shared memory safety
+        if (!hdr->head.is_lock_free() || !hdr->tail.is_lock_free()) {
+            UnmapViewOfFile(v);
+            CloseHandle(h);
+            throw std::runtime_error("Atomic operations not lock-free - shared memory ring buffer unsafe");
+        }
+        
         hdr->head.store(0, std::memory_order_relaxed);
         hdr->tail.store(0, std::memory_order_relaxed);
         hdr->capacity = static_cast<uint32_t>(sz);

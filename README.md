@@ -1,6 +1,6 @@
 # GGML Visualizer
 
-[ggmlviz](docs/ggmlviz.md) / [build](docs/BUILD.md) / [ring buffer analysis](docs/RING_BUFFER_ANALYSIS.md)
+[ggmlviz](docs/ggmlviz.md) / [build](docs/BUILD.md)
 
 **Real-time performance visualization for GGML-based LLM runtimes**
 
@@ -10,11 +10,11 @@ GGML Visualizer is a performance analysis toolkit designed to make understanding
 
 The core of the tool is **zero-recompilation tracing** through platform-specific function interposition. By using mechanisms like `LD_PRELOAD` on Linux, `DYLD_INSERT_LIBRARIES` on macOS, and MinHook DLL injection on Windows, ggml-viz can intercept GGML function calls in any existing binary and capture detailed execution traces with nanosecond precision. This means you can take any llama.cpp binary you've already built, set a few environment variables, and immediately get real-time visualization of graph computations, individual operation timing, memory allocations, and backend utilization across CPU, Metal, CUDA, and Vulkan.
 
-The captured events flow through a ring buffer architecture into a custom binary streaming format called GGMLVIZ, designed for high-frequency event capture with minimal overhead. The format uses an 8-byte magic header ("GGMLVIZ1"), version information for backward compatibility, and union-based event structures that can be written incrementally during execution and read efficiently during analysis. This enables both post-mortem analysis of saved traces and live monitoring where the visualization GUI updates in real-time as your model runs.
+The captured events flow through a lock-free SPSC (Single Producer, Single Consumer) ring buffer into a custom binary streaming format called GGMLVIZ, designed for high-frequency event capture with minimal overhead. The ring buffer uses cache-line aligned atomic operations with acquire/release memory ordering for thread-safe operation without mutex overhead. The format uses an 8-byte magic header ("GGMLVIZ1"), version information for backward compatibility, and union-based event structures that can be written incrementally during execution and read efficiently during analysis. This enables both post-mortem analysis of saved traces and live monitoring where the visualization GUI updates in real-time as your model runs.
 
 ## Project Status and Goals
 
-The project is production-ready on macOS and Linux with a working ImGui-based desktop interface, real-time live mode, and comprehensive build system. The Windows implementation exists but remains experimental due to the complexity of DLL injection mechanisms. The ring buffer implementation, while functional, currently uses mutexes despite claims of being "lock-free" - an issue documented in our [ring buffer analysis](docs/RING_BUFFER_ANALYSIS.md) with a clear path to a true lock-free SPSC design.
+The project is production-ready on macOS and Linux with a working ImGui-based desktop interface, real-time live mode, and comprehensive build system. The Windows implementation exists but remains experimental due to the complexity of DLL injection mechanisms. The ring buffer now implements a true lock-free SPSC design with proper memory ordering, cache-line alignment, and backpressure monitoring through dropped event counters - replacing the previous mutex-based implementation as detailed in our [ring buffer analysis](docs/RING_BUFFER_ANALYSIS.md).
 
 The primary goal is to make GGML model performance analysis straightforward and accessible for anyone working with GGML-based applications. It's designed to provide clear, real-time insight into tensor computations, operation timings, memory allocations, and backend utilization—without requiring deep systems knowledge or complex profiling setups. The toolkit enables users to observe exactly how their models execute, identify bottlenecks, and understand resource usage at a granular level.
 
@@ -54,15 +54,15 @@ The system consists of four main layers:
 - Data collection (ring buffer storage and GGMLVIZ format serialization)
 - Frontend (ImGui-based real-time visualization) 
 
-Events are captured with nanosecond timestamps, stored in a ring buffer with atomic operations, and periodically flushed to disk in a binary format optimized for both write performance during capture and read performance during analysis.
+Events are captured with nanosecond timestamps, stored in a lock-free SPSC ring buffer with proper acquire/release memory ordering, and periodically flushed to disk in a binary format optimized for both write performance during capture and read performance during analysis. The ring buffer uses the "one empty slot" rule to distinguish full from empty states and implements backpressure through dropped event counters when the buffer is full.
 
 The interposition mechanisms differ by platform but achieve the same goal: intercepting calls to key GGML functions like `ggml_backend_graph_compute()` without modifying the original application. On macOS, this uses Apple's `DYLD_INTERPOSE` mechanism with symbol replacement in the `__DATA,__interpose` section. On Linux, it uses `LD_PRELOAD` for shared library symbol precedence. On Windows, it uses the MinHook library for runtime API patching, though this implementation remains experimental.
 
-Performance impact is designed to be minimal through careful optimization of the event capture path. The ring buffer uses atomic operations for thread safety, cache line alignment to prevent false sharing, and batch writing to minimize file I/O overhead. Event filtering allows you to capture only the operations you care about, and the binary format avoids expensive serialization during the critical path.
+Performance impact is designed to be minimal through careful optimization of the event capture path. The lock-free SPSC ring buffer uses monotonic uint64_t counters with masking for indexing, cache-line aligned atomic operations to prevent false sharing, and leaner memory ordering (producer uses relaxed/acquire, consumer uses acquire/relaxed) for optimal performance. Event filtering allows you to capture only the operations you care about, and the binary format avoids expensive serialization during the critical path.
 
 ## Current Limitations and Development
 
-The project successfully demonstrates the core concept and provides working visualization for GGML applications, but several areas need continued development. The ring buffer implementation needs to be converted from mutex-protected to truly lock-free as documented in our analysis. The Windows implementation requires more robust testing and potentially alternative approaches to DLL injection. The web dashboard server exists but needs frontend development for browser-based visualization.
+The project successfully demonstrates the core concept and provides working visualization for GGML applications, but several areas need continued development. The lock-free SPSC ring buffer is now implemented and production-ready. The Windows implementation requires more robust testing and potentially alternative approaches to DLL injection. The web dashboard server exists but needs frontend development for browser-based visualization.
 
 Advanced features like memory usage tracking, thread synchronization analysis, and plugin-based visualizations are partially implemented but not yet production-ready. Export capabilities to formats like Chrome Trace and Tracy profiler are planned but not yet available. Integration with real-world llama.cpp workflows has been tested manually but needs more comprehensive examples and documentation.
 
