@@ -56,5 +56,13 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 install_manifest.txt
+cmake-trace.txt
+compile_commands.json
+
+# Benchmark results (generated data)
+benchmark_results/
+
+# Additional runtime files
+*.ini
 
 .gitignore
