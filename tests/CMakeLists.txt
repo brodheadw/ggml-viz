@@ -67,3 +67,18 @@ target_link_libraries(test_logger
 
 add_test(NAME logger_basic
          COMMAND test_logger)
+
+# test_config
+add_executable(test_config
+    test_config.cpp
+)
+
+target_link_libraries(test_config
+    PRIVATE
+      ggml_utils       # from src/CMakeLists.txt (includes config)
+      nlohmann_json::nlohmann_json
+      Threads::Threads
+)
+
+add_test(NAME config_basic
+         COMMAND test_config)
