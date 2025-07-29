@@ -309,11 +309,11 @@ void test_precedence_loading() {
     // Load with precedence (CLI should win)
     mgr.load_with_precedence("cli_config.json", "", "default_config.json");
     
-    const Config& loaded_config = mgr.get();
+    auto loaded_config = mgr.get();
     
     // CLI config should take precedence
-    assert(loaded_config.instrumentation.max_events == 200000);
-    assert(loaded_config.output.filename == "cli.ggmlviz");
+    assert(loaded_config->instrumentation.max_events == 200000);
+    assert(loaded_config->output.filename == "cli.ggmlviz");
     assert(mgr.is_loaded());
     
     // Test dump

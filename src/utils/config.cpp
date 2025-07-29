@@ -352,7 +352,7 @@ void ConfigManager::load_with_precedence(
     if (!default_config_path.empty()) {
         try {
             Config file_config = Config::from_file(default_config_path);
-            config_.merge_from(file_config);
+            config.merge_from(file_config);
             std::cout << "[GGML_VIZ] Loaded config from: " << default_config_path << "\n";
         } catch (const std::exception& e) {
             // Default config file is optional
@@ -363,7 +363,7 @@ void ConfigManager::load_with_precedence(
     if (!env_config_path.empty()) {
         try {
             Config env_file_config = Config::from_file(env_config_path);
-            config_.merge_from(env_file_config);
+            config.merge_from(env_file_config);
             std::cout << "[GGML_VIZ] Loaded config from env: " << env_config_path << "\n";
         } catch (const std::exception& e) {
             std::cerr << "[GGML_VIZ] Warning: Could not load env config " 
@@ -372,13 +372,13 @@ void ConfigManager::load_with_precedence(
     }
     
     // 3. Apply environment variable overrides
-    config_.apply_env_overrides();
+    config.apply_env_overrides();
     
     // 4. Try CLI-specified config file (highest precedence)
     if (!cli_config_path.empty()) {
         try {
             Config cli_config = Config::from_file(cli_config_path);
-            config_.merge_from(cli_config);
+            config.merge_from(cli_config);
             std::cout << "[GGML_VIZ] Loaded config from CLI: " << cli_config_path << "\n";
         } catch (const std::exception& e) {
             throw std::runtime_error("Failed to load CLI config " + cli_config_path + ": " + e.what());
@@ -386,45 +386,41 @@ void ConfigManager::load_with_precedence(
     }
     
     // Final validation
-    if (!config_.is_valid()) {
-        throw std::runtime_error("Final configuration is invalid: " + config_.validation_error());
+    if (!config.is_valid()) {
+        throw std::runtime_error("Final configuration is invalid: " + config.validation_error());
     }
     
-    loaded_ = true;
+    // Atomically update the config pointer (lock-free for readers)
+    config_ptr_.store(std::make_shared<const Config>(std::move(config)));
+    loaded_.store(true);
     
     // Log resolved settings at INFO level
+    auto current_config = config_ptr_.load();
     std::cout << "[GGML_VIZ] Configuration loaded successfully:\n";
-    std::cout << "[GGML_VIZ]   Output file: " << config_.output.filename << "\n";
-    std::cout << "[GGML_VIZ]   Max events: " << config_.instrumentation.max_events << "\n";
-    std::cout << "[GGML_VIZ]   Log level: " << log_level_to_string(config_.logging.level) << "\n";
-    std::cout << "[GGML_VIZ]   Op timing: " << (config_.instrumentation.enable_op_timing ? "enabled" : "disabled") << "\n";
+    std::cout << "[GGML_VIZ]   Output file: " << current_config->output.filename << "\n";
+    std::cout << "[GGML_VIZ]   Max events: " << current_config->instrumentation.max_events << "\n";
+    std::cout << "[GGML_VIZ]   Log level: " << log_level_to_string(current_config->logging.level) << "\n";
+    std::cout << "[GGML_VIZ]   Op timing: " << (current_config->instrumentation.enable_op_timing ? "enabled" : "disabled") << "\n";
 }
 
-const Config& ConfigManager::get() const {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (!loaded_) {
-        throw std::runtime_error("Configuration not loaded - call load_with_precedence() first");
-    }
-    return config_;
+std::shared_ptr<const Config> ConfigManager::get() const {
+    // Lock-free read for hot path
+    return config_ptr_.load();
 }
 
 bool ConfigManager::is_loaded() const {
-    std::lock_guard<std::mutex> lock(mutex_);
-    return loaded_;
+    return loaded_.load();
 }
 
 std::string ConfigManager::dump_json() const {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (!loaded_) {
-        return Config::default_config().to_json();
-    }
-    return config_.to_json();
+    auto config = config_ptr_.load();
+    return config->to_json();
 }
 
 void ConfigManager::reset() {
     std::lock_guard<std::mutex> lock(mutex_);
-    config_ = Config::default_config();
-    loaded_ = false;
+    config_ptr_.store(std::make_shared<const Config>(Config::default_config()));
+    loaded_.store(false);
 }
 
 } // namespace ggml_viz
