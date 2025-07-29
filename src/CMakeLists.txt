@@ -141,14 +141,16 @@ target_compile_definitions(ggml_viz_hook
       BUILDING_GGML_VIZ
 )
 
-# Add logger sources directly to ggml_viz_hook to avoid circular dependency
+# Add config and logger sources directly to ggml_viz_hook to avoid circular dependency
 target_sources(ggml_viz_hook PRIVATE 
+    utils/config.cpp
     utils/logger.cpp
 )
 
 target_link_libraries(ggml_viz_hook
     PUBLIC 
       ggml_ipc_core
+      nlohmann_json::nlohmann_json
       Threads::Threads
       # Note: We intentionally don't link ggml-base to allow function interception
 )

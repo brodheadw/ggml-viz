@@ -21,7 +21,9 @@ target_compile_definitions(ggml_hook_test
 )
 
 target_link_libraries(ggml_hook_test
-    PUBLIC Threads::Threads
+    PUBLIC 
+      ggml_utils       # For ConfigManager
+      Threads::Threads
 )
 
 # test_ggml_hook

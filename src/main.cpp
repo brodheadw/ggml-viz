@@ -2,6 +2,7 @@
 #include "frontend/imgui_app.hpp"
 #include "server/live_data_collector.hpp"
 #include "utils/logger.hpp"
+#include "utils/config.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -229,34 +230,49 @@ namespace {
             exit(1);
         }
         
-        if (!config.config_file.empty()) {
-            std::cerr << "Warning: Config file loading is not yet implemented.\n";
-            std::cerr << "         Config file will be ignored: " << config.config_file << "\n";
-        }
+        // Config file validation is handled during loading
+        // No need to check existence here as ConfigManager handles fallbacks
     }
     
     void setup_environment(const Config& config) {
-        // Set environment variables based on config
+        // Load configuration through ConfigManager with CLI precedence
+        auto& config_mgr = ggml_viz::ConfigManager::instance();
+        
+        // Set environment variables for backward compatibility
         if (config.verbose) {
 #ifdef _WIN32
             _putenv_s("GGML_VIZ_VERBOSE", "1");
 #else
             setenv("GGML_VIZ_VERBOSE", "1", 1);
 #endif
-            GGML_VIZ_LOG_INFO("Verbose mode enabled");
         }
         
-        // Configure logger from environment variables
-        ggml_viz::Logger::instance().configure_from_env();
+        // Load configuration with CLI precedence: CLI > env file > defaults
+        const char* env_config_file = getenv("GGML_VIZ_CONFIG");
+        config_mgr.load_with_precedence(
+            config.config_file,                    // CLI --config flag (highest precedence)
+            env_config_file ? env_config_file : "", // GGML_VIZ_CONFIG env var
+            "ggml-viz.json"                        // Default config file
+        );
+        
+        // Configure logger from the loaded configuration
+        auto app_config = config_mgr.get();
+        ggml_viz::Logger::instance().configure_from_config(*app_config);
         
         // Print configuration if verbose
         if (config.verbose) {
-            GGML_VIZ_LOG_INFO("Configuration:");
+            GGML_VIZ_LOG_INFO("CLI Configuration:");
             GGML_VIZ_LOG_INFO_FMT("  Trace file: %s", config.trace_file.empty() ? "(none)" : config.trace_file.c_str());
             GGML_VIZ_LOG_INFO_FMT("  Config file: %s", config.config_file.empty() ? "(none)" : config.config_file.c_str());
             GGML_VIZ_LOG_INFO_FMT("  Live mode: %s", config.live_mode ? "enabled" : "disabled");
             GGML_VIZ_LOG_INFO_FMT("  Port: %d", config.port);
             GGML_VIZ_LOG_INFO_FMT("  Verbose: %s", config.verbose ? "enabled" : "disabled");
+            
+            GGML_VIZ_LOG_INFO("\nLoaded GGML Configuration:");
+            GGML_VIZ_LOG_INFO_FMT("  Output file: %s", app_config->output.filename.c_str());
+            GGML_VIZ_LOG_INFO_FMT("  Max events: %llu", app_config->instrumentation.max_events);
+            GGML_VIZ_LOG_INFO_FMT("  Op timing: %s", app_config->instrumentation.enable_op_timing ? "enabled" : "disabled");
+            GGML_VIZ_LOG_INFO_FMT("  Memory tracking: %s", app_config->instrumentation.enable_memory_tracking ? "enabled" : "disabled");
         }
     }
 }
