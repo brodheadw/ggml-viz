@@ -125,13 +125,13 @@ public:
     void reset();
 
 private:
-    ConfigManager() = default;
+    ConfigManager();
     ~ConfigManager() = default;
     ConfigManager(const ConfigManager&) = delete;
     ConfigManager& operator=(const ConfigManager&) = delete;
     
     mutable std::mutex mutex_;  // Only used for loading/reset operations
-    std::atomic<std::shared_ptr<const Config>> config_ptr_;
+    mutable std::shared_ptr<const Config> config_ptr_;
     std::atomic<bool> loaded_{false};
 };
 

@@ -70,6 +70,14 @@ std::string Config::validation_error() const {
         return "ui.max_live_events must be greater than 0";
     }
     
+    // Validate backend names
+    const std::vector<std::string> valid_backends = {"cpu", "metal", "cuda", "vulkan", "opencl"};
+    for (const auto& backend : instrumentation.backends_to_trace) {
+        if (std::find(valid_backends.begin(), valid_backends.end(), backend) == valid_backends.end()) {
+            return "Invalid backend name: " + backend + ". Valid backends: cpu, metal, cuda, vulkan, opencl";
+        }
+    }
+    
     return ""; // Valid
 }
 
@@ -333,7 +341,7 @@ ConfigManager& ConfigManager::instance() {
 
 ConfigManager::ConfigManager() {
     // Initialize with default config
-    config_ptr_.store(std::make_shared<const Config>(Config::default_config()));
+    config_ptr_ = std::make_shared<const Config>(Config::default_config());
 }
 
 void ConfigManager::load_with_precedence(
@@ -390,12 +398,12 @@ void ConfigManager::load_with_precedence(
         throw std::runtime_error("Final configuration is invalid: " + config.validation_error());
     }
     
-    // Atomically update the config pointer (lock-free for readers)
-    config_ptr_.store(std::make_shared<const Config>(std::move(config)));
+    // Atomically update the config pointer
+    config_ptr_ = std::make_shared<const Config>(std::move(config));
     loaded_.store(true);
     
     // Log resolved settings at INFO level
-    auto current_config = config_ptr_.load();
+    auto current_config = config_ptr_;
     std::cout << "[GGML_VIZ] Configuration loaded successfully:\n";
     std::cout << "[GGML_VIZ]   Output file: " << current_config->output.filename << "\n";
     std::cout << "[GGML_VIZ]   Max events: " << current_config->instrumentation.max_events << "\n";
@@ -404,8 +412,8 @@ void ConfigManager::load_with_precedence(
 }
 
 std::shared_ptr<const Config> ConfigManager::get() const {
-    // Lock-free read for hot path
-    return config_ptr_.load();
+    std::lock_guard<std::mutex> lock(mutex_);
+    return config_ptr_;
 }
 
 bool ConfigManager::is_loaded() const {
@@ -413,13 +421,13 @@ bool ConfigManager::is_loaded() const {
 }
 
 std::string ConfigManager::dump_json() const {
-    auto config = config_ptr_.load();
-    return config->to_json();
+    std::lock_guard<std::mutex> lock(mutex_);
+    return config_ptr_->to_json();
 }
 
 void ConfigManager::reset() {
     std::lock_guard<std::mutex> lock(mutex_);
-    config_ptr_.store(std::make_shared<const Config>(Config::default_config()));
+    config_ptr_ = std::make_shared<const Config>(Config::default_config());
     loaded_.store(false);
 }
 
