@@ -113,7 +113,7 @@ public:
     );
     
     // Access current configuration (lock-free for hot path)
-    std::shared_ptr<const Config> get() const;
+    std::shared_ptr<const Config> get() const noexcept;
     
     // Check if configuration has been loaded
     bool is_loaded() const;

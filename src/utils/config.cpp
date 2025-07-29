@@ -237,7 +237,7 @@ Config Config::from_file(const std::string& filepath) {
 // Merging for precedence handling
 void Config::merge_from(const Config& other) {
     // Only merge if other config has different values from defaults
-    Config defaults = default_config();
+    static const Config defaults = default_config();
     
     // Instrumentation
     if (other.instrumentation.enable_op_timing != defaults.instrumentation.enable_op_timing) {
@@ -398,8 +398,10 @@ void ConfigManager::load_with_precedence(
         throw std::runtime_error("Final configuration is invalid: " + config.validation_error());
     }
     
-    // Atomically update the config pointer
-    config_ptr_ = std::make_shared<const Config>(std::move(config));
+    // Atomically update the config pointer with release semantics
+    std::atomic_store_explicit(&config_ptr_, 
+        std::make_shared<const Config>(std::move(config)), 
+        std::memory_order_release);
     loaded_.store(true);
     
     // Log resolved settings at INFO level
@@ -411,9 +413,9 @@ void ConfigManager::load_with_precedence(
     std::cout << "[GGML_VIZ]   Op timing: " << (current_config->instrumentation.enable_op_timing ? "enabled" : "disabled") << "\n";
 }
 
-std::shared_ptr<const Config> ConfigManager::get() const {
-    std::lock_guard<std::mutex> lock(mutex_);
-    return config_ptr_;
+std::shared_ptr<const Config> ConfigManager::get() const noexcept {
+    // Lock-free read for hot path - atomic shared_ptr load
+    return std::atomic_load_explicit(&config_ptr_, std::memory_order_acquire);
 }
 
 bool ConfigManager::is_loaded() const {
@@ -427,7 +429,9 @@ std::string ConfigManager::dump_json() const {
 
 void ConfigManager::reset() {
     std::lock_guard<std::mutex> lock(mutex_);
-    config_ptr_ = std::make_shared<const Config>(Config::default_config());
+    std::atomic_store_explicit(&config_ptr_, 
+        std::make_shared<const Config>(Config::default_config()),
+        std::memory_order_release);
     loaded_.store(false);
 }
 
