@@ -331,6 +331,11 @@ ConfigManager& ConfigManager::instance() {
     return instance;
 }
 
+ConfigManager::ConfigManager() {
+    // Initialize with default config
+    config_ptr_.store(std::make_shared<const Config>(Config::default_config()));
+}
+
 void ConfigManager::load_with_precedence(
     const std::string& cli_config_path,
     const std::string& env_config_path,

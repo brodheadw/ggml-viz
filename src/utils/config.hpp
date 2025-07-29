@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <memory>
+#include <atomic>
+#include <mutex>
 
 namespace ggml_viz {
 
@@ -109,8 +112,8 @@ public:
         const std::string& default_config_path = "ggml-viz.json"
     );
     
-    // Access current configuration (thread-safe)
-    const Config& get() const;
+    // Access current configuration (lock-free for hot path)
+    std::shared_ptr<const Config> get() const;
     
     // Check if configuration has been loaded
     bool is_loaded() const;
@@ -127,9 +130,9 @@ private:
     ConfigManager(const ConfigManager&) = delete;
     ConfigManager& operator=(const ConfigManager&) = delete;
     
-    mutable std::mutex mutex_;
-    Config config_;
-    bool loaded_ = false;
+    mutable std::mutex mutex_;  // Only used for loading/reset operations
+    std::atomic<std::shared_ptr<const Config>> config_ptr_;
+    std::atomic<bool> loaded_{false};
 };
 
 } // namespace ggml_viz
