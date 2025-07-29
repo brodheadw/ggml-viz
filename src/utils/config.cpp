@@ -344,7 +344,7 @@ void ConfigManager::load_with_precedence(
     std::lock_guard<std::mutex> lock(mutex_);
     
     // Start with defaults
-    config_ = Config::default_config();
+    Config config = Config::default_config();
     
     // Apply in precedence order: defaults < file < env < CLI
     
