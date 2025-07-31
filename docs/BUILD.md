@@ -165,25 +165,31 @@ env GGML_VIZ_OUTPUT=test_live_trace.ggmlviz \
 
 ## Testing the Build
 
-### Built-in Demo Applications (Recommended)
-The project includes production-ready demo applications that showcase the full configuration system and visualization capabilities:
+### Real Model Demo Applications (Recommended)
+The project includes demo scripts that download and run real GGML models for authentic testing:
 
 ```bash
-# Run LLaMA transformer simulation demo
-./bin/run_llama_vis
-# This generates llama_trace.ggmlviz with 36 events
+# Interactive demo menu with system requirements
+./examples/run_demos.sh
 
-# Run Whisper audio processing simulation demo  
-./bin/run_whisper_vis
-# This generates whisper_trace.ggmlviz with 1,414 events
+# Real LLaMA demo - Downloads TinyLlama 1.1B (~637MB) and runs inference
+./examples/llama_demo/run_llama_demo.sh
+# Generates llama_real_trace.ggmlviz with actual transformer operations
 
-# View the generated traces in the GUI
-./bin/ggml-viz llama_trace.ggmlviz
-./bin/ggml-viz whisper_trace.ggmlviz
+# Real Whisper demo - Downloads Whisper base.en (~148MB) and transcribes audio
+./examples/whisper_demo/run_whisper_demo.sh  
+# Generates whisper_real_trace.ggmlviz with actual audio processing
 
-# Test configuration-driven setup
-./bin/ggml-viz --config examples/llama_demo/llama_demo_config.json --live trace.ggmlviz
+# View the real traces in the GUI
+./bin/ggml-viz llama_real_trace.ggmlviz
+./bin/ggml-viz whisper_real_trace.ggmlviz
 ```
+
+**System Requirements for Real Demos**:
+- 2-4GB disk space (models + builds)
+- 4GB+ RAM for model loading
+- Internet connection for downloads
+- wget or curl for downloading
 
 ### Configuration File Examples
 The demos use JSON configuration files that demonstrate the full configuration schema:

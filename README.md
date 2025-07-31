@@ -28,11 +28,12 @@ git clone --recursive https://github.com/brodheadw/ggml-viz.git
 cd ggml-viz && mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc)
 
-# Option 1: Run built-in demos (recommended for first-time users)
-./bin/run_llama_vis    # LLaMA transformer simulation
-./bin/run_whisper_vis  # Whisper audio processing simulation
-./bin/ggml-viz llama_trace.ggmlviz     # View LLaMA demo trace
-./bin/ggml-viz whisper_trace.ggmlviz   # View Whisper demo trace
+# Option 1: Run real model demos (recommended for first-time users)
+./examples/run_demos.sh                # Interactive demo menu
+./examples/llama_demo/run_llama_demo.sh     # Real LLaMA inference with TinyLlama 1.1B
+./examples/whisper_demo/run_whisper_demo.sh # Real Whisper transcription with base.en
+./bin/ggml-viz llama_real_trace.ggmlviz     # View real LLaMA trace
+./bin/ggml-viz whisper_real_trace.ggmlviz   # View real Whisper trace
 
 # Option 2: Visualize any GGML application (no recompilation needed)
 export GGML_VIZ_OUTPUT=trace.ggmlviz
@@ -78,21 +79,26 @@ GGML Visualizer now features a comprehensive configuration management system tha
 
 ### Demo Applications
 
-The project includes production-ready demonstration applications showcasing real-world usage patterns:
+The project includes real model demonstrations that download and run actual GGML applications:
 
-**LLaMA Demo** - Transformer architecture simulation with realistic attention mechanisms:
+**Real LLaMA Demo** - Downloads and runs TinyLlama 1.1B for actual transformer inference:
 ```bash
-./bin/run_llama_vis  # Generates llama_trace.ggmlviz with 36 events
-./bin/ggml-viz llama_trace.ggmlviz  # View in GUI
+./examples/llama_demo/run_llama_demo.sh  # Downloads model, runs real inference
+./bin/ggml-viz llama_real_trace.ggmlviz  # View real computation trace
 ```
 
-**Whisper Demo** - Comprehensive audio processing pipeline with encoder-decoder architecture:
+**Real Whisper Demo** - Downloads and runs Whisper base.en for actual audio transcription:
 ```bash  
-./bin/run_whisper_vis  # Generates whisper_trace.ggmlviz with 1,414 events
-./bin/ggml-viz whisper_trace.ggmlviz  # View in GUI
+./examples/whisper_demo/run_whisper_demo.sh  # Downloads model, transcribes audio
+./bin/ggml-viz whisper_real_trace.ggmlviz    # View real audio processing trace
 ```
 
-Both demos use configuration files (`examples/*/config.json`) and demonstrate the full visualization capabilities without requiring external model files.
+**Interactive Demo Runner**:
+```bash
+./examples/run_demos.sh  # Menu-driven demo selection with requirements
+```
+
+These demos show **real GGML operations** including actual attention mechanisms, matrix multiplications, and audio processing - not simulations.
 
 ## Integration Approaches
 
