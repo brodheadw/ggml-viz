@@ -1,40 +1,31 @@
 # examples/llama_demo/CMakeLists.txt
 cmake_minimum_required(VERSION 3.15)
 
-# Build llama.cpp first
-add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/llama.cpp 
-                 ${CMAKE_BINARY_DIR}/third_party/llama.cpp 
-                 EXCLUDE_FROM_ALL)
-
-# Create llama demo executable
-add_executable(run_llama_vis
-    run_llama_vis.cpp
+# Install the real demo scripts (both bash and PowerShell)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/run_llama_demo.sh
+    ${CMAKE_BINARY_DIR}/examples/llama_demo/run_llama_demo.sh
+    COPYONLY
 )
 
-# Include directories
-target_include_directories(run_llama_vis PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/third_party/llama.cpp/include
-    ${CMAKE_SOURCE_DIR}/third_party/llama.cpp/src
-    ${CMAKE_SOURCE_DIR}/third_party/llama.cpp/common
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/run_llama_demo.ps1
+    ${CMAKE_BINARY_DIR}/examples/llama_demo/run_llama_demo.ps1
+    COPYONLY
 )
 
-# Link required libraries
-target_link_libraries(run_llama_vis PRIVATE
-    # Our ggml-viz libraries
-    ggml_hook
-    ggml_utils
-    ggml_frontend
-    
-    # llama.cpp libraries
-    llama
-    common
-    
-    # System libraries
-    Threads::Threads
-)
+# Make the bash script executable on Unix
+if(UNIX)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/run_llama_demo.sh
+         DESTINATION ${CMAKE_BINARY_DIR}/examples/llama_demo/
+         FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                         GROUP_READ GROUP_EXECUTE
+                         WORLD_READ WORLD_EXECUTE)
+endif()
 
-# Set output directory
-set_target_properties(run_llama_vis PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/examples
+# Copy config file
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/llama_demo_config.json
+    ${CMAKE_BINARY_DIR}/examples/llama_demo/llama_demo_config.json
+    COPYONLY
 )

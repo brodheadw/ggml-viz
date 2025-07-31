@@ -1,5 +1,6 @@
 // src/utils/logger.cpp
 #include "logger.hpp"
+#include "config.hpp"
 #include <cstdlib>
 #include <thread>
 #include <cstdio>
@@ -88,6 +89,33 @@ void Logger::configure_from_env() {
     if (prefix) {
         prefix_ = std::string(prefix);
     }
+}
+
+void Logger::configure_from_config(const Config& config) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    
+    // Convert ConfigLogLevel to LogLevel
+    switch (config.logging.level) {
+        case ConfigLogLevel::DEBUG:
+            current_level_ = LogLevel::DEBUG;
+            break;
+        case ConfigLogLevel::INFO:
+            current_level_ = LogLevel::INFO;
+            break;
+        case ConfigLogLevel::WARN:
+            current_level_ = LogLevel::WARN;
+            break;
+        case ConfigLogLevel::ERROR_LEVEL:
+            current_level_ = LogLevel::ERROR_LEVEL;
+            break;
+        case ConfigLogLevel::FATAL:
+            current_level_ = LogLevel::FATAL;
+            break;
+    }
+    
+    timestamp_enabled_ = config.logging.timestamp;
+    thread_id_enabled_ = config.logging.thread_id;
+    prefix_ = config.logging.prefix;
 }
 
 bool Logger::should_log(LogLevel level) const {

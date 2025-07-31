@@ -139,21 +139,50 @@ struct ggmlviz_file_t {
 
 ## Usage Examples
 
-### Writing a Trace
+### Configuration-Driven Setup (Recommended)
+```cpp
+#include "utils/config.hpp"
+#include "instrumentation/ggml_hook.hpp"
+
+// Load configuration with precedence handling
+auto& config_mgr = ggml_viz::ConfigManager::instance();
+config_mgr.load_with_precedence("config.json", "", "");
+auto config = config_mgr.get();
+
+// ConfigManager automatically configures all components
+// Hook configuration is handled internally via ConfigManager
+
+// Your GGML computation happens here...
+// Events are automatically captured based on config settings
+```
+
+**Example configuration file (config.json):**
+```json
+{
+  "instrumentation": {
+    "max_events": 50000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true,
+    "output_file": "my_trace.ggmlviz"
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_timestamps": true
+  }
+}
+```
+
+### Legacy Direct Configuration
 ```c
 #include "ggml_hook.hpp"
 
-// Initialize tracing
+// Direct hook configuration (deprecated - use ConfigManager instead)
 GGMLHook& hook = GGMLHook::instance();
-HookConfig config;
-config.output_filename = "my_trace.ggmlviz";
-hook.configure(config);
-hook.start();
+// Note: configure() method is deprecated
+// Configuration now handled automatically via ConfigManager
 
 // Your GGML computation happens here...
 // Events are automatically captured
-
-hook.stop(); // Flushes remaining events to file
 ```
 
 ### Reading a Trace
@@ -235,20 +264,143 @@ Readers should handle unknown event types gracefully by:
 ## Tooling Support
 
 ### Analysis Tools
-- **ggml-viz**: Primary visualization and analysis tool
-- **TraceReader**: C++ library for programmatic access
-- **CLI utilities**: Command-line tools for trace inspection and conversion
+- **ggml-viz**: Primary visualization and analysis tool with configuration system support
+  - CLI usage: `./bin/ggml-viz --config config.json --live trace.ggmlviz`
+  - Supports JSON configuration files for repeatable analysis workflows
+- **Demo Applications**: Production-ready demonstrations showcasing real-world usage
+  - `run_llama_vis`: LLaMA transformer simulation with 36 events
+  - `run_whisper_vis`: Whisper audio processing simulation with 1,414 events
+- **TraceReader**: C++ library for programmatic access to GGMLVIZ files
+- **ConfigManager**: Thread-safe configuration management system
+  - JSON schema validation and precedence handling
+  - Integration across all components
+
+### Configuration-Driven Workflows
+GGMLVIZ now supports structured configuration management:
+- **JSON Configuration Files**: Centralized settings for all components
+- **Configuration Precedence**: CLI > config file > environment variables > defaults
+- **Live Configuration**: Real-time updates and hot-reload capability
+- **Demo Configurations**: Example configurations for different use cases
 
 ### Integration
 GGMLVIZ files can be:
-- Loaded directly into visualization tools
+- Loaded directly into visualization tools with configuration-driven setup
+- Generated using built-in demo applications for learning and testing
 - Converted to other profiling formats (Chrome Trace, Tracy)
-- Processed with custom analysis scripts
-- Streamed in real-time for live monitoring
+- Processed with custom analysis scripts using ConfigManager
+- Streamed in real-time for live monitoring with JSON-configured settings
+
+## Demo Applications
+
+The project includes production-ready demonstration applications that showcase real-world GGMLVIZ usage patterns and the configuration system:
+
+### LLaMA Transformer Demo
+**Location**: `examples/llama_demo/`
+**Executable**: `./bin/run_llama_vis`
+**Configuration**: `examples/llama_demo/llama_demo_config.json`
+
+**Features**:
+- Full transformer architecture simulation with realistic attention mechanisms
+- Feed-forward network operations and multi-head attention patterns
+- Generates **36 events** demonstrating graph computation, operation timing, and memory tracking
+- Uses 50,000 max events with enhanced instrumentation settings
+
+**Configuration Example**:
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": false,
+    "port": 8080
+  },
+  "instrumentation": {
+    "max_events": 50000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true,
+    "output_file": "llama_trace.ggmlviz"
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_timestamps": true,
+    "prefix": "[LLAMA_DEMO]"
+  }
+}
+```
+
+### Whisper Audio Processing Demo
+**Location**: `examples/whisper_demo/`
+**Executable**: `./bin/run_whisper_vis`
+**Configuration**: `examples/whisper_demo/whisper_demo_config.json`
+
+**Features**:
+- Comprehensive encoder-decoder architecture with cross-attention mechanisms
+- Audio preprocessing pipeline including FFT, mel filterbank, VAD, and language detection
+- Multiple audio scenarios (podcast, meeting, music) with different Whisper model sizes
+- Generates **1,414 events** in a 53KB trace file demonstrating complex speech recognition workflows
+- Uses faster polling interval (75ms) and specialized settings for audio processing
+
+**Configuration Example**:
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": true,
+    "port": 8081,
+    "polling_interval_ms": 75
+  },
+  "instrumentation": {
+    "max_events": 40000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true,
+    "output_file": "whisper_trace.ggmlviz"
+  },
+  "logging": {
+    "level": "DEBUG",
+    "enable_timestamps": true,
+    "enable_thread_id": true,
+    "prefix": "[WHISPER_DEMO]"
+  }
+}
+```
+
+### Running the Demos
+```bash
+# Quick demo execution
+./bin/run_llama_vis    # Generates llama_trace.ggmlviz
+./bin/run_whisper_vis  # Generates whisper_trace.ggmlviz
+
+# View traces in GUI
+./bin/ggml-viz llama_trace.ggmlviz
+./bin/ggml-viz whisper_trace.ggmlviz
+
+# Configuration-driven workflow
+./bin/ggml-viz --config examples/llama_demo/llama_demo_config.json --live custom_trace.ggmlviz
+```
+
+Both demos use manual hook triggering for realistic simulation without requiring external model files, making them perfect for learning the GGMLVIZ format and testing the visualization capabilities.
 
 ## Trace Capture Implementation
 
-GGMLVIZ traces are captured using platform-specific function interposition to instrument GGML execution without requiring source code modifications or recompilation.
+GGMLVIZ traces are captured using platform-specific function interposition to instrument GGML execution without requiring source code modifications or recompilation. The capture system is now integrated with a comprehensive configuration management system for structured, repeatable trace capture workflows.
+
+### Configuration System Integration
+
+The trace capture system uses the ConfigManager for centralized configuration:
+
+```cpp
+// ConfigManager handles all configuration automatically
+auto& config_mgr = ggml_viz::ConfigManager::instance();
+config_mgr.load_with_precedence("config.json", "", "");
+
+// All components (hooks, logging, GUI) are configured automatically
+// No manual configuration needed
+```
+
+**Configuration Precedence** ensures consistent behavior:
+1. **CLI flags**: Override all other settings
+2. **JSON config files**: Structured, repeatable configuration
+3. **Environment variables**: Legacy support (backward compatible)
+4. **Built-in defaults**: Fallback values
 
 ### Function Interposition Methods
 
@@ -305,7 +457,39 @@ $env:GGML_VIZ_VERBOSE = "1"
 | Windows 10+ | ✅ AVX2 | ✅ CUDA/DirectML | MinHook DLL Injection | ✅ Complete | ⚠️ Experimental |
 | Raspberry Pi | ✅ NEON | ❌ | LD_PRELOAD | ❓ Untested | ❓ Unknown |
 
-### Environment Variables
+### Configuration Methods
+
+#### JSON Configuration Files (Recommended)
+The preferred method for configuring GGMLVIZ trace capture is through JSON configuration files with the ConfigManager system:
+
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": true
+  },
+  "instrumentation": {
+    "max_events": 50000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true,
+    "output_file": "my_trace.ggmlviz"
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_timestamps": true
+  }
+}
+```
+
+**Configuration Precedence** (highest to lowest priority):
+1. **CLI flags**: `--verbose`, `--config`, etc.
+2. **JSON configuration files**: `--config config.json`
+3. **Environment variables**: Legacy approach (still supported)
+4. **Built-in defaults**: Fallback values
+
+#### Environment Variables (Legacy)
+
+**Note**: Environment variables are still supported for backward compatibility, but JSON configuration files are recommended for new deployments.
 
 #### Essential Variables
 - **`GGML_VIZ_OUTPUT`**: Output trace file path (required for capture)
@@ -384,12 +568,32 @@ graph TD
 
 ### Integration Methods
 
-#### Method 1: Dynamic Interposition (Recommended)
+#### Method 1: Built-in Demo Applications (Recommended for Learning)
+The project includes production-ready demonstrations that showcase the configuration system:
+
+```bash
+# Run LLaMA transformer simulation demo
+./bin/run_llama_vis
+# Generates llama_trace.ggmlviz with 36 events using examples/llama_demo/llama_demo_config.json
+
+# Run Whisper audio processing simulation demo
+./bin/run_whisper_vis  
+# Generates whisper_trace.ggmlviz with 1,414 events using examples/whisper_demo/whisper_demo_config.json
+
+# View the traces in GUI
+./bin/ggml-viz llama_trace.ggmlviz
+./bin/ggml-viz whisper_trace.ggmlviz
+
+# Configuration-driven live mode
+./bin/ggml-viz --config examples/llama_demo/llama_demo_config.json --live trace.ggmlviz
+```
+
+#### Method 2: Dynamic Interposition
 Works with **any existing GGML installation** without recompiling:
 
 ```bash
-# Terminal 1: Start visualization
-./bin/ggml-viz --live trace.ggmlviz --no-hook --verbose
+# Terminal 1: Start visualization with config
+./bin/ggml-viz --config myconfig.json --live trace.ggmlviz
 
 # Terminal 2: Run application with interposition
 export GGML_VIZ_OUTPUT=trace.ggmlviz
@@ -403,25 +607,24 @@ Expected output:
 - **GUI Updates**: `[ImGuiApp] Loaded X new events from external file`
 - **Live Dashboard**: Real-time graph and timeline visualization
 
-#### Method 2: Direct Integration (Advanced)
-For custom GGML applications or development purposes:
+#### Method 3: Direct Integration (Advanced)
+For custom GGML applications using the ConfigManager system:
 
 ```cpp
-#include "ggml_hook.hpp"
+#include "utils/config.hpp"
+#include "instrumentation/ggml_hook.hpp"
 
 int main() {
-    // Initialize tracing
-    auto& hook = ggml_viz::GGMLHook::instance();
-    ggml_viz::HookConfig config;
-    config.output_filename = "my_trace.ggmlviz";
-    hook.configure(config);
-    hook.start();
+    // Load configuration with precedence handling
+    auto& config_mgr = ggml_viz::ConfigManager::instance();
+    config_mgr.load_with_precedence("myconfig.json", "", "");
+    
+    // ConfigManager automatically configures all components
+    // including instrumentation settings
     
     // Your GGML computation
     ggml_graph_compute(ctx, graph);
     
-    // Finalize tracing
-    hook.stop();
     return 0;
 }
 ```
@@ -429,19 +632,24 @@ int main() {
 **CMake Integration:**
 ```cmake
 find_package(ggml_viz REQUIRED)
-target_link_libraries(your_app ggml_viz_hook)
+target_link_libraries(your_app ggml_viz_hook ggml_utils)
 ```
 
-**Configuration Options:**
-```cpp
-ggml_viz::HookConfig config;
-config.enable_op_timing = true;           // Operation timing (default: true)
-config.enable_memory_tracking = false;    // Memory allocation tracking (default: false)
-config.enable_thread_tracking = false;    // Thread events (default: false)
-config.enable_tensor_names = true;        // Capture tensor names (default: true)
-config.output_filename = "trace.ggmlviz"; // Output file path
-config.max_events = 1000000;              // Maximum events to capture
-hook.configure(config);
+**JSON Configuration Example:**
+```json
+{
+  "instrumentation": {
+    "enable_op_timing": true,
+    "enable_memory_tracking": false,
+    "enable_thread_tracking": false,
+    "output_file": "trace.ggmlviz",
+    "max_events": 1000000
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_timestamps": true
+  }
+}
 ```
 
 ### Troubleshooting Interposition Implementation

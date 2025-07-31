@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "instrumentation": {
+    "enable_op_timing": true,
+    "enable_memory_tracking": false,
+    "record_tensor_names": true,
+    "max_events": 1000000,
+    "op_types_to_trace": [],
+    "backends_to_trace": ["cpu", "metal", "cuda"]
+  },
+  "output": {
+    "filename": "ggml_trace.ggmlviz",
+    "write_to_file": true,
+    "flush_interval": 4096
+  },
+  "logging": {
+    "level": "INFO",
+    "timestamp": true,
+    "thread_id": false,
+    "prefix": "[GGML_VIZ]"
+  },
+  "ui": {
+    "live_mode": false,
+    "poll_interval_ms": 100,
+    "max_live_events": 50000
+  }
+}

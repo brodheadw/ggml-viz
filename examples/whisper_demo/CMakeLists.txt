@@ -1,28 +1,31 @@
 # examples/whisper_demo/CMakeLists.txt
 cmake_minimum_required(VERSION 3.15)
 
-# Create whisper demo executable (placeholder implementation)
-add_executable(run_whisper_vis
-    run_whisper_vis.cpp
+# Install the real demo scripts (both bash and PowerShell)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/run_whisper_demo.sh
+    ${CMAKE_BINARY_DIR}/examples/whisper_demo/run_whisper_demo.sh
+    COPYONLY
 )
 
-# Include directories
-target_include_directories(run_whisper_vis PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/run_whisper_demo.ps1
+    ${CMAKE_BINARY_DIR}/examples/whisper_demo/run_whisper_demo.ps1
+    COPYONLY
 )
 
-# Link required libraries
-target_link_libraries(run_whisper_vis PRIVATE
-    # Our ggml-viz libraries
-    ggml_hook
-    ggml_utils
-    ggml_frontend
-    
-    # System libraries
-    Threads::Threads
-)
+# Make the bash script executable on Unix
+if(UNIX)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/run_whisper_demo.sh
+         DESTINATION ${CMAKE_BINARY_DIR}/examples/whisper_demo/
+         FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                         GROUP_READ GROUP_EXECUTE
+                         WORLD_READ WORLD_EXECUTE)
+endif()
 
-# Set output directory
-set_target_properties(run_whisper_vis PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/examples
+# Copy config file
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/whisper_demo_config.json
+    ${CMAKE_BINARY_DIR}/examples/whisper_demo/whisper_demo_config.json
+    COPYONLY
 )

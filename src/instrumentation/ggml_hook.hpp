@@ -69,6 +69,8 @@ struct Event {
     const char* label;
 };
 
+// Legacy HookConfig struct - deprecated in favor of ConfigManager
+// Kept for backward compatibility
 struct HookConfig {
     bool enable_op_timing = true;
     bool enable_memory_tracking = false;
@@ -88,7 +90,7 @@ class GGMLHook {
 public:
     static GGMLHook& instance();
     
-    // Config
+    // Config (deprecated - use ConfigManager instead)
     void configure(const HookConfig& config);
 
     // Control
@@ -127,7 +129,6 @@ private:
     void record_event(const Event& event);
     void flush_to_file();
 
-    HookConfig config_;
     std::atomic<bool> active_{false};
     std::atomic<size_t> event_count_{0};
 

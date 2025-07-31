@@ -27,9 +27,38 @@ The logger supports 5 log levels in order of severity:
 - **ERROR**: Error messages
 - **FATAL**: Fatal errors
 
-## Environment Variable Configuration
+## Configuration Methods
 
-Control logging behavior via environment variables:
+### JSON Configuration Files (Recommended)
+
+Use JSON configuration files for structured, repeatable logging configuration:
+
+```json
+{
+  "logging": {
+    "level": "DEBUG",
+    "enable_timestamps": true,
+    "enable_thread_id": true,
+    "prefix": "[GGML_VIZ]"
+  }
+}
+```
+
+Load configuration with precedence handling:
+```bash
+# CLI flag takes highest precedence
+./bin/ggml-viz --config myconfig.json --verbose
+
+# ConfigManager handles precedence automatically:
+# 1. CLI flags (--verbose, --config)
+# 2. JSON configuration file
+# 3. Environment variables
+# 4. Built-in defaults
+```
+
+### Environment Variable Configuration
+
+Control logging behavior via environment variables (legacy approach):
 
 ```bash
 # Enable debug logging (backward compatibility)
@@ -83,13 +112,22 @@ GGML_VIZ_WARN << "Memory usage: " << memory_used << "/" << memory_total
 ```
 
 ### Programmatic Configuration
+
 ```cpp
+#include "utils/config.hpp"
+#include "utils/logger.hpp"
+
+// ConfigManager integration (recommended)
+auto& config_mgr = ggml_viz::ConfigManager::instance();
+config_mgr.load_with_precedence("config.json", "", "");
+auto config = config_mgr.get();
+
+// Configure logger from config
 auto& logger = ggml_viz::Logger::instance();
+logger.configure_from_config(*config);
 
-// Set log level
+// Direct configuration (legacy approach)
 logger.set_level(ggml_viz::LogLevel::DEBUG);
-
-// Configure formatting
 logger.set_timestamp_enabled(true);
 logger.set_thread_id_enabled(false);
 logger.set_prefix("[GGML_VIZ]");
@@ -154,6 +192,48 @@ The logger is fully thread-safe and can be used from multiple threads simultaneo
 - Use formatted logging (`GGML_VIZ_LOG_*_FMT`) for complex messages
 - Stream-style logging creates temporary objects but is convenient for complex formatting
 
+## Configuration Precedence Examples
+
+The configuration system respects the following precedence order (highest to lowest):
+
+### Example 1: CLI Override
+```bash
+# config.json has "level": "ERROR"
+# But CLI flag overrides it
+./bin/ggml-viz --config config.json --verbose  # Results in DEBUG level
+```
+
+### Example 2: Config File Override  
+```bash
+# Environment has GGML_VIZ_LOG_LEVEL=ERROR
+export GGML_VIZ_LOG_LEVEL=ERROR
+
+# But config file overrides environment
+./bin/ggml-viz --config config.json  # Uses level from config.json
+```
+
+### Example 3: Environment Override
+```bash
+# No config file specified
+# Environment variables are used
+export GGML_VIZ_LOG_LEVEL=DEBUG
+export GGML_VIZ_LOG_PREFIX="[MY_APP]"
+./bin/ggml-viz  # Uses environment settings
+```
+
+### Example 4: Demo Configurations
+The built-in demos showcase different logging configurations:
+
+```bash
+# LLaMA demo uses INFO level with timestamps
+./bin/run_llama_vis
+# Uses examples/llama_demo/llama_demo_config.json
+
+# Whisper demo uses DEBUG level with thread IDs
+./bin/run_whisper_vis  
+# Uses examples/whisper_demo/whisper_demo_config.json
+```
+
 ## Testing
 
 Run the logger test suite to verify functionality:
@@ -168,3 +248,4 @@ The test suite validates:
 - Stream-style logging
 - Configuration options
 - Environment variable handling
+- ConfigManager integration

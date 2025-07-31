@@ -165,6 +165,109 @@ env GGML_VIZ_OUTPUT=test_live_trace.ggmlviz \
 
 ## Testing the Build
 
+### Real Model Demo Applications (Recommended)
+The project includes demo scripts that download and run real GGML models for authentic testing:
+
+#### **Unix/Linux/macOS**
+```bash
+# Interactive demo menu with system requirements
+./examples/run_demos.sh
+
+# Real LLaMA demo - Downloads TinyLlama 1.1B (~637MB) and runs inference
+./examples/llama_demo/run_llama_demo.sh
+# Generates llama_real_trace.ggmlviz with actual transformer operations
+
+# Real Whisper demo - Downloads Whisper base.en (~148MB) and transcribes audio
+./examples/whisper_demo/run_whisper_demo.sh  
+# Generates whisper_real_trace.ggmlviz with actual audio processing
+
+# View the real traces in the GUI
+./bin/ggml-viz llama_real_trace.ggmlviz
+./bin/ggml-viz whisper_real_trace.ggmlviz
+```
+
+#### **Windows (PowerShell)**
+```powershell
+# Interactive demo menu with system requirements
+.\examples\run_demos.ps1
+
+# Real LLaMA demo - Downloads TinyLlama 1.1B (~637MB) and runs inference
+.\examples\llama_demo\run_llama_demo.ps1
+# Generates llama_real_trace.ggmlviz with actual transformer operations
+
+# Real Whisper demo - Downloads Whisper base.en (~148MB) and transcribes audio
+.\examples\whisper_demo\run_whisper_demo.ps1
+# Generates whisper_real_trace.ggmlviz with actual audio processing
+
+# View the real traces in the GUI
+.\bin\Release\ggml-viz.exe llama_real_trace.ggmlviz
+.\bin\Release\ggml-viz.exe whisper_real_trace.ggmlviz
+```
+
+#### **Windows (WSL Alternative)**
+If PowerShell scripts don't work, use Windows Subsystem for Linux:
+```bash
+# Run in WSL
+./examples/run_demos.sh  # Uses Linux approach
+```
+
+**System Requirements for Real Demos**:
+- 2-4GB disk space (models + builds)
+- 4GB+ RAM for model loading
+- Internet connection for downloads
+- Unix: wget or curl for downloading
+- Windows: PowerShell 5.1+ (pre-installed on Windows 10+)
+
+### Configuration File Examples
+The demos use JSON configuration files that demonstrate the full configuration schema:
+
+**LLaMA Demo Configuration** (`examples/llama_demo/llama_demo_config.json`):
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": false,
+    "port": 8080
+  },
+  "instrumentation": {
+    "max_events": 50000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true,
+    "output_file": "llama_trace.ggmlviz"
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_timestamps": true,
+    "enable_thread_id": false,
+    "prefix": "[LLAMA_DEMO]"
+  }
+}
+```
+
+**Whisper Demo Configuration** (`examples/whisper_demo/whisper_demo_config.json`):
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": true,
+    "port": 8081,
+    "polling_interval_ms": 75
+  },
+  "instrumentation": {
+    "max_events": 40000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true,
+    "output_file": "whisper_trace.ggmlviz"
+  },
+  "logging": {
+    "level": "DEBUG",
+    "enable_timestamps": true,
+    "enable_thread_id": true,
+    "prefix": "[WHISPER_DEMO]"
+  }
+}
+```
+
 ### Basic Functionality Tests
 ```bash
 # Unix/Linux/macOS
@@ -221,6 +324,41 @@ Metal is enabled by default on macOS but may have shader compilation issues:
 # If you encounter Metal shader errors, disable Metal:
 cmake .. -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=OFF
 ```
+
+### Windows-Specific Demo Notes
+
+#### **DLL Injection Limitations**
+Windows demos use experimental DLL injection that may not work in all environments:
+- **MinHook**: Experimental runtime API patching
+- **Security Software**: Antivirus may block DLL injection
+- **Permissions**: May require administrator privileges
+
+#### **Troubleshooting Windows Demos**
+If PowerShell demos fail:
+
+1. **Check Hook DLL**: Ensure `ggml_viz_hook.dll` exists in build output
+   ```powershell
+   Test-Path "build\src\Release\ggml_viz_hook.dll"
+   ```
+
+2. **Manual Setup**: Run llama.cpp/whisper.cpp manually with DLL in same directory
+   ```powershell
+   # Copy hook DLL to same directory as executable
+   Copy-Item "build\src\Release\ggml_viz_hook.dll" "third_party\llama.cpp\build\bin\Release\"
+   
+   # Set environment and run
+   $env:GGML_VIZ_OUTPUT = "trace.ggmlviz"
+   $env:GGML_VIZ_VERBOSE = "1"
+   .\third_party\llama.cpp\build\bin\Release\llama-cli.exe -m model.gguf -p "Hello"
+   ```
+
+3. **Use WSL**: For full Linux compatibility
+   ```bash
+   # In WSL
+   ./examples/run_demos.sh
+   ```
+
+4. **Manual Integration**: Build and run models separately, then use function interposition from documentation
 
 ## Troubleshooting
 

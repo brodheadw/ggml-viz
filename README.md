@@ -28,21 +28,93 @@ git clone --recursive https://github.com/brodheadw/ggml-viz.git
 cd ggml-viz && mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc)
 
-# Visualize any GGML application (no recompilation needed)
+# Option 1: Run real model demos (recommended for first-time users)
+# Unix/Linux/macOS:
+./examples/run_demos.sh                     # Interactive demo menu
+./examples/llama_demo/run_llama_demo.sh     # Real LLaMA inference with TinyLlama 1.1B
+./examples/whisper_demo/run_whisper_demo.sh # Real Whisper transcription with base.en
+
+# Windows PowerShell:
+.\examples\run_demos.ps1                    # Interactive demo menu  
+.\examples\llama_demo\run_llama_demo.ps1    # Real LLaMA inference
+.\examples\whisper_demo\run_whisper_demo.ps1 # Real Whisper transcription
+
+# View traces (adjust paths for Windows):
+./bin/ggml-viz llama_real_trace.ggmlviz     # View real LLaMA trace
+./bin/ggml-viz whisper_real_trace.ggmlviz   # View real Whisper trace
+
+# Option 2: Visualize any GGML application (no recompilation needed)
 export GGML_VIZ_OUTPUT=trace.ggmlviz
 export LD_PRELOAD=build/src/libggml_viz_hook.so  # Linux
 # export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib  # macOS
 ./your_llama_cpp_binary -m model.gguf -p "Hello world" -n 10
 
-# View the trace
-./bin/ggml-viz trace.ggmlviz
+# Option 3: Configuration-driven setup
+./bin/ggml-viz --config examples/llama_demo/llama_demo_config.json --live trace.ggmlviz
 ```
+
+## Configuration System
+
+GGML Visualizer now features a comprehensive configuration management system that supports JSON configuration files, environment variables, and CLI flags with proper precedence handling.
+
+### Configuration Methods
+
+**JSON Configuration Files (Recommended)**: Create `.json` files with structured settings for all components:
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": true,
+    "port": 8080
+  },
+  "instrumentation": {
+    "max_events": 50000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_timestamps": true
+  }
+}
+```
+
+**Configuration Precedence** (highest to lowest priority):
+1. Command-line flags (`--verbose`, `--config`, etc.)
+2. JSON configuration files (`--config config.json`)
+3. Environment variables (`GGML_VIZ_VERBOSE=1`)
+4. Built-in defaults
+
+### Demo Applications
+
+The project includes real model demonstrations that download and run actual GGML applications:
+
+**Real LLaMA Demo** - Downloads and runs TinyLlama 1.1B for actual transformer inference:
+```bash
+./examples/llama_demo/run_llama_demo.sh  # Downloads model, runs real inference
+./bin/ggml-viz llama_real_trace.ggmlviz  # View real computation trace
+```
+
+**Real Whisper Demo** - Downloads and runs Whisper base.en for actual audio transcription:
+```bash  
+./examples/whisper_demo/run_whisper_demo.sh  # Downloads model, transcribes audio
+./bin/ggml-viz whisper_real_trace.ggmlviz    # View real audio processing trace
+```
+
+**Interactive Demo Runner**:
+```bash
+./examples/run_demos.sh  # Menu-driven demo selection with requirements
+```
+
+These demos show **real GGML operations** including actual attention mechanisms, matrix multiplications, and audio processing - not simulations.
 
 ## Integration Approaches
 
-**Function Interposition (Recommended)**: Works with any existing GGML binary by intercepting function calls at runtime. Set environment variables to specify the interposition library path (`LD_PRELOAD` or `DYLD_INSERT_LIBRARIES`) and output trace file (`GGML_VIZ_OUTPUT`), then run your application normally. The interposition library captures events transparently and writes them to the GGMLVIZ format.
+**Built-in Demos (Recommended for Learning)**: Use the included LLaMA and Whisper demonstrations to understand the visualization capabilities and configuration system before integrating with your own applications.
 
-**Direct Integration**: For custom applications or when you need programmatic control over tracing, link against the ggml-viz library and use the C++ API to start/stop tracing, configure event types, and control output. This approach provides the most flexibility but requires recompilation of your application.
+**Function Interposition**: Works with any existing GGML binary by intercepting function calls at runtime. Set environment variables to specify the interposition library path (`LD_PRELOAD` or `DYLD_INSERT_LIBRARIES`) and output trace file (`GGML_VIZ_OUTPUT`), then run your application normally. The interposition library captures events transparently and writes them to the GGMLVIZ format.
+
+**Configuration-Driven Integration**: Use JSON configuration files to control all aspects of tracing and visualization, providing better organization and repeatability than environment variables.
 
 **Live Monitoring**: Run the GUI in live mode (`--live trace.ggmlviz`) to watch events appear in real-time as your application executes. The GUI polls the trace file and updates the visualization automatically, making it possible to see exactly what your model is doing as it processes each token.
 
