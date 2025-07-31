@@ -5,6 +5,71 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.10] - 2025-07-31
+
+### Added - Configuration Management System ✅
+- **Complete ConfigManager Implementation** - Centralized configuration system with JSON-based settings
+  - Thread-safe singleton ConfigManager with atomic operations for configuration access
+  - JSON configuration file support using nlohmann/json library with schema validation
+  - Configuration precedence hierarchy: CLI flags > config file > environment variables > defaults
+  - Type-safe configuration structure with separate sections for CLI, instrumentation, logging, and IPC settings
+  - Hot-reload capability and validation with detailed error reporting
+
+- **Comprehensive Configuration Integration** - Full system integration across all components
+  - Updated GGMLHook to use ConfigManager instead of direct environment variable parsing
+  - Integrated CLI --config flag for loading configuration files with proper validation
+  - Logger configuration integration with ConfigLogLevel to LogLevel conversion
+  - Thread-safe configuration access patterns throughout the codebase
+
+- **Production-Ready Demo Applications** - Complete config-driven example implementations
+  - **LLaMA Demo** (`examples/llama_demo/`) - Full transformer simulation with realistic attention and feed-forward operations
+    - Config-driven setup with 50,000 max events and enhanced instrumentation settings
+    - Manual hook triggering for demonstration without requiring real llama.cpp integration
+    - Generated 36 events showcasing graph computation, operation timing, and memory tracking
+  - **Whisper Demo** (`examples/whisper_demo/`) - Comprehensive audio processing pipeline simulation
+    - Encoder-decoder architecture with cross-attention and audio preprocessing simulation
+    - Multiple audio scenarios (podcast, meeting, music) with different Whisper model sizes
+    - Generated 1,414 events in 53KB trace file demonstrating complex speech recognition workflows
+
+### Fixed - Build System and Dependency Management
+- **Circular Dependency Resolution** - Fixed complex CMake dependency issues between components
+  - Resolved circular dependency between ggml_hook and ggml_utils libraries
+  - Moved config.cpp source directly into ggml_viz_hook shared library target
+  - Updated test linking to include ggml_utils dependency for ConfigManager access
+  - Eliminated build failures caused by interdependent library structures
+
+- **Configuration Precedence Implementation** - Proper configuration loading with environment variable precedence
+  - Implemented load_with_precedence() method handling CLI args, config files, and environment variables
+  - Fixed validation logic to prevent warnings about unimplemented configuration loading
+  - Added comprehensive precedence testing and validation throughout the system
+
+### Changed - Architecture and Integration Patterns
+- **Deprecated Direct Environment Variable Access** - ConfigManager now primary configuration interface
+  - Marked GGMLHook::configure() method as deprecated in favor of ConfigManager singleton
+  - Replaced direct environment variable parsing with centralized configuration management
+  - Maintained backward compatibility while encouraging migration to new configuration system
+
+- **Enhanced Demo Infrastructure** - Complete build system integration for example applications
+  - Added examples directory to main CMake build with proper target dependencies
+  - Created realistic simulation patterns for transformer operations without external dependencies
+  - Established config-driven demonstration patterns for future example development
+
+### Technical Achievements
+- **Thread-Safe Configuration Access** - Production-ready singleton pattern with atomic operations
+  - Implemented proper memory ordering and synchronization for configuration access
+  - Atomic shared_ptr operations for thread-safe configuration updates and access
+  - Lock-free configuration reading in hot paths with proper memory ordering guarantees
+
+- **JSON Schema Validation** - Robust configuration file parsing with error handling
+  - Comprehensive JSON schema validation with detailed error messages
+  - Type conversion and validation for all configuration parameters
+  - Graceful degradation with defaults when configuration sections are missing
+
+- **Realistic Demonstration Applications** - Production-quality examples showcasing real-world usage
+  - LLaMA demo simulates transformer architecture with attention mechanisms and feed-forward layers
+  - Whisper demo implements encoder-decoder pipeline with audio preprocessing and language detection
+  - Both demos generate meaningful trace data demonstrating the full visualization capabilities
+
 ## [0.0.9] - 2025-07-25
 
 ### Fixed - Build System and Code Quality Improvements

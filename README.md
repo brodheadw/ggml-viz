@@ -28,21 +28,79 @@ git clone --recursive https://github.com/brodheadw/ggml-viz.git
 cd ggml-viz && mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc)
 
-# Visualize any GGML application (no recompilation needed)
+# Option 1: Run built-in demos (recommended for first-time users)
+./bin/run_llama_vis    # LLaMA transformer simulation
+./bin/run_whisper_vis  # Whisper audio processing simulation
+./bin/ggml-viz llama_trace.ggmlviz     # View LLaMA demo trace
+./bin/ggml-viz whisper_trace.ggmlviz   # View Whisper demo trace
+
+# Option 2: Visualize any GGML application (no recompilation needed)
 export GGML_VIZ_OUTPUT=trace.ggmlviz
 export LD_PRELOAD=build/src/libggml_viz_hook.so  # Linux
 # export DYLD_INSERT_LIBRARIES=build/src/libggml_viz_hook.dylib  # macOS
 ./your_llama_cpp_binary -m model.gguf -p "Hello world" -n 10
 
-# View the trace
-./bin/ggml-viz trace.ggmlviz
+# Option 3: Configuration-driven setup
+./bin/ggml-viz --config examples/llama_demo/llama_demo_config.json --live trace.ggmlviz
 ```
+
+## Configuration System
+
+GGML Visualizer now features a comprehensive configuration management system that supports JSON configuration files, environment variables, and CLI flags with proper precedence handling.
+
+### Configuration Methods
+
+**JSON Configuration Files (Recommended)**: Create `.json` files with structured settings for all components:
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": true,
+    "port": 8080
+  },
+  "instrumentation": {
+    "max_events": 50000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_timestamps": true
+  }
+}
+```
+
+**Configuration Precedence** (highest to lowest priority):
+1. Command-line flags (`--verbose`, `--config`, etc.)
+2. JSON configuration files (`--config config.json`)
+3. Environment variables (`GGML_VIZ_VERBOSE=1`)
+4. Built-in defaults
+
+### Demo Applications
+
+The project includes production-ready demonstration applications showcasing real-world usage patterns:
+
+**LLaMA Demo** - Transformer architecture simulation with realistic attention mechanisms:
+```bash
+./bin/run_llama_vis  # Generates llama_trace.ggmlviz with 36 events
+./bin/ggml-viz llama_trace.ggmlviz  # View in GUI
+```
+
+**Whisper Demo** - Comprehensive audio processing pipeline with encoder-decoder architecture:
+```bash  
+./bin/run_whisper_vis  # Generates whisper_trace.ggmlviz with 1,414 events
+./bin/ggml-viz whisper_trace.ggmlviz  # View in GUI
+```
+
+Both demos use configuration files (`examples/*/config.json`) and demonstrate the full visualization capabilities without requiring external model files.
 
 ## Integration Approaches
 
-**Function Interposition (Recommended)**: Works with any existing GGML binary by intercepting function calls at runtime. Set environment variables to specify the interposition library path (`LD_PRELOAD` or `DYLD_INSERT_LIBRARIES`) and output trace file (`GGML_VIZ_OUTPUT`), then run your application normally. The interposition library captures events transparently and writes them to the GGMLVIZ format.
+**Built-in Demos (Recommended for Learning)**: Use the included LLaMA and Whisper demonstrations to understand the visualization capabilities and configuration system before integrating with your own applications.
 
-**Direct Integration**: For custom applications or when you need programmatic control over tracing, link against the ggml-viz library and use the C++ API to start/stop tracing, configure event types, and control output. This approach provides the most flexibility but requires recompilation of your application.
+**Function Interposition**: Works with any existing GGML binary by intercepting function calls at runtime. Set environment variables to specify the interposition library path (`LD_PRELOAD` or `DYLD_INSERT_LIBRARIES`) and output trace file (`GGML_VIZ_OUTPUT`), then run your application normally. The interposition library captures events transparently and writes them to the GGMLVIZ format.
+
+**Configuration-Driven Integration**: Use JSON configuration files to control all aspects of tracing and visualization, providing better organization and repeatability than environment variables.
 
 **Live Monitoring**: Run the GUI in live mode (`--live trace.ggmlviz`) to watch events appear in real-time as your application executes. The GUI polls the trace file and updates the visualization automatically, making it possible to see exactly what your model is doing as it processes each token.
 

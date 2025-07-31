@@ -165,6 +165,76 @@ env GGML_VIZ_OUTPUT=test_live_trace.ggmlviz \
 
 ## Testing the Build
 
+### Built-in Demo Applications (Recommended)
+The project includes production-ready demo applications that showcase the full configuration system and visualization capabilities:
+
+```bash
+# Run LLaMA transformer simulation demo
+./bin/run_llama_vis
+# This generates llama_trace.ggmlviz with 36 events
+
+# Run Whisper audio processing simulation demo  
+./bin/run_whisper_vis
+# This generates whisper_trace.ggmlviz with 1,414 events
+
+# View the generated traces in the GUI
+./bin/ggml-viz llama_trace.ggmlviz
+./bin/ggml-viz whisper_trace.ggmlviz
+
+# Test configuration-driven setup
+./bin/ggml-viz --config examples/llama_demo/llama_demo_config.json --live trace.ggmlviz
+```
+
+### Configuration File Examples
+The demos use JSON configuration files that demonstrate the full configuration schema:
+
+**LLaMA Demo Configuration** (`examples/llama_demo/llama_demo_config.json`):
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": false,
+    "port": 8080
+  },
+  "instrumentation": {
+    "max_events": 50000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true,
+    "output_file": "llama_trace.ggmlviz"
+  },
+  "logging": {
+    "level": "INFO",
+    "enable_timestamps": true,
+    "enable_thread_id": false,
+    "prefix": "[LLAMA_DEMO]"
+  }
+}
+```
+
+**Whisper Demo Configuration** (`examples/whisper_demo/whisper_demo_config.json`):
+```json
+{
+  "cli": {
+    "verbose": true,
+    "live_mode": true,
+    "port": 8081,
+    "polling_interval_ms": 75
+  },
+  "instrumentation": {
+    "max_events": 40000,
+    "enable_op_timing": true,
+    "enable_memory_tracking": true,
+    "output_file": "whisper_trace.ggmlviz"
+  },
+  "logging": {
+    "level": "DEBUG",
+    "enable_timestamps": true,
+    "enable_thread_id": true,
+    "prefix": "[WHISPER_DEMO]"
+  }
+}
+```
+
 ### Basic Functionality Tests
 ```bash
 # Unix/Linux/macOS
