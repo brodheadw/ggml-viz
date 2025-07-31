@@ -20,17 +20,12 @@ echo "   • Downloads Whisper base.en model (~148MB)"
 echo "   • Transcribes sample JFK speech audio"
 echo "   • Generates real audio processing events"
 echo
-echo "3) 🔧 Quick Test - Simulation demos (deprecated)"
-echo "   • Runs fast simulation without downloads"
-echo "   • Only for testing basic functionality"
-echo "   • NOT recommended - shows fake events only"
+echo "3) ℹ️  Show system requirements"
 echo
-echo "4) ℹ️  Show system requirements"
-echo
-echo "5) 🚪 Exit"
+echo "4) 🚪 Exit"
 echo
 
-read -p "Enter your choice (1-5): " choice
+read -p "Enter your choice (1-4): " choice
 
 case $choice in
     1)
@@ -61,24 +56,6 @@ case $choice in
         ;;
     3)
         echo
-        echo "⚠️  WARNING: These are simulation demos with fake events"
-        echo "They do NOT run real GGML operations - just trigger hooks manually."
-        echo "For educational purposes only. Use options 1 or 2 for real demos."
-        echo
-        read -p "Continue anyway? (y/N): " confirm
-        if [[ $confirm =~ ^[Yy]$ ]]; then
-            echo
-            echo "Available simulation demos:"
-            echo "• ${PROJECT_ROOT}/build/bin/run_llama_vis (fake LLaMA events)"
-            echo "• ${PROJECT_ROOT}/build/bin/run_whisper_vis (fake Whisper events)"
-            echo
-            echo "These generate trace files but with simulated events only."
-        else
-            echo "Wise choice! Use options 1 or 2 for real demos."
-        fi
-        ;;
-    4)
-        echo
         echo "📋 System Requirements:"
         echo
         echo "Required:"
@@ -103,12 +80,12 @@ case $choice in
         echo "• whisper.cpp: ~2-5 minutes compilation"
         echo
         ;;
-    5)
+    4)
         echo "Goodbye! 👋"
         exit 0
         ;;
     *)
-        echo "❌ Invalid choice. Please select 1-5."
+        echo "❌ Invalid choice. Please select 1-4."
         exit 1
         ;;
 esac
