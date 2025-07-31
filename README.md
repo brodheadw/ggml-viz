@@ -29,9 +29,17 @@ cd ggml-viz && mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc)
 
 # Option 1: Run real model demos (recommended for first-time users)
-./examples/run_demos.sh                # Interactive demo menu
+# Unix/Linux/macOS:
+./examples/run_demos.sh                     # Interactive demo menu
 ./examples/llama_demo/run_llama_demo.sh     # Real LLaMA inference with TinyLlama 1.1B
 ./examples/whisper_demo/run_whisper_demo.sh # Real Whisper transcription with base.en
+
+# Windows PowerShell:
+.\examples\run_demos.ps1                    # Interactive demo menu  
+.\examples\llama_demo\run_llama_demo.ps1    # Real LLaMA inference
+.\examples\whisper_demo\run_whisper_demo.ps1 # Real Whisper transcription
+
+# View traces (adjust paths for Windows):
 ./bin/ggml-viz llama_real_trace.ggmlviz     # View real LLaMA trace
 ./bin/ggml-viz whisper_real_trace.ggmlviz   # View real Whisper trace
 

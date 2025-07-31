@@ -7,6 +7,25 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 echo "🚀 GGML Visualizer - Demo Runner"
 echo "================================"
+
+# Check for Windows and recommend PowerShell scripts
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+    echo "🪟 Windows detected!"
+    echo ""
+    echo "For the best experience on Windows, use the PowerShell scripts:"
+    echo "• examples/run_demos.ps1 (main menu)"
+    echo "• examples/llama_demo/run_llama_demo.ps1"
+    echo "• examples/whisper_demo/run_whisper_demo.ps1"
+    echo ""
+    echo "Or use WSL (Windows Subsystem for Linux) to run these bash scripts."
+    echo ""
+    read -p "Continue with bash script anyway? (y/N): " continue_bash
+    if [[ ! $continue_bash =~ ^[Yy]$ ]]; then
+        echo "Use PowerShell scripts for native Windows experience! 🪟"
+        exit 0
+    fi
+fi
+
 echo
 echo "Choose a demo to run:"
 echo

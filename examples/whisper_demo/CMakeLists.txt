@@ -1,14 +1,20 @@
 # examples/whisper_demo/CMakeLists.txt
 cmake_minimum_required(VERSION 3.15)
 
-# Install the real demo script
+# Install the real demo scripts (both bash and PowerShell)
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/run_whisper_demo.sh
     ${CMAKE_BINARY_DIR}/examples/whisper_demo/run_whisper_demo.sh
     COPYONLY
 )
 
-# Make the script executable
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/run_whisper_demo.ps1
+    ${CMAKE_BINARY_DIR}/examples/whisper_demo/run_whisper_demo.ps1
+    COPYONLY
+)
+
+# Make the bash script executable on Unix
 if(UNIX)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/run_whisper_demo.sh
          DESTINATION ${CMAKE_BINARY_DIR}/examples/whisper_demo/
