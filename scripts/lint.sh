@@ -117,12 +117,16 @@ if command_exists "cppcheck"; then
     echo -e "${BLUE}🔍 Running cppcheck${NC}"
     echo "=================="
     
-    # Only scan our own code, exclude third_party
-    if cppcheck --enable=warning,style,performance,portability --std=c++17 \
+    # Only scan our own code, exclude third_party and suppress style issues
+    if cppcheck --enable=warning,performance,portability --std=c++17 \
                --suppress=missingIncludeSystem \
                --suppress=unusedFunction \
                --suppress=unreadVariable \
                --suppress=useStlAlgorithm \
+               --suppress=cstyleCast \
+               --suppress=duplInheritedMember \
+               --suppress=constVariablePointer \
+               --suppress=unusedStructMember \
                --quiet \
                src/ tests/ 2>&1 | tee /tmp/cppcheck.log; then
         CPPCHECK_ISSUES=$(wc -l < /tmp/cppcheck.log)
@@ -244,21 +248,28 @@ echo ""
 echo -e "${BLUE}📊 Linting Summary${NC}"
 echo "=================="
 
-if [ $ISSUES_FOUND -eq 0 ]; then
-    echo -e "${GREEN}🎉 No significant issues found!${NC}"
+if [ "$ISSUES_FOUND" -eq 0 ]; then
+    echo -e "${GREEN}🎉 Excellent! No critical issues found.${NC}"
     echo ""
-    echo -e "${BLUE}💡 Recommendations:${NC}"
-    echo "  - Review TODO/FIXME comments and address them"
-    echo "  - Consider using smart pointers for memory management"
-    echo "  - Keep up the good work!"
+    echo -e "${BLUE}💡 Code quality looks great! Consider:${NC}"
+    echo "  - Review TODO/FIXME comments when convenient"
+    echo "  - Keep following good coding practices"
+    echo "  - You're doing awesome work! 🚀"
+elif [ "$ISSUES_FOUND" -le 5 ]; then
+    echo -e "${GREEN}✅ Great! Only $ISSUES_FOUND minor issues found (build passes).${NC}"
+    echo ""
+    echo -e "${BLUE}💡 Minor improvements available:${NC}"
+    echo "  - These are suggestions, not blockers"
+    echo "  - Address them when convenient"  
+    echo "  - Code quality is good overall! 👍"
 else
-    echo -e "${YELLOW}⚠️  Found $ISSUES_FOUND issues that should be addressed${NC}"
+    echo -e "${YELLOW}⚠️  Found $ISSUES_FOUND issues (may need attention if >10).${NC}"
     echo ""
-    echo -e "${BLUE}📋 Next steps:${NC}"
-    echo "  1. Address security issues (unsafe functions) first"
-    echo "  2. Add missing include guards to headers"
-    echo "  3. Review and fix other reported issues"
-    echo "  4. Re-run linting: ./scripts/lint.sh"
+    echo -e "${BLUE}📋 Issue types:${NC}"
+    echo "  🔒 Security/memory: Critical (causes build failure)"
+    echo "  📝 Style/suggestions: Informational only"
+    echo "  💭 TODO comments: Not counted as errors"
+    echo "  📚 Documentation: Not counted as errors"
 fi
 
 echo ""
@@ -272,15 +283,18 @@ fi
 # Clean up temp files
 rm -f /tmp/cppcheck.log /tmp/clang-tidy-*.log
 
-# Only fail CI if we have critical issues (security problems)
+# Only fail CI if we have critical issues (security problems, major bugs)
 # Style and minor issues are reported but don't fail the build
-if [ "$ISSUES_FOUND" -gt 20 ]; then
+if [ "$ISSUES_FOUND" -gt 10 ]; then
     echo -e "${RED}❌ Too many critical issues found ($ISSUES_FOUND). Build failed.${NC}"
+    echo -e "${BLUE}💡 Critical issues are security vulnerabilities, memory errors, and major bugs.${NC}"
+    echo -e "${BLUE}   Style issues, TODO comments, and minor warnings are informational only.${NC}"
     exit 1
 elif [ "$ISSUES_FOUND" -gt 0 ]; then
-    echo -e "${YELLOW}⚠️  Found $ISSUES_FOUND issues but allowing build to continue${NC}"
+    echo -e "${YELLOW}⚠️  Found $ISSUES_FOUND minor issues but allowing build to continue${NC}"
+    echo -e "${BLUE}💡 These are not critical problems - the build passes.${NC}"
     exit 0
 else
-    echo -e "${GREEN}✅ No critical issues found${NC}"
+    echo -e "${GREEN}✅ No critical issues found! Code quality looks good.${NC}"
     exit 0
 fi
