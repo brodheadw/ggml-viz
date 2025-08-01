@@ -8,6 +8,7 @@
 #include <cassert>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 #ifdef _WIN32
 #include <io.h>     // for _commit, _fileno
 #else
@@ -364,14 +365,10 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend
 
     if (!config->instrumentation.op_types_to_trace.empty()) {
         // Check if this op type is in the filter list
-        bool found = false;
-        for (uint32_t op : config->instrumentation.op_types_to_trace) {
-            if (op == tensor->op) {
-                found = true;
-                break;
-            }
+        const auto& op_list = config->instrumentation.op_types_to_trace;
+        if (std::find(op_list.begin(), op_list.end(), tensor->op) == op_list.end()) {
+            return;
         }
-        if (!found) return;
     }
 
     std::cout << "[DEBUG] Op compute begin: " << tensor->name << " type: " << tensor->op << ", backend: " << (backend ? "yes" : "no") << "\n";
@@ -400,14 +397,10 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* 
     
     // Same filtering as begin
     if (!config->instrumentation.op_types_to_trace.empty()) {
-        bool found = false;
-        for (uint32_t op : config->instrumentation.op_types_to_trace) {
-            if (op == tensor->op) {
-                found = true;
-                break;
-            }
+        const auto& op_list = config->instrumentation.op_types_to_trace;
+        if (std::find(op_list.begin(), op_list.end(), tensor->op) == op_list.end()) {
+            return;
         }
-        if (!found) return;
     }
     
     Event event = {};
