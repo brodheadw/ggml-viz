@@ -36,7 +36,7 @@ namespace {
 
 #ifdef _WIN32
     // Windows doesn't have getopt.h, we'll implement simple option parsing
-    void parse_windows_args(int argc, char* argv[], Config& config) {
+    void parse_windows_args(int argc, const char* const argv[], Config& config) {
         for (int i = 1; i < argc; i++) {
             std::string arg = argv[i];
             if (arg == "-h" || arg == "--help") {
