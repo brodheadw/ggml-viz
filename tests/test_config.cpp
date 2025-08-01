@@ -209,11 +209,18 @@ void test_env_overrides() {
     assert(disabled_config.instrumentation.enable_memory_tracking == false);
     assert(disabled_config.output.write_to_file == false);
     
-    // Cleanup
+    // Cleanup - Windows doesn't have unsetenv(), use putenv() with empty value
+#ifdef _WIN32
+    putenv(const_cast<char*>("GGML_VIZ_OUTPUT="));
+    putenv(const_cast<char*>("GGML_VIZ_MAX_EVENTS="));
+    putenv(const_cast<char*>("GGML_VIZ_VERBOSE="));
+    putenv(const_cast<char*>("GGML_VIZ_DISABLE="));
+#else
     unsetenv("GGML_VIZ_OUTPUT");
     unsetenv("GGML_VIZ_MAX_EVENTS");
     unsetenv("GGML_VIZ_VERBOSE");
     unsetenv("GGML_VIZ_DISABLE");
+#endif
     
     std::cout << "✅ Environment override test passed" << std::endl;
 }

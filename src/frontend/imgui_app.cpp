@@ -586,7 +586,7 @@ void ImGuiApp::render_timeline_view() {
             // Visual Timeline tab
             if (ImGui::BeginTabItem("Visual Timeline")) {
                 // Render the custom timeline widget
-                TraceReader* trace_reader_for_widget = nullptr;
+                const TraceReader* trace_reader_for_widget = nullptr;
                 if (data_->live_mode && data_->live_trace_reader) {
                     trace_reader_for_widget = data_->live_trace_reader.get();
                 } else {
@@ -743,8 +743,8 @@ void ImGuiApp::render_graph_view() {
                 graph_widget_.render("##compute_graph", data_->live_trace_reader.get(), graph_config_);
                 
                 // Sync selection between graph widget and other views
-                int selected = graph_widget_.get_selected_node();
                 // TODO: Map node selection to event selection
+                // int selected = graph_widget_.get_selected_node(); // Unused for now
             } else {
                 ImGui::Text("Loading graph data...");
             }
