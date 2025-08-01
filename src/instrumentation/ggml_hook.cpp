@@ -1,5 +1,6 @@
 // src/instrumentation/ggml_hook.cpp
 #include "ggml_hook.hpp"
+#include "../utils/config.hpp"
 #include "ggml-impl.h" // for ggml_cgraph, ggml_tensor
 #include "ggml-backend.h" // for ggml_backend_t
 #include <thread>
@@ -7,6 +8,7 @@
 #include <cassert>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 #ifdef _WIN32
 #include <io.h>     // for _commit, _fileno
 #else
@@ -61,28 +63,10 @@ namespace {
     }
 }
 
-// Private constructor with environment variable initialization
+// Private constructor - configuration now handled by ConfigManager
 GGMLHook::GGMLHook() : event_buffer_{}, write_pos_{}, read_pos_{} {
-    // Initialize config with defaults, then override with environment variables
-    config_.enable_op_timing = true;
-    config_.enable_memory_tracking = false;
-    config_.enable_thread_tracking = false;
-    config_.enable_tensor_names = true;
-    config_.write_to_file = true;
-    config_.output_filename = "ggml_trace.bin";
-    config_.max_events = 1000000;
-
-    // Override with environment variables if present
-    const char* output_env = getenv("GGML_VIZ_OUTPUT");
-    if (output_env) {
-        config_.output_filename = output_env;
-    }
-
-    const char* max_events_env = getenv("GGML_VIZ_MAX_EVENTS");
-    if (max_events_env) {
-        config_.max_events = atoi(max_events_env);
-    }
-
+    // Configuration is now managed by ConfigManager singleton
+    // No initialization needed here - config is loaded via CLI/file
 }
 
 // Singleton implementation
@@ -96,14 +80,26 @@ void GGMLHook::configure(const HookConfig& config) {
         std::cerr << "Warning: Cannot reconfigure while hook is active.\n";
         return;
     }
-    config_ = config;
+    // Legacy method - now handled by ConfigManager
+    std::cerr << "Warning: GGMLHook::configure() is deprecated. Use ConfigManager::load_with_precedence() instead.\n";
 }
 
 void GGMLHook::start() {
-    // Check if hooks are disabled by environment variable
-    const char* disable_env = getenv("GGML_VIZ_DISABLE");
-    if (disable_env && (strcmp(disable_env, "1") == 0 || strcmp(disable_env, "true") == 0)) {
-        std::cout << "GGML Viz hooks disabled by GGML_VIZ_DISABLE environment variable.\n";
+    // Get current configuration from ConfigManager
+    auto& config_mgr = ConfigManager::instance();
+    
+    // Load default config if not already loaded
+    if (!config_mgr.is_loaded()) {
+        // Try to load from environment-specified config file or defaults
+        const char* config_file_env = getenv("GGML_VIZ_CONFIG");
+        config_mgr.load_with_precedence("", config_file_env ? config_file_env : "", "ggml-viz.json");
+    }
+    
+    auto config = config_mgr.get();
+    
+    // Check if hooks are disabled via config
+    if (!config->instrumentation.enable_op_timing && !config->instrumentation.enable_memory_tracking) {
+        std::cout << "GGML Viz hooks disabled by configuration.\n";
         return;
     }
 
@@ -112,34 +108,16 @@ void GGMLHook::start() {
         return; // Already active
     }
 
-    // Override config with environment variables if set
-    const char* output_env = getenv("GGML_VIZ_OUTPUT");
-    if (output_env) {
-        config_.output_filename = output_env;
-        config_.write_to_file = true;
-    }
-
-    const char* max_events_env = getenv("GGML_VIZ_MAX_EVENTS");
-    if (max_events_env) {
-        config_.max_events = atoi(max_events_env);
-    }
-
-    const char* verbose_env = getenv("GGML_VIZ_VERBOSE");
-    if (verbose_env && (strcmp(verbose_env, "1") == 0 || strcmp(verbose_env, "true") == 0)) {
-        // Enable verbose logging (we can add this feature later)
-        std::cout << "GGML Viz verbose mode enabled.\n";
-    }
-
     start_time_ = std::chrono::steady_clock::now();
     event_count_ = 0;
     write_pos_.v.store(0, std::memory_order_relaxed);
     read_pos_.v.store(0, std::memory_order_relaxed);
     dropped_events_.store(0, std::memory_order_relaxed);
 
-    if (config_.write_to_file) {
-        output_file_ = fopen(config_.output_filename.c_str(), "wb");
+    if (config->output.write_to_file) {
+        output_file_ = fopen(config->output.filename.c_str(), "wb");
         if (!output_file_) {
-            std::cerr << "Failed to open trace file: " << config_.output_filename << "\n";
+            std::cerr << "Failed to open trace file: " << config->output.filename << "\n";
             active_ = false;
             return;
         }
@@ -158,7 +136,10 @@ void GGMLHook::start() {
 #endif
     }
 
-    std::cout << "GGML Hook started. Output: " << config_.output_filename << "\n";
+    std::cout << "GGML Hook started. Output: " << config->output.filename << "\n";
+    if (config->logging.level == ConfigLogLevel::DEBUG) {
+        std::cout << "GGML Viz verbose mode enabled.\n";
+    }
 }
 
 void GGMLHook::stop() {
@@ -243,7 +224,9 @@ void GGMLHook::record_event(const Event& event) {
         return;
     }
 
-    if (event_count_.load() >= config_.max_events) {
+    // Get current config for max_events check (lock-free hot path)
+    auto config = ConfigManager::instance().get();
+    if (event_count_.load() >= config->instrumentation.max_events) {
         std::cerr << "Warning: Event limit reached, stopping trace\n";
         stop();
         return;
@@ -273,7 +256,7 @@ void GGMLHook::record_event(const Event& event) {
     // Increment event count after storing the event
     size_t new_count = event_count_.fetch_add(1, std::memory_order_relaxed) + 1;
 
-    if (config_.write_to_file && (new_count & 0xFFF) == 0) {
+    if (config->output.write_to_file && (new_count & 0xFFF) == 0) {
         std::lock_guard<std::mutex> lock(file_mutex_);
         flush_to_file();
     }
@@ -322,7 +305,10 @@ void GGMLHook::flush_to_file() {
 }
 
 void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
-    if (!active_.load() || !config_.enable_op_timing) return;
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_op_timing) return;
 
     // Add NULL check for graph pointer
     int n_nodes = (graph != nullptr) ? graph->n_nodes : 0;
@@ -341,7 +327,10 @@ void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backe
 }
 
 void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend) {
-    if (!active_.load() || !config_.enable_op_timing) return;
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_op_timing) return;
 
     // Add NULL check for graph pointer
     int n_nodes = (graph != nullptr) ? graph->n_nodes : 0;
@@ -359,28 +348,27 @@ void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend
     record_event(event);
     
     // Flush to file immediately after each graph computation for live mode
-    if (config_.write_to_file) {
+    if (config->output.write_to_file) {
         std::lock_guard<std::mutex> lock(file_mutex_);
         flush_to_file();
     }
 }
 
 void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend) {
-    if (!active_.load() || !config_.enable_op_timing) return;
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_op_timing) return;
 
     // Add NULL check for tensor pointer
     if (tensor == nullptr) return;
 
-    if (!config_.op_types_to_trace.empty()) {
+    if (!config->instrumentation.op_types_to_trace.empty()) {
         // Check if this op type is in the filter list
-        bool found = false;
-        for (uint32_t op : config_.op_types_to_trace) {
-            if (op == tensor->op) {
-                found = true;
-                break;
-            }
+        const auto& op_list = config->instrumentation.op_types_to_trace;
+        if (std::find(op_list.begin(), op_list.end(), tensor->op) == op_list.end()) {
+            return;
         }
-        if (!found) return;
     }
 
     std::cout << "[DEBUG] Op compute begin: " << tensor->name << " type: " << tensor->op << ", backend: " << (backend ? "yes" : "no") << "\n";
@@ -393,27 +381,26 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend
     event.data.op.op_type = tensor->op;
     event.data.op.op_size = ggml_nbytes_simple(tensor);
     event.data.op.backend_ptr = backend;
-    event.label = config_.enable_tensor_names ? tensor->name : nullptr;
+    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
     
     record_event(event);
 }
 
 void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend) {
-    if (!active_.load() || !config_.enable_op_timing) return;
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_op_timing) return;
     
     // Add NULL check for tensor pointer
     if (tensor == nullptr) return;
     
     // Same filtering as begin
-    if (!config_.op_types_to_trace.empty()) {
-        bool found = false;
-        for (uint32_t op : config_.op_types_to_trace) {
-            if (op == tensor->op) {
-                found = true;
-                break;
-            }
+    if (!config->instrumentation.op_types_to_trace.empty()) {
+        const auto& op_list = config->instrumentation.op_types_to_trace;
+        if (std::find(op_list.begin(), op_list.end(), tensor->op) == op_list.end()) {
+            return;
         }
-        if (!found) return;
     }
     
     Event event = {};
@@ -424,7 +411,7 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* 
     event.data.op.op_type = tensor->op;
     event.data.op.op_size = ggml_nbytes_simple(tensor);
     event.data.op.backend_ptr = backend;
-    event.label = config_.enable_tensor_names ? tensor->name : nullptr;
+    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
     
     record_event(event);
 }

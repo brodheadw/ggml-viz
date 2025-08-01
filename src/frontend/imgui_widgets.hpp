@@ -152,8 +152,8 @@ private:
     // Convert screen coordinates to graph coordinates
     ImVec2 screen_to_graph(const ImVec2& screen_pos, const GraphConfig& config, const ImVec2& canvas_pos);
     
-    // Check if point is inside node
-    bool point_in_node(const ImVec2& point, const GraphNode& node);
+    // Check if point is inside node (currently unused)
+    // bool point_in_node(const ImVec2& point, const GraphNode& node);
     
     // Get color for operation type
     ImU32 get_op_color(const std::string& op_type);

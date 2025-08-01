@@ -36,7 +36,7 @@ extern "C" {
             orig_backend_graph_compute = (ggml_backend_graph_compute_func)dlsym(handle, "ggml_backend_graph_compute");
             orig_backend_graph_compute_async = (ggml_backend_graph_compute_async_func)dlsym(handle, "ggml_backend_graph_compute_async");
             orig_backend_metal_graph_compute = (ggml_backend_metal_graph_compute_func)dlsym(handle, "ggml_backend_metal_graph_compute");
-            orig_graph_compute = (ggml_graph_compute_func)dlsym(handle, "ggml_graph_compute");
+            orig_graph_compute = reinterpret_cast<ggml_graph_compute_func>(dlsym(handle, "ggml_graph_compute"));
             orig_graph_compute_with_ctx = (ggml_graph_compute_with_ctx_func)dlsym(handle, "ggml_graph_compute_with_ctx");
             dlclose(handle);
         }

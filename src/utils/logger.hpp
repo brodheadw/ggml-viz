@@ -72,6 +72,11 @@ public:
      * Configure logger from environment variables
      */
     void configure_from_env();
+    
+    /**
+     * Configure logger from Config struct
+     */
+    void configure_from_config(const class Config& config);
 
     /**
      * Log a message at the specified level

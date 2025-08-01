@@ -128,7 +128,7 @@ bool PosixSharedMemory::read(void* dest, size_t n) {
     uint32_t avail = (head + cap - tail) & (cap - 1);
     if (n > avail) return false;
 
-    auto* base = static_cast<uint8_t*>(view_) + sizeof(RingHeader);
+    const auto* base = static_cast<const uint8_t*>(view_) + sizeof(RingHeader);
     for (size_t i = 0; i < n; ++i)
         static_cast<uint8_t*>(dest)[i] = base[(tail + i) & (cap - 1)];
 

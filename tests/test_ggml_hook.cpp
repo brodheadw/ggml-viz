@@ -1,5 +1,6 @@
 // tests/test_ggml_hook.cpp
 #include "ggml_hook.hpp"
+#include "utils/config.hpp"
 #include "ggml-cpu.h"
 #include "ggml-impl.h"
 #include <iostream>
@@ -18,16 +19,21 @@ int main() {
 
     struct ggml_context* ctx = ggml_init(params);
 
-    // Configure hooks
-    ggml_viz::HookConfig config;
-    config.enable_op_timing = true;
-    config.enable_tensor_names = true;
-    config.output_filename = "test_trace.ggmlviz";
+    // Configure using environment variables for simplicity in tests
+    putenv(const_cast<char*>("GGML_VIZ_OUTPUT=test_trace.ggmlviz"));
+    putenv(const_cast<char*>("GGML_VIZ_VERBOSE=1"));
 
-    // Only trace specific operations (optional)
-    // config.op_types_to_trace = { GGML_OP_ADD, GGML_OP_MUL_MAT };
+    // Initialize ConfigManager with environment variables
+    ggml_viz::ConfigManager& config_mgr = ggml_viz::ConfigManager::instance();
+    config_mgr.load_with_precedence("", "", "");  // Empty paths - will use env vars and defaults
 
-    ggml_viz::GGMLHook::instance().configure(config);
+    // Debug: check configuration
+    auto config = config_mgr.get();
+    std::cout << "Configuration loaded:\n";
+    std::cout << "  output.filename: " << config->output.filename << "\n";
+    std::cout << "  output.write_to_file: " << (config->output.write_to_file ? "true" : "false") << "\n";
+    std::cout << "  instrumentation.enable_op_timing: " << (config->instrumentation.enable_op_timing ? "true" : "false") << "\n";
+
     ggml_viz::GGMLHook::instance().start();
 
     std::cout << "Hook started, active: " << ggml_viz::GGMLHook::instance().is_active() << "\n";
@@ -104,6 +110,22 @@ int main() {
     std::cout << "\nTrace complete!\n";
     std::cout << "Events recorded: " << ggml_viz::GGMLHook::instance().event_count() << "\n";
     std::cout << "Trace file: test_trace.ggmlviz\n";
+    
+    // Debug: Check if file actually exists and has content
+    FILE* check_file = fopen("test_trace.ggmlviz", "rb");
+    if (check_file) {
+        fseek(check_file, 0, SEEK_END);
+        long file_size = ftell(check_file);
+        fclose(check_file);
+        std::cout << "Trace file size: " << file_size << " bytes\n";
+        if (file_size > 0) {
+            std::cout << "✅ Trace file successfully created and contains data\n";
+        } else {
+            std::cout << "❌ Trace file exists but is empty\n";
+        }
+    } else {
+        std::cout << "❌ Trace file does not exist\n";
+    }
 
     ggml_graph_dump_dot(gf, NULL, "test_graph.dot");
     std::cout << "Graph structure: test_graph.dot\n";

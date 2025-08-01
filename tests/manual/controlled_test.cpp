@@ -8,8 +8,12 @@ extern "C" {
 int main() {
     std::cout << "Controlled test - no environment variables..." << std::endl;
     
-    // Explicitly unset the environment variable
+    // Explicitly unset the environment variable - Windows doesn't have unsetenv()
+#ifdef _WIN32
+    putenv(const_cast<char*>("GGML_VIZ_OUTPUT="));
+#else
     unsetenv("GGML_VIZ_OUTPUT");
+#endif
     
     std::cout << "Calling hook without auto-initialization..." << std::endl;
     ggml_viz_hook_graph_compute_begin(nullptr, nullptr);

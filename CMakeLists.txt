@@ -49,6 +49,9 @@ endif()
 # Build our instrumentation library
 add_subdirectory(src)
 
+# Build examples (demos)
+add_subdirectory(examples)
+
 # Build and run tests
 enable_testing()
 add_subdirectory(tests)
