@@ -55,8 +55,8 @@ std::vector<TimelineWidget::TimelineEvent> TimelineWidget::process_events(const 
     std::unordered_map<int, int> thread_to_lane;
     
     for (const auto& event : events) {
-        if (thread_to_lane.find(event.thread_id) == thread_to_lane.end()) {
-            thread_to_lane[event.thread_id] = thread_ids_.size();
+        auto [it, inserted] = thread_to_lane.try_emplace(event.thread_id, thread_ids_.size());
+        if (inserted) {
             thread_ids_.push_back(event.thread_id);
         }
     }
@@ -101,7 +101,7 @@ void TimelineWidget::render_timeline_canvas(const std::vector<TimelineEvent>& ti
     // Calculate timeline dimensions
     int num_lanes = config.show_threads ? thread_ids_.size() : 1;
     float total_lane_height = num_lanes * (config.lane_height + config.padding);
-    float usable_height = std::min(canvas_size.y - 40.0f, total_lane_height); // Leave space for time ruler
+    // float usable_height = std::min(canvas_size.y - 40.0f, total_lane_height); // Leave space for time ruler (unused for now)
     
     // Draw canvas background
     draw_list->AddRectFilled(canvas_pos, 
@@ -234,7 +234,6 @@ void TimelineWidget::render_timeline_canvas(const std::vector<TimelineEvent>& ti
             float wheel = ImGui::GetIO().MouseWheel;
             float mouse_time = pixel_to_time(mouse_x, total_duration_ms, timeline_width, config);
             
-            float old_zoom = config.zoom;
             config.zoom *= (1.0f + wheel * 0.1f);
             config.zoom = std::max(0.1f, std::min(config.zoom, 100.0f));
             
@@ -429,7 +428,8 @@ std::vector<GraphWidget::GraphNode> GraphWidget::build_graph_from_trace(const Tr
         node.color = get_op_color(node.op_type);
         
         // Map tensor pointer to node ID for later connection building
-        tensor_to_node[node.tensor_ptr] = node.node_id;
+        // TODO: Use tensor_to_node for dependency analysis
+        (void)tensor_to_node[node.tensor_ptr]; // Suppress unused warning
         
         nodes.push_back(node);
     }
@@ -766,10 +766,13 @@ ImVec2 GraphWidget::screen_to_graph(const ImVec2& screen_pos, const GraphConfig&
                   (screen_pos.y - canvas_pos.y) / config.zoom - config.pan_offset.y);
 }
 
+// Currently unused function - commented out to fix lint warning
+/*
 bool GraphWidget::point_in_node(const ImVec2& point, const GraphNode& node) {
     return point.x >= node.position.x && point.x <= node.position.x + node.size.x &&
            point.y >= node.position.y && point.y <= node.position.y + node.size.y;
 }
+*/
 
 ImU32 GraphWidget::get_op_color(const std::string& op_type) {
     // Color coding for different operation types
