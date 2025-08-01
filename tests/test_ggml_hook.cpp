@@ -1,5 +1,6 @@
 // tests/test_ggml_hook.cpp
 #include "ggml_hook.hpp"
+#include "utils/config.hpp"
 #include "ggml-cpu.h"
 #include "ggml-impl.h"
 #include <iostream>
@@ -18,16 +19,14 @@ int main() {
 
     struct ggml_context* ctx = ggml_init(params);
 
-    // Configure hooks
-    ggml_viz::HookConfig config;
-    config.enable_op_timing = true;
-    config.enable_tensor_names = true;
-    config.output_filename = "test_trace.ggmlviz";
+    // Configure using environment variables for simplicity in tests
+    putenv(const_cast<char*>("GGML_VIZ_OUTPUT=test_trace.ggmlviz"));
+    putenv(const_cast<char*>("GGML_VIZ_VERBOSE=1"));
 
-    // Only trace specific operations (optional)
-    // config.op_types_to_trace = { GGML_OP_ADD, GGML_OP_MUL_MAT };
+    // Initialize ConfigManager with environment variables
+    ggml_viz::ConfigManager& config_mgr = ggml_viz::ConfigManager::instance();
+    config_mgr.load_with_precedence("", "", "");  // Empty paths - will use env vars and defaults
 
-    ggml_viz::GGMLHook::instance().configure(config);
     ggml_viz::GGMLHook::instance().start();
 
     std::cout << "Hook started, active: " << ggml_viz::GGMLHook::instance().is_active() << "\n";
