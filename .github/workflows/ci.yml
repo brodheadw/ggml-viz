@@ -123,8 +123,8 @@ jobs:
       shell: bash
       run: |
         # Test the interposition system
-        export GGML_VIZ_OUTPUT="ci_test.ggmlviz"
-        export GGML_VIZ_VERBOSE=1
+        # The test hardcodes the output filename, so we check for that
+        EXPECTED_TRACE_FILE="test_trace.ggmlviz"
         
         if [ "${{ matrix.platform }}" = "macos" ]; then
           export DYLD_INSERT_LIBRARIES="$PWD/src/libggml_viz_hook.dylib"
@@ -132,7 +132,6 @@ jobs:
         elif [ "${{ matrix.platform }}" = "windows" ]; then
           # Windows uses DLL injection - test the DLL loading
           echo "Testing Windows DLL loading..."
-          export GGML_VIZ_OUTPUT="win_test.ggmlviz"
           export PATH="$PWD/bin/$BUILD_TYPE:$PATH"
           ./bin/$BUILD_TYPE/test_ggml_hook.exe
         else
@@ -140,9 +139,12 @@ jobs:
           ./bin/test_ggml_hook
         fi
         
-        # Verify trace file was created
-        if [ ! -f "$GGML_VIZ_OUTPUT" ]; then
+        # Verify trace file was created (test hardcodes filename)
+        if [ ! -f "$EXPECTED_TRACE_FILE" ]; then
           echo "Error: Interposition trace file not created"
+          echo "Expected: $EXPECTED_TRACE_FILE"
+          echo "Files in directory:"
+          ls -la *.ggmlviz 2>/dev/null || echo "No .ggmlviz files found"
           exit 1
         fi
         
@@ -150,9 +152,9 @@ jobs:
         unset DYLD_INSERT_LIBRARIES
         unset LD_PRELOAD
         if [ "${{ matrix.platform }}" = "windows" ]; then
-          ./bin/$BUILD_TYPE/test_trace_reader.exe "$GGML_VIZ_OUTPUT"
+          ./bin/$BUILD_TYPE/test_trace_reader.exe "$EXPECTED_TRACE_FILE"
         else
-          ./bin/test_trace_reader "$GGML_VIZ_OUTPUT"
+          ./bin/test_trace_reader "$EXPECTED_TRACE_FILE"
         fi
         
     - name: Run performance benchmark
