@@ -339,9 +339,8 @@ ConfigManager& ConfigManager::instance() {
     return instance;
 }
 
-ConfigManager::ConfigManager() {
-    // Initialize with default config
-    config_ptr_ = std::make_shared<const Config>(Config::default_config());
+ConfigManager::ConfigManager() : config_ptr_(std::make_shared<const Config>(Config::default_config())) {
+    // Initialize with default config in initializer list
 }
 
 void ConfigManager::load_with_precedence(

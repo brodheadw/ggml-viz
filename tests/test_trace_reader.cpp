@@ -2,7 +2,7 @@
 #include "utils/trace_reader.hpp" 
 #include <iostream>
 
-int main(int argc, char* argv[]) {
+int main(int argc, const char* const argv[]) {
     if (argc != 2) {
         std::cout << "Usage: " << argv[0] << " <trace_file.ggmlviz>" << std::endl;
         return 1;
