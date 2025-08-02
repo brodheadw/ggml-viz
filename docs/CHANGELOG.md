@@ -397,7 +397,7 @@ Logging system
   - Enhanced event capture for both sync and async compute paths
   - Complete operation timeline tracking for detailed profiling
 
-- **USER_GUIDE2.md** - Comprehensive setup guide for live mode workflows
+- **Live mode setup guide** - Comprehensive setup guide for live mode workflows
   - Step-by-step terminal setup instructions
   - Environment variable configuration examples
   - DYLD_INSERT_LIBRARIES integration with llama.cpp
@@ -445,7 +445,7 @@ Logging system
 ### Added
 - **Performance Benchmarking Infrastructure** - Complete benchmarking system with statistical analysis
 - **BENCHMARKING.md** - Comprehensive guide for performance measurement  
-- Comprehensive User Guide (USER_GUIDE.md) with llama.cpp integration examples
+- Comprehensive documentation with llama.cpp integration examples
 - Updated project documentation with accurate feature status
 - Fixed macOS build instructions with Metal backend workaround
 - Auto-start functionality when `GGML_VIZ_OUTPUT` environment variable is set
