@@ -101,6 +101,8 @@ bool ImGuiApp::initialize() {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport
     
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -126,7 +128,7 @@ void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
             // Configure the hook
             HookConfig config;
             config.enable_op_timing = true;
-            config.enable_memory_tracking = false;
+            config.enable_memory_tracking = true;  // Enable memory tracking for live visualization
             config.enable_thread_tracking = false;
             config.enable_tensor_names = true;
             config.write_to_file = false;  // Don't write to file in live mode
@@ -137,6 +139,13 @@ void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
             
             std::cout << "[ImGuiApp] Live mode enabled and GGML hook started" << std::endl;
             std::cout << "[ImGuiApp] Hook active: " << (hook.is_active() ? "YES" : "NO") << std::endl;
+            std::cout << "[ImGuiApp] DEBUG: Configuration applied:" << std::endl;
+            std::cout << "[ImGuiApp]   - Op timing: " << (config.enable_op_timing ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Memory tracking: " << (config.enable_memory_tracking ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Thread tracking: " << (config.enable_thread_tracking ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Tensor names: " << (config.enable_tensor_names ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Write to file: " << (config.write_to_file ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Max events: " << config.max_events << std::endl;
             
         } catch (const std::exception& e) {
             std::cerr << "[ImGuiApp] Error starting GGML hook: " << e.what() << std::endl;
@@ -210,6 +219,19 @@ void ImGuiApp::update_live_data() {
         if (hook.is_active()) {
             auto new_events = hook.consume_available_events();
             if (!new_events.empty()) {
+                // DEBUG: Count event types in new batch
+                size_t new_memory_events = 0;
+                for (const auto& event : new_events) {
+                    if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+                        new_memory_events++;
+                    }
+                }
+                
+                if (call_count % 100 == 0) {  // Only print every 100 calls
+                    std::cout << "[ImGuiApp] DEBUG: Got " << new_events.size() << " new events (" 
+                              << new_memory_events << " memory events)" << std::endl;
+                }
+                
                 // Add new events to our live buffer
                 data_->live_events.insert(data_->live_events.end(), new_events.begin(), new_events.end());
                 data_->last_live_update = std::chrono::steady_clock::now();
@@ -221,6 +243,10 @@ void ImGuiApp::update_live_data() {
                     data_->live_events.erase(data_->live_events.begin(), 
                                            data_->live_events.begin() + (data_->live_events.size() - max_events));
                 }
+            }
+        } else {
+            if (call_count % 100 == 0) {
+                std::cout << "[ImGuiApp] DEBUG: Hook is not active" << std::endl;
             }
         }
     } catch (const std::exception& e) {
@@ -250,21 +276,34 @@ void ImGuiApp::update_live_data() {
                     if (new_trace_reader->is_valid()) {
                         const auto& events = new_trace_reader->events();
                         
-                        // Only add new events (events beyond what we've already processed)
-                        size_t previous_event_count = data_->live_events.size();
-                        size_t start_idx = data_->live_trace_reader ? previous_event_count : 0;
+                        // Handle file recreation/truncation by detecting if file has fewer events than expected
+                        static size_t last_file_event_count = 0;
+                        size_t start_idx = 0;
+                        
+                        if (data_->live_trace_reader && events.size() >= last_file_event_count) {
+                            // File appears to be growing normally, only load new events
+                            start_idx = last_file_event_count;
+                        } else {
+                            // File was recreated/truncated or this is first load, load all events
+                            start_idx = 0;
+                            std::cout << "[ImGuiApp] File appears to be recreated/truncated, loading all events" << std::endl;
+                        }
                         
                         if (events.size() > start_idx) {
+                            // Add new events to our live buffer
+                            size_t new_event_count = events.size() - start_idx;
                             data_->live_events.insert(data_->live_events.end(), 
                                                      events.begin() + start_idx, events.end());
                             data_->last_live_update = std::chrono::steady_clock::now();
                             data_->live_data_available = true;
                             
-                            std::cout << "[ImGuiApp] Loaded " << (events.size() - start_idx) 
-                                      << " new events from external file" << std::endl;
+                            std::cout << "[ImGuiApp] Loaded " << new_event_count 
+                                      << " new events from external file (total events in file: " << events.size() << ")" << std::endl;
+                            
+                            last_file_event_count = events.size();
                         } else {
-                            std::cout << "[ImGuiApp] No new events to load (total: " << events.size() 
-                                      << ", start_idx: " << start_idx << ")" << std::endl;
+                            std::cout << "[ImGuiApp] No new events to load (file has " << events.size() 
+                                      << " events, last processed: " << last_file_event_count << ")" << std::endl;
                         }
                         
                         // Update file monitoring state
@@ -308,7 +347,8 @@ void ImGuiApp::render_frame() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     
-    // Note: Docking disabled for compatibility with basic ImGui build
+    // Enable docking
+    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
     
     // Render main menu bar
     render_main_menu_bar();
@@ -923,21 +963,55 @@ void ImGuiApp::render_live_memory_view() {
     ImGui::Text("🔴 LIVE MODE - Memory View");
     ImGui::Text("Live events: %zu", data_->live_events.size());
     
+    // DEBUG: Show event type breakdown
+    size_t graph_events = 0, op_events = 0, memory_events = 0, other_events = 0;
+    for (const auto& event : data_->live_events) {
+        switch (event.type) {
+            case EventType::GRAPH_COMPUTE_BEGIN:
+            case EventType::GRAPH_COMPUTE_END:
+                graph_events++;
+                break;
+            case EventType::OP_COMPUTE_BEGIN:
+            case EventType::OP_COMPUTE_END:
+                op_events++;
+                break;
+            case EventType::TENSOR_ALLOC:
+            case EventType::TENSOR_FREE:
+                memory_events++;
+                break;
+            default:
+                other_events++;
+                break;
+        }
+    }
+    
+    ImGui::Text("🔍 DEBUG - Event breakdown:");
+    ImGui::BulletText("Graph events: %zu", graph_events);
+    ImGui::BulletText("Operation events: %zu", op_events);
+    ImGui::BulletText("Memory events: %zu", memory_events);
+    ImGui::BulletText("Other events: %zu", other_events);
+    
     // Update cached memory stats incrementally
     update_live_memory_stats();
     
     // Count memory events for display
-    size_t memory_event_count = 0;
-    for (size_t i = 0; i < data_->live_events.size(); ++i) {
-        const auto& event = data_->live_events[i];
-        if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
-            memory_event_count++;
-        }
-    }
+    size_t memory_event_count = memory_events;
     
     if (memory_event_count == 0) {
-        ImGui::Text("No memory events in live trace yet...");
-        ImGui::Text("Enable memory tracking in configuration to see memory events.");
+        ImGui::Text("🔍 No memory events in live trace yet...");
+        ImGui::Separator();
+        ImGui::Text("💡 To see memory events:");
+        ImGui::BulletText("Run a GGML application with:");
+        ImGui::Indent();
+        ImGui::Text("env DYLD_INSERT_LIBRARIES=./libggml_viz_hook.dylib your_app");
+        ImGui::Text("env GGML_VIZ_OUTPUT=trace.ggmlviz your_app");
+        ImGui::Unindent();
+        ImGui::BulletText("Or monitor an external trace file:");
+        ImGui::Indent();
+        ImGui::Text("./ggml-viz --live --no-hook trace_file.ggmlviz");
+        ImGui::Unindent();
+        ImGui::Separator();
+        ImGui::Text("✅ Memory tracking is enabled and ready!");
         return;
     }
     
