@@ -197,7 +197,7 @@ TraceReader::MemoryStats TraceReader::get_memory_stats() const {
     return cached_memory_stats_;
 }
 
-void TraceReader::update_memory_stats() {
+void TraceReader::update_memory_stats() const {
     // Reset state
     cached_memory_stats_ = MemoryStats{};
     allocations_.clear();

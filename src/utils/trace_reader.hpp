@@ -62,7 +62,7 @@ public:
 
 private: 
     bool load_events();
-    void update_memory_stats();
+    void update_memory_stats() const;
 
     std::string filename_;
     FILE* file_ = nullptr;

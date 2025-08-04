@@ -11,6 +11,7 @@
 #include <chrono>
 #include <ctime>
 #include <sys/stat.h>
+#include <unordered_map>
 
 namespace ggml_viz {
 
@@ -27,6 +28,12 @@ struct ImGuiApp::AppData {
     // Live mode support
     bool live_mode = false;
     std::vector<Event> live_events;
+    
+    // Cached live memory stats for performance
+    size_t live_memory_last_processed_event = 0;
+    size_t live_total_allocs = 0, live_total_frees = 0;
+    size_t live_bytes_allocated = 0, live_current_usage = 0, live_peak_usage = 0;
+    std::unordered_map<const void*, size_t> live_allocations;
     std::chrono::steady_clock::time_point last_live_update;
     std::atomic<bool> live_data_available{false};
     
@@ -831,14 +838,379 @@ void ImGuiApp::render_memory_view() {
         }
         
         if (data_->live_mode) {
-            ImGui::Text("🔴 LIVE MODE - Memory View");
-            ImGui::Text("Live events: %zu", data_->live_events.size());
-            ImGui::Text("Memory visualization for live mode coming soon...");
+            render_live_memory_view();
         } else {
-            ImGui::Text("Memory visualization coming soon...");
+            render_static_memory_view();
         }
     }
     ImGui::End();
+}
+
+void ImGuiApp::render_static_memory_view() {
+    if (!data_->trace_reader) return;
+    
+    auto memory_stats = data_->trace_reader->get_memory_stats();
+    auto memory_events = data_->trace_reader->get_memory_events();
+    
+    // Memory Statistics Section
+    if (ImGui::CollapsingHeader("Memory Statistics", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::Columns(2, "MemoryStats");
+        
+        ImGui::Text("Total Allocations:");
+        ImGui::NextColumn();
+        ImGui::Text("%llu", static_cast<unsigned long long>(memory_stats.total_allocations));
+        ImGui::NextColumn();
+        
+        ImGui::Text("Total Frees:");
+        ImGui::NextColumn();
+        ImGui::Text("%llu", static_cast<unsigned long long>(memory_stats.total_frees));
+        ImGui::NextColumn();
+        
+        ImGui::Text("Bytes Allocated:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", memory_stats.bytes_allocated / 1024.0);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Bytes Freed:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", memory_stats.bytes_freed / 1024.0);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Peak Usage:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", memory_stats.peak_usage / 1024.0);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Current Usage:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", memory_stats.current_usage / 1024.0);
+        ImGui::NextColumn();
+        
+        if (memory_stats.leaked_bytes > 0) {
+            ImGui::Text("🔴 Leaked Memory:");
+            ImGui::NextColumn();
+            ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%.2f KB", memory_stats.leaked_bytes / 1024.0);
+        } else {
+            ImGui::Text("✅ Memory Leaks:");
+            ImGui::NextColumn();
+            ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "None detected");
+        }
+        ImGui::NextColumn();
+        
+        ImGui::Columns(1);
+    }
+    
+    // Memory Timeline Section
+    if (ImGui::CollapsingHeader("Memory Timeline", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (memory_events.empty()) {
+            ImGui::Text("No memory events found in trace");
+        } else {
+            render_memory_timeline(memory_events);
+        }
+    }
+    
+    // Memory Events List Section
+    if (ImGui::CollapsingHeader("Memory Events")) {
+        if (memory_events.empty()) {
+            ImGui::Text("No memory events found in trace");
+        } else {
+            render_memory_events_list(memory_events);
+        }
+    }
+}
+
+void ImGuiApp::render_live_memory_view() {
+    ImGui::Text("🔴 LIVE MODE - Memory View");
+    ImGui::Text("Live events: %zu", data_->live_events.size());
+    
+    // Update cached memory stats incrementally
+    update_live_memory_stats();
+    
+    // Count memory events for display
+    size_t memory_event_count = 0;
+    for (size_t i = 0; i < data_->live_events.size(); ++i) {
+        const auto& event = data_->live_events[i];
+        if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+            memory_event_count++;
+        }
+    }
+    
+    if (memory_event_count == 0) {
+        ImGui::Text("No memory events in live trace yet...");
+        ImGui::Text("Enable memory tracking in configuration to see memory events.");
+        return;
+    }
+    
+    // Live Memory Statistics
+    if (ImGui::CollapsingHeader("Live Memory Statistics", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::Columns(2, "LiveMemoryStats");
+        
+        ImGui::Text("Allocations:");
+        ImGui::NextColumn();
+        ImGui::Text("%zu", data_->live_total_allocs);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Frees:");
+        ImGui::NextColumn();
+        ImGui::Text("%zu", data_->live_total_frees);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Peak Usage:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", data_->live_peak_usage / 1024.0);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Current Usage:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", data_->live_current_usage / 1024.0);
+        ImGui::NextColumn();
+        
+        size_t leaked_bytes = 0;
+        for (const auto& pair : data_->live_allocations) {
+            leaked_bytes += pair.second;
+        }
+        
+        if (leaked_bytes > 0) {
+            ImGui::Text("🔴 Active Allocs:");
+            ImGui::NextColumn();
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.4f, 1.0f), "%.2f KB", leaked_bytes / 1024.0);
+        } else {
+            ImGui::Text("✅ Active Allocs:");
+            ImGui::NextColumn();
+            ImGui::Text("0 bytes");
+        }
+        
+        ImGui::Columns(1);
+    }
+    
+    // Recent Memory Events
+    if (ImGui::CollapsingHeader("Recent Memory Events")) {
+        render_live_memory_events_list();
+    }
+}
+
+void ImGuiApp::render_memory_timeline(const std::vector<const Event*>& memory_events) {
+    if (memory_events.empty()) return;
+    
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
+    ImVec2 canvas_sz = ImGui::GetContentRegionAvail();
+    
+    if (canvas_sz.x < 50.0f) canvas_sz.x = 50.0f;
+    if (canvas_sz.y < 200.0f) canvas_sz.y = 200.0f;
+    
+    ImVec2 canvas_p1 = ImVec2(canvas_p0.x + canvas_sz.x, canvas_p0.y + canvas_sz.y);
+    
+    // Timeline bounds
+    uint64_t min_time = memory_events.front()->timestamp_ns;
+    uint64_t max_time = memory_events.back()->timestamp_ns;
+    uint64_t time_range = max_time - min_time;
+    
+    if (time_range == 0) time_range = 1; // Avoid division by zero
+    
+    // Calculate memory usage over time
+    std::vector<std::pair<float, float>> usage_points; // (x_pos, usage_kb)
+    size_t current_usage = 0;
+    size_t max_usage = 0;
+    std::unordered_map<const void*, size_t> allocations;
+    
+    for (const auto* event : memory_events) {
+        float x_pos = (float)(event->timestamp_ns - min_time) / time_range;
+        
+        if (event->type == EventType::TENSOR_ALLOC) {
+            allocations[event->data.memory.ptr] = event->data.memory.size;
+            current_usage += event->data.memory.size;
+        } else if (event->type == EventType::TENSOR_FREE) {
+            auto it = allocations.find(event->data.memory.ptr);
+            if (it != allocations.end()) {
+                current_usage -= it->second;
+                allocations.erase(it);
+            }
+        }
+        
+        if (current_usage > max_usage) max_usage = current_usage;
+        usage_points.push_back({x_pos, (float)current_usage / 1024.0f});
+    }
+    
+    // Draw background
+    draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 255));
+    draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
+    
+    // Draw grid lines
+    const int num_h_lines = 5;
+    const int num_v_lines = 10;
+    
+    for (int i = 0; i <= num_h_lines; i++) {
+        float y = canvas_p0.y + ((float)i / num_h_lines) * canvas_sz.y;
+        draw_list->AddLine(ImVec2(canvas_p0.x, y), ImVec2(canvas_p1.x, y), IM_COL32(100, 100, 100, 100));
+    }
+    
+    for (int i = 0; i <= num_v_lines; i++) {
+        float x = canvas_p0.x + ((float)i / num_v_lines) * canvas_sz.x;
+        draw_list->AddLine(ImVec2(x, canvas_p0.y), ImVec2(x, canvas_p1.y), IM_COL32(100, 100, 100, 100));
+    }
+    
+    // Draw memory usage line
+    if (usage_points.size() > 1 && max_usage > 0) {
+        for (size_t i = 1; i < usage_points.size(); i++) {
+            ImVec2 p1(canvas_p0.x + usage_points[i-1].first * canvas_sz.x, 
+                     canvas_p1.y - (usage_points[i-1].second / (max_usage / 1024.0f)) * canvas_sz.y);
+            ImVec2 p2(canvas_p0.x + usage_points[i].first * canvas_sz.x, 
+                     canvas_p1.y - (usage_points[i].second / (max_usage / 1024.0f)) * canvas_sz.y);
+            draw_list->AddLine(p1, p2, IM_COL32(100, 200, 255, 255), 2.0f);
+        }
+    }
+    
+    // Draw allocation/free markers
+    for (const auto* event : memory_events) {
+        float x_pos = (float)(event->timestamp_ns - min_time) / time_range;
+        float x = canvas_p0.x + x_pos * canvas_sz.x;
+        
+        if (event->type == EventType::TENSOR_ALLOC) {
+            draw_list->AddLine(ImVec2(x, canvas_p0.y), ImVec2(x, canvas_p1.y), IM_COL32(100, 255, 100, 150), 1.0f);
+        } else if (event->type == EventType::TENSOR_FREE) {
+            draw_list->AddLine(ImVec2(x, canvas_p0.y), ImVec2(x, canvas_p1.y), IM_COL32(255, 100, 100, 150), 1.0f);
+        }
+    }
+    
+    ImGui::Dummy(canvas_sz);
+    
+    // Timeline legend
+    ImGui::Text("Memory Timeline");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "━━ Usage");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "│ Alloc");
+    ImGui::SameLine();    
+    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "│ Free");
+    ImGui::Text("Peak: %.2f KB", max_usage / 1024.0f);
+}
+
+void ImGuiApp::render_memory_events_list(const std::vector<const Event*>& memory_events) {
+    if (ImGui::BeginTable("MemoryEvents", 4, ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+        ImGui::TableSetupColumn("Time (ns)", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+        ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+        ImGui::TableSetupColumn("Tensor", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableHeadersRow();
+        
+        // Show most recent events first (last 100)
+        size_t start_idx = memory_events.size() > 100 ? memory_events.size() - 100 : 0;
+        for (size_t i = memory_events.size(); i > start_idx; --i) {
+            const Event* event = memory_events[i - 1];
+            
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%llu", event->timestamp_ns);
+            
+            ImGui::TableSetColumnIndex(1);
+            if (event->type == EventType::TENSOR_ALLOC) {
+                ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "ALLOC");
+            } else {
+                ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "FREE");
+            }
+            
+            ImGui::TableSetColumnIndex(2);
+            if (event->type == EventType::TENSOR_ALLOC) {
+                ImGui::Text("%zu B", event->data.memory.size);
+            } else {
+                ImGui::Text("-");
+            }
+            
+            ImGui::TableSetColumnIndex(3);
+            if (event->label && strlen(event->label) > 0) {
+                ImGui::Text("%s", event->label);
+            } else {
+                ImGui::Text("0x%p", event->data.memory.ptr);
+            }
+        }
+        
+        ImGui::EndTable();
+    }
+}
+
+void ImGuiApp::update_live_memory_stats() {
+    // Process only new events since last update
+    size_t events_to_process = data_->live_events.size();
+    if (events_to_process <= data_->live_memory_last_processed_event) {
+        return; // No new events
+    }
+    
+    // Process new events incrementally
+    for (size_t i = data_->live_memory_last_processed_event; i < events_to_process; ++i) {
+        const auto& event = data_->live_events[i];
+        
+        if (event.type == EventType::TENSOR_ALLOC) {
+            data_->live_total_allocs++;
+            data_->live_bytes_allocated += event.data.memory.size;
+            data_->live_allocations[event.data.memory.ptr] = event.data.memory.size;
+            data_->live_current_usage += event.data.memory.size;
+            
+            if (data_->live_current_usage > data_->live_peak_usage) {
+                data_->live_peak_usage = data_->live_current_usage;
+            }
+        } else if (event.type == EventType::TENSOR_FREE) {
+            data_->live_total_frees++;
+            auto it = data_->live_allocations.find(event.data.memory.ptr);
+            if (it != data_->live_allocations.end()) {
+                data_->live_current_usage -= it->second;
+                data_->live_allocations.erase(it);
+            }
+        }
+    }
+    
+    data_->live_memory_last_processed_event = events_to_process;
+}
+
+void ImGuiApp::render_live_memory_events_list() {
+    // Show only recent memory events without copying into temporary vector
+    const size_t max_display_events = 100;
+    size_t memory_events_shown = 0;
+    
+    if (ImGui::BeginTable("LiveMemoryEvents", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY)) {
+        ImGui::TableSetupColumn("Time (ns)", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+        ImGui::TableSetupColumn("Pointer", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+        ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableHeadersRow();
+        
+        // Iterate backwards through events to show most recent first
+        for (int i = static_cast<int>(data_->live_events.size()) - 1; i >= 0 && memory_events_shown < max_display_events; --i) {
+            const auto& event = data_->live_events[i];
+            
+            if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+                ImGui::TableNextRow();
+                
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%llu", static_cast<unsigned long long>(event.timestamp_ns));
+                
+                ImGui::TableSetColumnIndex(1);
+                if (event.type == EventType::TENSOR_ALLOC) {
+                    ImGui::TextColored(ImVec4(0.5f, 1.0f, 0.5f, 1.0f), "ALLOC");
+                } else {
+                    ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "FREE");
+                }
+                
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("%p", event.data.memory.ptr);
+                
+                ImGui::TableSetColumnIndex(3);
+                if (event.type == EventType::TENSOR_ALLOC) {
+                    ImGui::Text("%.2f KB", event.data.memory.size / 1024.0);
+                } else {
+                    ImGui::Text("-");
+                }
+                
+                memory_events_shown++;
+            }
+        }
+        
+        ImGui::EndTable();
+    }
+    
+    if (memory_events_shown == max_display_events) {
+        ImGui::Text("... (showing most recent %zu memory events)", max_display_events);
+    }
 }
 
 } // namespace ggml_viz

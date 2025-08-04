@@ -3,7 +3,9 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include "imgui_widgets.hpp"
+#include "../instrumentation/ggml_hook.hpp" // For Event type
 
 namespace ggml_viz {
 
@@ -40,6 +42,12 @@ private:
     void render_graph_view();
     void render_tensor_inspector();
     void render_memory_view();
+    void render_static_memory_view();
+    void render_live_memory_view();
+    void render_memory_timeline(const std::vector<const Event*>& memory_events);
+    void render_memory_events_list(const std::vector<const Event*>& memory_events);
+    void render_live_memory_events_list();
+    void update_live_memory_stats();
     void render_file_browser();
     
     // Live mode support
