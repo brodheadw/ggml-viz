@@ -4,6 +4,10 @@
 #include "ggml-alloc.h"
 #include <iostream>
 #include <cassert>
+#ifdef _WIN32
+#include <cstdlib>
+#define setenv(name, value, overwrite) _putenv_s(name, value)
+#endif
 
 int main() {
     std::cout << "=== Memory Hook Test ===" << std::endl;
@@ -37,11 +41,10 @@ int main() {
     std::cout << "Testing manual memory event recording..." << std::endl;
     
     // Create a simple GGML context 
-    struct ggml_init_params params = {
-        .mem_size = 16 * 1024, // 16KB - small for testing
-        .mem_buffer = nullptr,
-        .no_alloc = false
-    };
+    struct ggml_init_params params = {};
+    params.mem_size = 16 * 1024; // 16KB - small for testing
+    params.mem_buffer = nullptr;
+    params.no_alloc = false;
     
     struct ggml_context* ctx = ggml_init(params);
     if (!ctx) {
