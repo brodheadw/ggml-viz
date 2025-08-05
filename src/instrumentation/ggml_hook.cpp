@@ -3,6 +3,7 @@
 #include "../utils/config.hpp"
 #include "ggml-impl.h" // for ggml_cgraph, ggml_tensor
 #include "ggml-backend.h" // for ggml_backend_t
+#include "ggml-alloc.h" // for memory allocation functions
 #include <thread>
 #include <cstring>
 #include <cassert>
@@ -416,6 +417,46 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* 
     record_event(event);
 }
 
+void GGMLHook::on_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggml_backend* backend) {
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+    
+    // Add NULL check for tensor pointer
+    if (tensor == nullptr) return;
+    
+    Event event = {};
+    event.type = EventType::TENSOR_ALLOC;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = tensor;
+    event.data.memory.size = size;
+    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    
+    record_event(event);
+}
+
+void GGMLHook::on_tensor_free(const ggml_tensor* tensor, const ggml_backend* backend) {
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+    
+    // Add NULL check for tensor pointer
+    if (tensor == nullptr) return;
+    
+    Event event = {};
+    event.type = EventType::TENSOR_FREE;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = tensor;
+    event.data.memory.size = 0; // Size not available for free events
+    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    
+    record_event(event);
+}
+
 // C-style hook functions that can be called from ggml
 extern "C" {
     void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
@@ -433,6 +474,14 @@ extern "C" {
     void ggml_viz_hook_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend) {
         GGMLHook::instance().on_op_compute_end(tensor, backend);
     }
+
+    void ggml_viz_hook_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggml_backend* backend) {
+        GGMLHook::instance().on_tensor_alloc(tensor, size, backend);
+    }
+
+    void ggml_viz_hook_tensor_free(const ggml_tensor* tensor, const ggml_backend* backend) {
+        GGMLHook::instance().on_tensor_free(tensor, backend);
+    }
 }
 
 // Function pointers to original implementations
@@ -440,6 +489,12 @@ static enum ggml_status (*original_backend_graph_compute)(ggml_backend_t, struct
 static void (*original_graph_compute)(struct ggml_context*, struct ggml_cgraph*) = nullptr;
 static enum ggml_status (*original_graph_compute_with_ctx)(struct ggml_context*, struct ggml_cgraph*, int) = nullptr;
 static enum ggml_status (*original_metal_graph_compute)(ggml_backend_t, struct ggml_cgraph*) = nullptr;
+
+// Memory allocation function pointers
+static enum ggml_status (*original_tallocr_alloc)(struct ggml_tallocr*, struct ggml_tensor*) = nullptr;
+static bool (*original_gallocr_alloc_graph)(ggml_gallocr_t, struct ggml_cgraph*) = nullptr;
+static struct ggml_backend_buffer* (*original_backend_alloc_ctx_tensors)(struct ggml_context*, ggml_backend_t) = nullptr;
+
 static bool hooks_initialized = false;
 
 // Our intercepted functions - only for shared library builds (not static library or test builds)
@@ -644,6 +699,124 @@ extern "C" {
         
         return result;
     }
+    
+    // Memory allocation hooks
+    GGML_VIZ_API enum ggml_status ggml_tallocr_alloc(struct ggml_tallocr* talloc, struct ggml_tensor* tensor) {
+        auto& hook = GGMLHook::instance();
+        
+        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
+        if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            hook.start();
+        }
+        
+        // Calculate tensor size before allocation
+        size_t tensor_size = 0;
+        if (tensor && hook.is_active()) {
+            tensor_size = ggml_nbytes_simple(tensor);
+            hook.on_tensor_alloc(tensor, tensor_size, nullptr);
+        }
+        
+        // Call the original function
+        enum ggml_status result = GGML_STATUS_SUCCESS;
+        
+        // Initialize function pointers if needed
+        if (!hooks_initialized) {
+            install_ggml_hooks();
+            hooks_initialized = true;
+        }
+        
+        if (original_tallocr_alloc) {
+            result = original_tallocr_alloc(talloc, tensor);
+        } else {
+            printf("[GGML_VIZ] Warning: No original ggml_tallocr_alloc function found\n");
+        }
+        
+        return result;
+    }
+    
+    GGML_VIZ_API bool ggml_gallocr_alloc_graph(ggml_gallocr_t galloc, struct ggml_cgraph* graph) {
+        auto& hook = GGMLHook::instance();
+        
+        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
+        if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            hook.start();
+        }
+        
+        if (hook.is_active() && graph) {
+            printf("[DEBUG] Intercepted ggml_gallocr_alloc_graph, nodes: %d\n", graph->n_nodes);
+            
+            // Record allocation events for all tensors in the graph
+            for (int i = 0; i < graph->n_nodes; i++) {
+                if (graph->nodes[i]) {
+                    size_t tensor_size = ggml_nbytes_simple(graph->nodes[i]);
+                    hook.on_tensor_alloc(graph->nodes[i], tensor_size, nullptr);
+                }
+            }
+            
+            // Also record leaf tensors (inputs)
+            for (int i = 0; i < graph->n_leafs; i++) {
+                if (graph->leafs[i]) {
+                    size_t tensor_size = ggml_nbytes_simple(graph->leafs[i]);
+                    hook.on_tensor_alloc(graph->leafs[i], tensor_size, nullptr);
+                }
+            }
+        }
+        
+        // Call the original function
+        bool result = false;
+        
+        // Initialize function pointers if needed
+        if (!hooks_initialized) {
+            install_ggml_hooks();
+            hooks_initialized = true;
+        }
+        
+        if (original_gallocr_alloc_graph) {
+            result = original_gallocr_alloc_graph(galloc, graph);
+        } else {
+            printf("[GGML_VIZ] Warning: No original ggml_gallocr_alloc_graph function found\n");
+        }
+        
+        return result;
+    }
+    
+    GGML_VIZ_API struct ggml_backend_buffer* ggml_backend_alloc_ctx_tensors(struct ggml_context* ctx, ggml_backend_t backend) {
+        auto& hook = GGMLHook::instance();
+        
+        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
+        if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            hook.start();
+        }
+        
+        if (hook.is_active() && ctx) {
+            printf("[DEBUG] Intercepted ggml_backend_alloc_ctx_tensors\n");
+            
+            // We'll record allocations for all tensors in the context
+            // Note: This is a simplified approach - in reality we'd need to traverse the context's tensor list
+            // For now, we record a single allocation event to indicate context allocation occurred
+            hook.on_tensor_alloc(nullptr, 0, backend);
+        }
+        
+        // Call the original function
+        struct ggml_backend_buffer* result = nullptr;
+        
+        // Initialize function pointers if needed
+        if (!hooks_initialized) {
+            install_ggml_hooks();
+            hooks_initialized = true;
+        }
+        
+        if (original_backend_alloc_ctx_tensors) {
+            result = original_backend_alloc_ctx_tensors(ctx, backend);
+        } else {
+            printf("[GGML_VIZ] Warning: No original ggml_backend_alloc_ctx_tensors function found\n");
+        }
+        
+        return result;
+    }
 }
 #endif // !GGML_VIZ_TEST_MODE
 
@@ -667,6 +840,14 @@ bool install_ggml_hooks() {
             (dlsym(handle, "ggml_graph_compute_with_ctx"));
         auto metal_func = reinterpret_cast<enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*)>
             (dlsym(handle, "ggml_backend_metal_graph_compute"));
+        
+        // Look for memory allocation functions
+        auto tallocr_alloc_func = reinterpret_cast<enum ggml_status (*)(struct ggml_tallocr*, struct ggml_tensor*)>
+            (dlsym(handle, "ggml_tallocr_alloc"));
+        auto gallocr_alloc_graph_func = reinterpret_cast<bool (*)(ggml_gallocr_t, struct ggml_cgraph*)>
+            (dlsym(handle, "ggml_gallocr_alloc_graph"));
+        auto backend_alloc_ctx_tensors_func = reinterpret_cast<struct ggml_backend_buffer* (*)(struct ggml_context*, ggml_backend_t)>
+            (dlsym(handle, "ggml_backend_alloc_ctx_tensors"));
 
         // Only store if they're different from our overrides (shared library builds only)
 #if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
@@ -686,6 +867,20 @@ bool install_ggml_hooks() {
             original_metal_graph_compute = metal_func;
             printf("[GGML_VIZ] Found original ggml_backend_metal_graph_compute\n");
         }
+        
+        // Store memory allocation function pointers
+        if (tallocr_alloc_func && tallocr_alloc_func != ggml_tallocr_alloc) {
+            original_tallocr_alloc = tallocr_alloc_func;
+            printf("[GGML_VIZ] Found original ggml_tallocr_alloc\n");
+        }
+        if (gallocr_alloc_graph_func && gallocr_alloc_graph_func != ggml_gallocr_alloc_graph) {
+            original_gallocr_alloc_graph = gallocr_alloc_graph_func;
+            printf("[GGML_VIZ] Found original ggml_gallocr_alloc_graph\n");
+        }
+        if (backend_alloc_ctx_tensors_func && backend_alloc_ctx_tensors_func != ggml_backend_alloc_ctx_tensors) {
+            original_backend_alloc_ctx_tensors = backend_alloc_ctx_tensors_func;
+            printf("[GGML_VIZ] Found original ggml_backend_alloc_ctx_tensors\n");
+        }
 #else
         // In test mode, just store the functions we find
         if (backend_func) {
@@ -704,6 +899,20 @@ bool install_ggml_hooks() {
             original_metal_graph_compute = metal_func;
             printf("[GGML_VIZ] Found ggml_backend_metal_graph_compute (test mode)\n");
         }
+        
+        // Store memory allocation functions in test mode too
+        if (tallocr_alloc_func) {
+            original_tallocr_alloc = tallocr_alloc_func;
+            printf("[GGML_VIZ] Found ggml_tallocr_alloc (test mode)\n");
+        }
+        if (gallocr_alloc_graph_func) {
+            original_gallocr_alloc_graph = gallocr_alloc_graph_func;
+            printf("[GGML_VIZ] Found ggml_gallocr_alloc_graph (test mode)\n");
+        }
+        if (backend_alloc_ctx_tensors_func) {
+            original_backend_alloc_ctx_tensors = backend_alloc_ctx_tensors_func;
+            printf("[GGML_VIZ] Found ggml_backend_alloc_ctx_tensors (test mode)\n");
+        }
 #endif
         
         dlclose(handle);
@@ -720,6 +929,13 @@ bool uninstall_ggml_hooks() {
     // Reset function pointers
     original_backend_graph_compute = nullptr;
     original_graph_compute = nullptr;
+    original_graph_compute_with_ctx = nullptr;
+    original_metal_graph_compute = nullptr;
+    
+    // Reset memory allocation function pointers
+    original_tallocr_alloc = nullptr;
+    original_gallocr_alloc_graph = nullptr;
+    original_backend_alloc_ctx_tensors = nullptr;
     
     printf("[GGML_VIZ] GGML hooks uninstalled\n");
     return true;

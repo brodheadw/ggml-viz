@@ -2,7 +2,7 @@
   "schema_version": 1,
   "instrumentation": {
     "enable_op_timing": true,
-    "enable_memory_tracking": false,
+    "enable_memory_tracking": true,
     "record_tensor_names": true,
     "max_events": 1000000,
     "op_types_to_trace": [],

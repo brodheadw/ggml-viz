@@ -11,6 +11,7 @@
 #include <chrono>
 #include <ctime>
 #include <sys/stat.h>
+#include <unordered_map>
 
 namespace ggml_viz {
 
@@ -26,7 +27,14 @@ struct ImGuiApp::AppData {
     
     // Live mode support
     bool live_mode = false;
+    bool live_mode_no_hook = false;  // Track if we're using --no-hook flag
     std::vector<Event> live_events;
+    
+    // Cached live memory stats for performance
+    size_t live_memory_last_processed_event = 0;
+    size_t live_total_allocs = 0, live_total_frees = 0;
+    size_t live_bytes_allocated = 0, live_current_usage = 0, live_peak_usage = 0;
+    std::unordered_map<const void*, size_t> live_allocations;
     std::chrono::steady_clock::time_point last_live_update;
     std::atomic<bool> live_data_available{false};
     
@@ -95,6 +103,12 @@ bool ImGuiApp::initialize() {
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     
+    // Enable docking if available (requires docking branch of ImGui)
+#ifdef IMGUI_HAS_DOCK
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport
+#endif
+    
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     
@@ -107,6 +121,7 @@ bool ImGuiApp::initialize() {
 
 void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
     data_->live_mode = true;
+    data_->live_mode_no_hook = no_hook;  // Store the no_hook flag
     data_->live_events.clear();
     data_->last_live_update = std::chrono::steady_clock::now();
     data_->current_filename = "[Live Mode]";
@@ -119,7 +134,7 @@ void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
             // Configure the hook
             HookConfig config;
             config.enable_op_timing = true;
-            config.enable_memory_tracking = false;
+            config.enable_memory_tracking = true;  // Enable memory tracking for live visualization
             config.enable_thread_tracking = false;
             config.enable_tensor_names = true;
             config.write_to_file = false;  // Don't write to file in live mode
@@ -130,6 +145,13 @@ void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
             
             std::cout << "[ImGuiApp] Live mode enabled and GGML hook started" << std::endl;
             std::cout << "[ImGuiApp] Hook active: " << (hook.is_active() ? "YES" : "NO") << std::endl;
+            std::cout << "[ImGuiApp] DEBUG: Configuration applied:" << std::endl;
+            std::cout << "[ImGuiApp]   - Op timing: " << (config.enable_op_timing ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Memory tracking: " << (config.enable_memory_tracking ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Thread tracking: " << (config.enable_thread_tracking ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Tensor names: " << (config.enable_tensor_names ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Write to file: " << (config.write_to_file ? "ENABLED" : "DISABLED") << std::endl;
+            std::cout << "[ImGuiApp]   - Max events: " << config.max_events << std::endl;
             
         } catch (const std::exception& e) {
             std::cerr << "[ImGuiApp] Error starting GGML hook: " << e.what() << std::endl;
@@ -203,6 +225,19 @@ void ImGuiApp::update_live_data() {
         if (hook.is_active()) {
             auto new_events = hook.consume_available_events();
             if (!new_events.empty()) {
+                // DEBUG: Count event types in new batch
+                size_t new_memory_events = 0;
+                for (const auto& event : new_events) {
+                    if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+                        new_memory_events++;
+                    }
+                }
+                
+                if (call_count % 100 == 0) {  // Only print every 100 calls
+                    std::cout << "[ImGuiApp] DEBUG: Got " << new_events.size() << " new events (" 
+                              << new_memory_events << " memory events)" << std::endl;
+                }
+                
                 // Add new events to our live buffer
                 data_->live_events.insert(data_->live_events.end(), new_events.begin(), new_events.end());
                 data_->last_live_update = std::chrono::steady_clock::now();
@@ -214,6 +249,10 @@ void ImGuiApp::update_live_data() {
                     data_->live_events.erase(data_->live_events.begin(), 
                                            data_->live_events.begin() + (data_->live_events.size() - max_events));
                 }
+            }
+        } else {
+            if (call_count % 100 == 0) {
+                std::cout << "[ImGuiApp] DEBUG: Hook is not active" << std::endl;
             }
         }
     } catch (const std::exception& e) {
@@ -243,21 +282,34 @@ void ImGuiApp::update_live_data() {
                     if (new_trace_reader->is_valid()) {
                         const auto& events = new_trace_reader->events();
                         
-                        // Only add new events (events beyond what we've already processed)
-                        size_t previous_event_count = data_->live_events.size();
-                        size_t start_idx = data_->live_trace_reader ? previous_event_count : 0;
+                        // Handle file recreation/truncation by detecting if file has fewer events than expected
+                        static size_t last_file_event_count = 0;
+                        size_t start_idx = 0;
+                        
+                        if (data_->live_trace_reader && events.size() >= last_file_event_count) {
+                            // File appears to be growing normally, only load new events
+                            start_idx = last_file_event_count;
+                        } else {
+                            // File was recreated/truncated or this is first load, load all events
+                            start_idx = 0;
+                            std::cout << "[ImGuiApp] File appears to be recreated/truncated, loading all events" << std::endl;
+                        }
                         
                         if (events.size() > start_idx) {
+                            // Add new events to our live buffer
+                            size_t new_event_count = events.size() - start_idx;
                             data_->live_events.insert(data_->live_events.end(), 
                                                      events.begin() + start_idx, events.end());
                             data_->last_live_update = std::chrono::steady_clock::now();
                             data_->live_data_available = true;
                             
-                            std::cout << "[ImGuiApp] Loaded " << (events.size() - start_idx) 
-                                      << " new events from external file" << std::endl;
+                            std::cout << "[ImGuiApp] Loaded " << new_event_count 
+                                      << " new events from external file (total events in file: " << events.size() << ")" << std::endl;
+                            
+                            last_file_event_count = events.size();
                         } else {
-                            std::cout << "[ImGuiApp] No new events to load (total: " << events.size() 
-                                      << ", start_idx: " << start_idx << ")" << std::endl;
+                            std::cout << "[ImGuiApp] No new events to load (file has " << events.size() 
+                                      << " events, last processed: " << last_file_event_count << ")" << std::endl;
                         }
                         
                         // Update file monitoring state
@@ -301,10 +353,19 @@ void ImGuiApp::render_frame() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     
-    // Note: Docking disabled for compatibility with basic ImGui build
+    // Enable docking if available
+#ifdef IMGUI_HAS_DOCK
+    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+#endif
     
     // Render main menu bar
     render_main_menu_bar();
+    
+    // Check for hook status and show notification if needed
+    render_hook_status_notification();
+    
+    // Render stats overlay
+    render_stats_overlay();
     
     // Render GUI panels
     if (show_file_browser_) {
@@ -526,6 +587,9 @@ bool ImGuiApp::load_trace_file(const std::string& filename) {
 }
 
 void ImGuiApp::render_timeline_view() {
+    // Color-code timeline panel (blue)
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.13f, 0.54f, 0.82f, 1.0f)); // Blue color
+    
     if (ImGui::Begin("Timeline View")) {
         // Handle both live mode and loaded traces
         const std::vector<Event>* events_ptr = nullptr;
@@ -539,7 +603,11 @@ void ImGuiApp::render_timeline_view() {
             
             // Show live mode status
             auto& hook = GGMLHook::instance();
-            ImGui::Text("🔴 LIVE MODE - Hook Active: %s", hook.is_active() ? "YES" : "NO");
+            if (hook.is_active()) {
+                ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "✅ LIVE MODE ACTIVE");
+            } else {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "❌ HOOK INACTIVE");
+            }
             ImGui::Text("Live Events: %zu", event_count);
             
             if (event_count > 0) {
@@ -581,6 +649,14 @@ void ImGuiApp::render_timeline_view() {
         
         ImGui::Separator();
         
+        // Search/Filter bar for operations
+        static char search_buffer[256] = "";
+        ImGui::InputTextWithHint("##search", "🔍 Filter operations...", search_buffer, sizeof(search_buffer));
+        ImGui::SameLine();
+        if (ImGui::Button("Clear")) {
+            search_buffer[0] = '\0';
+        }
+        
         // Tabs for different views
         if (ImGui::BeginTabBar("TimelineViews")) {
             // Visual Timeline tab
@@ -602,7 +678,36 @@ void ImGuiApp::render_timeline_view() {
                         data_->selected_event = selected;
                     }
                 } else {
-                    ImGui::Text("No trace data available for timeline visualization");
+                    // Draw railway-track backdrop for empty timeline
+                    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+                    ImVec2 canvas_pos = ImGui::GetCursorScreenPos();
+                    ImVec2 canvas_size = ImGui::GetContentRegionAvail();
+                    
+                    if (canvas_size.x > 100 && canvas_size.y > 50) {
+                        // Draw railway track background
+                        ImU32 track_color = IM_COL32(80, 80, 80, 100);
+                        ImU32 tie_color = IM_COL32(60, 60, 60, 150);
+                        
+                        // Draw horizontal tracks
+                        float track_y1 = canvas_pos.y + canvas_size.y * 0.4f;
+                        float track_y2 = canvas_pos.y + canvas_size.y * 0.6f;
+                        draw_list->AddLine(ImVec2(canvas_pos.x, track_y1), ImVec2(canvas_pos.x + canvas_size.x, track_y1), track_color, 3.0f);
+                        draw_list->AddLine(ImVec2(canvas_pos.x, track_y2), ImVec2(canvas_pos.x + canvas_size.x, track_y2), track_color, 3.0f);
+                        
+                        // Draw railroad ties
+                        for (float x = canvas_pos.x; x < canvas_pos.x + canvas_size.x; x += 30) {
+                            draw_list->AddLine(ImVec2(x, track_y1 - 10), ImVec2(x, track_y2 + 10), tie_color, 2.0f);
+                        }
+                        
+                        // Center the waiting text
+                        ImVec2 text_pos = ImVec2(canvas_pos.x + canvas_size.x * 0.5f - 100, canvas_pos.y + canvas_size.y * 0.5f - 20);
+                        draw_list->AddText(text_pos, IM_COL32(150, 150, 150, 255), "Waiting for first operation...");
+                    } else {
+                        ImGui::Text("Waiting for first operation...");
+                    }
+                    
+                    // Reserve space for the backdrop
+                    ImGui::Dummy(ImVec2(0, std::max(100.0f, canvas_size.y)));
                 }
                 
                 ImGui::EndTabItem();
@@ -712,9 +817,13 @@ void ImGuiApp::render_timeline_view() {
         }
     }
     ImGui::End();
+    ImGui::PopStyleColor(); // Pop blue timeline color
 }
 
 void ImGuiApp::render_graph_view() {
+    // Color-code graph panel (green)
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.30f, 0.69f, 0.31f, 1.0f)); // Green color
+    
     if (ImGui::Begin("Graph View")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
@@ -723,7 +832,7 @@ void ImGuiApp::render_graph_view() {
         }
         
         if (data_->live_mode) {
-            ImGui::Text("🔴 LIVE MODE - Graph View");
+            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "📊 LIVE GRAPH VIEW");
             ImGui::Text("Live events: %zu", data_->live_events.size());
             
             // Count graph events in live mode
@@ -768,9 +877,13 @@ void ImGuiApp::render_graph_view() {
         }
     }
     ImGui::End();
+    ImGui::PopStyleColor(); // Pop green graph color
 }
 
 void ImGuiApp::render_tensor_inspector() {
+    // Color-code tensor inspector panel (pink)
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.91f, 0.12f, 0.39f, 1.0f)); // Pink color
+    
     if (ImGui::Begin("Tensor Inspector")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
@@ -779,7 +892,7 @@ void ImGuiApp::render_tensor_inspector() {
         }
         
         if (data_->live_mode) {
-            ImGui::Text("🔴 LIVE MODE - Tensor Inspector");
+            ImGui::TextColored(ImVec4(0.91f, 0.12f, 0.39f, 1.0f), "🔬 LIVE TENSOR INSPECTOR");
             ImGui::Text("Live events: %zu", data_->live_events.size());
             
             if (data_->selected_event >= 0 && 
@@ -820,9 +933,13 @@ void ImGuiApp::render_tensor_inspector() {
         }
     }
     ImGui::End();
+    ImGui::PopStyleColor(); // Pop pink tensor inspector color
 }
 
 void ImGuiApp::render_memory_view() {
+    // Color-code memory view panel (orange)
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(1.0f, 0.60f, 0.0f, 1.0f)); // Orange color
+    
     if (ImGui::Begin("Memory View")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
@@ -831,11 +948,534 @@ void ImGuiApp::render_memory_view() {
         }
         
         if (data_->live_mode) {
-            ImGui::Text("🔴 LIVE MODE - Memory View");
-            ImGui::Text("Live events: %zu", data_->live_events.size());
-            ImGui::Text("Memory visualization for live mode coming soon...");
+            render_live_memory_view();
         } else {
-            ImGui::Text("Memory visualization coming soon...");
+            render_static_memory_view();
+        }
+    }
+    ImGui::End();
+    ImGui::PopStyleColor(); // Pop orange memory view color
+}
+
+void ImGuiApp::render_static_memory_view() {
+    if (!data_->trace_reader) return;
+    
+    auto memory_stats = data_->trace_reader->get_memory_stats();
+    auto memory_events = data_->trace_reader->get_memory_events();
+    
+    // Memory Statistics Section
+    if (ImGui::CollapsingHeader("Memory Statistics", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::Columns(2, "MemoryStats");
+        
+        ImGui::Text("Total Allocations:");
+        ImGui::NextColumn();
+        ImGui::Text("%llu", static_cast<unsigned long long>(memory_stats.total_allocations));
+        ImGui::NextColumn();
+        
+        ImGui::Text("Total Frees:");
+        ImGui::NextColumn();
+        ImGui::Text("%llu", static_cast<unsigned long long>(memory_stats.total_frees));
+        ImGui::NextColumn();
+        
+        ImGui::Text("Bytes Allocated:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", memory_stats.bytes_allocated / 1024.0);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Bytes Freed:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", memory_stats.bytes_freed / 1024.0);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Peak Usage:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", memory_stats.peak_usage / 1024.0);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Current Usage:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", memory_stats.current_usage / 1024.0);
+        ImGui::NextColumn();
+        
+        if (memory_stats.leaked_bytes > 0) {
+            ImGui::Text("🔴 Leaked Memory:");
+            ImGui::NextColumn();
+            ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%.2f KB", memory_stats.leaked_bytes / 1024.0);
+        } else {
+            ImGui::Text("✅ Memory Leaks:");
+            ImGui::NextColumn();
+            ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "None detected");
+        }
+        ImGui::NextColumn();
+        
+        ImGui::Columns(1);
+    }
+    
+    // Memory Timeline Section
+    if (ImGui::CollapsingHeader("Memory Timeline", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (memory_events.empty()) {
+            ImGui::Text("No memory events found in trace");
+        } else {
+            render_memory_timeline(memory_events);
+        }
+    }
+    
+    // Memory Events List Section
+    if (ImGui::CollapsingHeader("Memory Events")) {
+        if (memory_events.empty()) {
+            ImGui::Text("No memory events found in trace");
+        } else {
+            render_memory_events_list(memory_events);
+        }
+    }
+}
+
+void ImGuiApp::render_live_memory_view() {
+    ImGui::TextColored(ImVec4(1.0f, 0.60f, 0.0f, 1.0f), "💾 LIVE MEMORY VIEW");
+    ImGui::Text("Live events: %zu", data_->live_events.size());
+    
+    // DEBUG: Show event type breakdown
+    size_t graph_events = 0, op_events = 0, memory_events = 0, other_events = 0;
+    for (const auto& event : data_->live_events) {
+        switch (event.type) {
+            case EventType::GRAPH_COMPUTE_BEGIN:
+            case EventType::GRAPH_COMPUTE_END:
+                graph_events++;
+                break;
+            case EventType::OP_COMPUTE_BEGIN:
+            case EventType::OP_COMPUTE_END:
+                op_events++;
+                break;
+            case EventType::TENSOR_ALLOC:
+            case EventType::TENSOR_FREE:
+                memory_events++;
+                break;
+            default:
+                other_events++;
+                break;
+        }
+    }
+    
+    ImGui::Text("🔍 DEBUG - Event breakdown:");
+    ImGui::BulletText("Graph events: %zu", graph_events);
+    ImGui::BulletText("Operation events: %zu", op_events);
+    ImGui::BulletText("Memory events: %zu", memory_events);
+    ImGui::BulletText("Other events: %zu", other_events);
+    
+    // Update cached memory stats incrementally
+    update_live_memory_stats();
+    
+    // Count memory events for display
+    size_t memory_event_count = memory_events;
+    
+    if (memory_event_count == 0) {
+        ImGui::Text("🔍 No memory events in live trace yet...");
+        ImGui::Separator();
+        ImGui::Text("💡 To see memory events, run your GGML application with memory tracking:");
+        
+        // Copy setup command buttons
+        if (ImGui::Button("📋 Copy macOS Command")) {
+            ImGui::SetClipboardText("env DYLD_INSERT_LIBRARIES=./libggml_viz_hook.dylib GGML_VIZ_OUTPUT=trace.ggmlviz your_app");
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("📋 Copy Linux Command")) {
+            ImGui::SetClipboardText("env LD_PRELOAD=./libggml_viz_hook.so GGML_VIZ_OUTPUT=trace.ggmlviz your_app");
+        }
+        
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "✅ Memory tracking enabled and ready!");
+        return;
+    }
+    
+    // Memory tabs for compact display
+    if (ImGui::BeginTabBar("MemoryTabs")) {
+        if (ImGui::BeginTabItem("📊 Statistics")) {
+        ImGui::Columns(2, "LiveMemoryStats");
+        
+        ImGui::Text("Allocations:");
+        ImGui::NextColumn();
+        ImGui::Text("%zu", data_->live_total_allocs);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Frees:");
+        ImGui::NextColumn();
+        ImGui::Text("%zu", data_->live_total_frees);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Peak Usage:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", data_->live_peak_usage / 1024.0);
+        ImGui::NextColumn();
+        
+        ImGui::Text("Current Usage:");
+        ImGui::NextColumn();
+        ImGui::Text("%.2f KB", data_->live_current_usage / 1024.0);
+        ImGui::NextColumn();
+        
+        size_t leaked_bytes = 0;
+        for (const auto& pair : data_->live_allocations) {
+            leaked_bytes += pair.second;
+        }
+        
+        if (leaked_bytes > 0) {
+            ImGui::Text("🔴 Active Allocs:");
+            ImGui::NextColumn();
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.4f, 1.0f), "%.2f KB", leaked_bytes / 1024.0);
+        } else {
+            ImGui::Text("✅ Active Allocs:");
+            ImGui::NextColumn();
+            ImGui::Text("0 bytes");
+        }
+        
+        ImGui::Columns(1);
+            ImGui::EndTabItem();
+        }
+        
+        if (ImGui::BeginTabItem("📝 Events")) {
+            render_live_memory_events_list();
+            ImGui::EndTabItem();
+        }
+        
+        ImGui::EndTabBar();
+    }
+}
+
+void ImGuiApp::render_memory_timeline(const std::vector<const Event*>& memory_events) {
+    if (memory_events.empty()) return;
+    
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
+    ImVec2 canvas_sz = ImGui::GetContentRegionAvail();
+    
+    if (canvas_sz.x < 50.0f) canvas_sz.x = 50.0f;
+    if (canvas_sz.y < 200.0f) canvas_sz.y = 200.0f;
+    
+    ImVec2 canvas_p1 = ImVec2(canvas_p0.x + canvas_sz.x, canvas_p0.y + canvas_sz.y);
+    
+    // Timeline bounds
+    uint64_t min_time = memory_events.front()->timestamp_ns;
+    uint64_t max_time = memory_events.back()->timestamp_ns;
+    uint64_t time_range = max_time - min_time;
+    
+    if (time_range == 0) time_range = 1; // Avoid division by zero
+    
+    // Calculate memory usage over time
+    std::vector<std::pair<float, float>> usage_points; // (x_pos, usage_kb)
+    size_t current_usage = 0;
+    size_t max_usage = 0;
+    std::unordered_map<const void*, size_t> allocations;
+    
+    for (const auto* event : memory_events) {
+        float x_pos = (float)(event->timestamp_ns - min_time) / time_range;
+        
+        if (event->type == EventType::TENSOR_ALLOC) {
+            allocations[event->data.memory.ptr] = event->data.memory.size;
+            current_usage += event->data.memory.size;
+        } else if (event->type == EventType::TENSOR_FREE) {
+            auto it = allocations.find(event->data.memory.ptr);
+            if (it != allocations.end()) {
+                current_usage -= it->second;
+                allocations.erase(it);
+            }
+        }
+        
+        if (current_usage > max_usage) max_usage = current_usage;
+        usage_points.push_back({x_pos, (float)current_usage / 1024.0f});
+    }
+    
+    // Draw background
+    draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 255));
+    draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
+    
+    // Draw grid lines
+    const int num_h_lines = 5;
+    const int num_v_lines = 10;
+    
+    for (int i = 0; i <= num_h_lines; i++) {
+        float y = canvas_p0.y + ((float)i / num_h_lines) * canvas_sz.y;
+        draw_list->AddLine(ImVec2(canvas_p0.x, y), ImVec2(canvas_p1.x, y), IM_COL32(100, 100, 100, 100));
+    }
+    
+    for (int i = 0; i <= num_v_lines; i++) {
+        float x = canvas_p0.x + ((float)i / num_v_lines) * canvas_sz.x;
+        draw_list->AddLine(ImVec2(x, canvas_p0.y), ImVec2(x, canvas_p1.y), IM_COL32(100, 100, 100, 100));
+    }
+    
+    // Draw memory usage line
+    if (usage_points.size() > 1 && max_usage > 0) {
+        for (size_t i = 1; i < usage_points.size(); i++) {
+            ImVec2 p1(canvas_p0.x + usage_points[i-1].first * canvas_sz.x, 
+                     canvas_p1.y - (usage_points[i-1].second / (max_usage / 1024.0f)) * canvas_sz.y);
+            ImVec2 p2(canvas_p0.x + usage_points[i].first * canvas_sz.x, 
+                     canvas_p1.y - (usage_points[i].second / (max_usage / 1024.0f)) * canvas_sz.y);
+            draw_list->AddLine(p1, p2, IM_COL32(100, 200, 255, 255), 2.0f);
+        }
+    }
+    
+    // Draw allocation/free markers
+    for (const auto* event : memory_events) {
+        float x_pos = (float)(event->timestamp_ns - min_time) / time_range;
+        float x = canvas_p0.x + x_pos * canvas_sz.x;
+        
+        if (event->type == EventType::TENSOR_ALLOC) {
+            draw_list->AddLine(ImVec2(x, canvas_p0.y), ImVec2(x, canvas_p1.y), IM_COL32(100, 255, 100, 150), 1.0f);
+        } else if (event->type == EventType::TENSOR_FREE) {
+            draw_list->AddLine(ImVec2(x, canvas_p0.y), ImVec2(x, canvas_p1.y), IM_COL32(255, 100, 100, 150), 1.0f);
+        }
+    }
+    
+    ImGui::Dummy(canvas_sz);
+    
+    // Timeline legend
+    ImGui::Text("Memory Timeline");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "━━ Usage");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "│ Alloc");
+    ImGui::SameLine();    
+    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "│ Free");
+    ImGui::Text("Peak: %.2f KB", max_usage / 1024.0f);
+}
+
+void ImGuiApp::render_memory_events_list(const std::vector<const Event*>& memory_events) {
+    if (ImGui::BeginTable("MemoryEvents", 4, ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+        ImGui::TableSetupColumn("Time (ns)", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+        ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+        ImGui::TableSetupColumn("Tensor", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableHeadersRow();
+        
+        // Show most recent events first (last 100)
+        size_t start_idx = memory_events.size() > 100 ? memory_events.size() - 100 : 0;
+        for (size_t i = memory_events.size(); i > start_idx; --i) {
+            const Event* event = memory_events[i - 1];
+            
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%llu", event->timestamp_ns);
+            
+            ImGui::TableSetColumnIndex(1);
+            if (event->type == EventType::TENSOR_ALLOC) {
+                ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "ALLOC");
+            } else {
+                ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "FREE");
+            }
+            
+            ImGui::TableSetColumnIndex(2);
+            if (event->type == EventType::TENSOR_ALLOC) {
+                ImGui::Text("%zu B", event->data.memory.size);
+            } else {
+                ImGui::Text("-");
+            }
+            
+            ImGui::TableSetColumnIndex(3);
+            if (event->label && strlen(event->label) > 0) {
+                ImGui::Text("%s", event->label);
+            } else {
+                ImGui::Text("0x%p", event->data.memory.ptr);
+            }
+        }
+        
+        ImGui::EndTable();
+    }
+}
+
+void ImGuiApp::update_live_memory_stats() {
+    // Process only new events since last update
+    size_t events_to_process = data_->live_events.size();
+    if (events_to_process <= data_->live_memory_last_processed_event) {
+        return; // No new events
+    }
+    
+    // Process new events incrementally
+    for (size_t i = data_->live_memory_last_processed_event; i < events_to_process; ++i) {
+        const auto& event = data_->live_events[i];
+        
+        if (event.type == EventType::TENSOR_ALLOC) {
+            data_->live_total_allocs++;
+            data_->live_bytes_allocated += event.data.memory.size;
+            data_->live_allocations[event.data.memory.ptr] = event.data.memory.size;
+            data_->live_current_usage += event.data.memory.size;
+            
+            if (data_->live_current_usage > data_->live_peak_usage) {
+                data_->live_peak_usage = data_->live_current_usage;
+            }
+        } else if (event.type == EventType::TENSOR_FREE) {
+            data_->live_total_frees++;
+            auto it = data_->live_allocations.find(event.data.memory.ptr);
+            if (it != data_->live_allocations.end()) {
+                data_->live_current_usage -= it->second;
+                data_->live_allocations.erase(it);
+            }
+        }
+    }
+    
+    data_->live_memory_last_processed_event = events_to_process;
+}
+
+void ImGuiApp::render_live_memory_events_list() {
+    // Show only recent memory events without copying into temporary vector
+    const size_t max_display_events = 100;
+    size_t memory_events_shown = 0;
+    
+    if (ImGui::BeginTable("LiveMemoryEvents", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY)) {
+        ImGui::TableSetupColumn("Time (ns)", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+        ImGui::TableSetupColumn("Pointer", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+        ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableHeadersRow();
+        
+        // Iterate backwards through events to show most recent first
+        for (int i = static_cast<int>(data_->live_events.size()) - 1; i >= 0 && memory_events_shown < max_display_events; --i) {
+            const auto& event = data_->live_events[i];
+            
+            if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+                ImGui::TableNextRow();
+                
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%llu", static_cast<unsigned long long>(event.timestamp_ns));
+                
+                ImGui::TableSetColumnIndex(1);
+                if (event.type == EventType::TENSOR_ALLOC) {
+                    ImGui::TextColored(ImVec4(0.5f, 1.0f, 0.5f, 1.0f), "ALLOC");
+                } else {
+                    ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "FREE");
+                }
+                
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("%p", event.data.memory.ptr);
+                
+                ImGui::TableSetColumnIndex(3);
+                if (event.type == EventType::TENSOR_ALLOC) {
+                    ImGui::Text("%.2f KB", event.data.memory.size / 1024.0);
+                } else {
+                    ImGui::Text("-");
+                }
+                
+                memory_events_shown++;
+            }
+        }
+        
+        ImGui::EndTable();
+    }
+    
+    if (memory_events_shown == max_display_events) {
+        ImGui::Text("... (showing most recent %zu memory events)", max_display_events);
+    }
+}
+
+void ImGuiApp::render_hook_status_notification() {
+    // Check if we should show the hook status notification
+    bool should_show_notification = false;
+    std::string notification_text;
+    
+    if (data_->live_mode) {
+        if (data_->live_mode_no_hook) {
+            // File-based live mode
+            if (!data_->live_trace_reader || data_->live_trace_reader->events().empty()) {
+                should_show_notification = true;
+                notification_text = "📄  FILE-BASED LIVE MODE - WAITING FOR DATA\n\n"
+                                  "Monitoring trace file: " + data_->live_file_path + "\n\n"
+                                  "To generate data, run:\n\n"
+                                  "env GGML_VIZ_OUTPUT=" + data_->live_file_path + " \\\n"
+                                  "    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \\\n"
+                                  "    ./third_party/llama.cpp/build/bin/llama-cli \\\n"
+                                  "    -m ./models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \\\n"
+                                  "    -p \"Hello world\" -n 10";
+            }
+        } else {
+            // Ring buffer live mode
+            try {
+                auto& hook = GGMLHook::instance();
+                if (!hook.is_active()) {
+                    should_show_notification = true;
+                    notification_text = "⚠️  RING BUFFER LIVE MODE - HOOK INACTIVE\n\n"
+                                      "The GGML hook is not capturing events. To fix this:\n\n"
+                                      "1. Set environment variables:\n"
+                                      "   export GGML_VIZ_OUTPUT=trace.ggmlviz\n\n"
+                                      "2. Run your GGML application with:\n"
+                                      "   env DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \\\n"
+                                      "       ./third_party/llama.cpp/build/bin/llama-cli \\\n"
+                                      "       -m ./models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \\\n"
+                                      "       -p \"Hello world\" -n 10\n\n"
+                                      "3. Or for Linux:\n"
+                                      "   env LD_PRELOAD=./build/src/libggml_viz_hook.so your_app";
+                } else if (hook.event_count() == 0) {
+                    should_show_notification = true;
+                    notification_text = "ℹ️  RING BUFFER HOOK ACTIVE - WAITING FOR OPERATIONS\n\n"
+                                      "The GGML hook is active and ready to capture events.\n"
+                                      "Run GGML operations in your application to see data here.";
+                }
+            } catch (const std::exception& e) {
+                should_show_notification = true;
+                notification_text = "❌  HOOK ERROR\n\nError accessing GGML hook: " + std::string(e.what());
+            }
+        }
+    } else if (!data_->trace_loaded) {
+        should_show_notification = true;
+        notification_text = "📁  NO TRACE LOADED\n\n"
+                          "Load a trace file using File → Open Trace...\n"
+                          "or enable Live Mode to capture real-time data.";
+    }
+    
+    if (should_show_notification) {
+        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+        ImGui::SetNextWindowBgAlpha(0.9f);
+        
+        if (ImGui::BeginPopupModal("Hook Status", nullptr, 
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
+            ImGui::Text("%s", notification_text.c_str());
+            
+            ImGui::Separator();
+            if (ImGui::Button("OK")) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+        
+        // Auto-open the popup
+        if (!ImGui::IsPopupOpen("Hook Status")) {
+            ImGui::OpenPopup("Hook Status");
+        }
+    }
+}
+
+void ImGuiApp::render_stats_overlay() {
+    // Position in top-right corner
+    const float DISTANCE = 10.0f;
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 window_pos = ImVec2(io.DisplaySize.x - DISTANCE, DISTANCE);
+    ImVec2 window_pos_pivot = ImVec2(1.0f, 0.0f);
+    
+    ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+    ImGui::SetNextWindowBgAlpha(0.35f);
+    
+    if (ImGui::Begin("Stats Overlay", nullptr, 
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDecoration | 
+        ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | 
+        ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav)) {
+        
+        // FPS
+        ImGui::Text("FPS: %.1f", io.Framerate);
+        
+        // Event stats
+        if (data_->live_mode) {
+            try {
+                auto& hook = GGMLHook::instance();
+                ImGui::Text("Events: %zu", hook.event_count());
+                ImGui::Text("Dropped: %zu", hook.get_dropped_events());
+                ImGui::Text("Hook: %s", hook.is_active() ? "✅" : "❌");
+            } catch (const std::exception&) {
+                ImGui::Text("Hook: ❌");
+            }
+        } else if (data_->trace_reader) {
+            ImGui::Text("Events: %zu", data_->trace_reader->events().size());
+            ImGui::Text("Duration: %.1fms", data_->trace_reader->get_total_duration_ns() / 1e6);
+        }
+        
+        // Memory usage (if available)
+        if (data_->trace_reader) {
+            ImGui::Text("Peak Mem: %.1fMB", data_->trace_reader->get_peak_memory_usage() / (1024.0 * 1024.0));
         }
     }
     ImGui::End();
