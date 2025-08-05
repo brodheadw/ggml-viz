@@ -5,6 +5,79 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.12] - 2025-08-04
+
+### Added - ImGui Dashboard UI/UX Improvements ✅
+- **Docking Support** - Enabled ImGui docking and viewports for flexible window management
+  - Full docking workspace with configurable panel layouts
+  - Multi-viewport support for detaching panels to separate windows  
+  - Drag-and-drop window organization for optimal workflow setup
+  - Professional dashboard-style interface replacing floating windows
+
+- **Smart Hook Status Notifications** - Center-screen notifications for common user issues
+  - Automatic detection of inactive hooks in live mode with actionable instructions
+  - "Waiting for operations" status when hook is active but no events captured
+  - Clear setup guidance with environment variable configuration examples
+  - Modal popups prevent user confusion about missing data
+
+- **Color-Coded Panel System** - Visual organization by functionality
+  - Timeline View: Blue title bars for temporal analysis
+  - Graph View: Green title bars for computation visualization  
+  - Tensor Inspector: Pink title bars for detailed inspection
+  - Memory View: Orange title bars for memory analysis
+  - Consistent color theming improves navigation and workflow clarity
+
+- **Enhanced Timeline Visualization** - Professional empty state handling
+  - Railway-track backdrop with subtle gray styling when no operations present
+  - "Waiting for first operation..." message with proper centering
+  - Visual feedback eliminates confusion between bugs and empty states
+  - ImGui DrawList integration for custom graphics rendering
+
+- **Real-Time Stats Overlay** - Comprehensive performance monitoring
+  - Top-right corner FPS display with 35% background transparency
+  - Live event counts, dropped event monitoring, and hook status indicators
+  - Memory usage statistics (peak memory in MB)
+  - Duration tracking for loaded traces
+  - Non-intrusive overlay design with proper positioning
+
+### Enhanced - Live Mode User Experience
+- **Polished Status Indicators** - Icon and color-coded live mode displays
+  - ✅ Green "LIVE MODE ACTIVE" when hook functioning correctly
+  - ❌ Red "HOOK INACTIVE" with clear visual distinction  
+  - 📊 Colored icons for Graph View, 🔬 Tensor Inspector, 💾 Memory View
+  - Replaced verbose text with intuitive symbols and consistent color theming
+
+- **Copy Setup Commands** - One-click environment setup
+  - "📋 Copy macOS Command" button for DYLD_INSERT_LIBRARIES setup
+  - "📋 Copy Linux Command" button for LD_PRELOAD configuration  
+  - Automatic clipboard integration eliminating manual typing errors
+  - Replaced verbose bullet-point instructions with actionable buttons
+
+- **Tabbed Memory Interface** - Compact vertical space utilization
+  - "📊 Statistics" tab for memory usage metrics and leak detection
+  - "📝 Events" tab for detailed allocation/free event history
+  - Reduced vertical scrolling requirements on smaller screens
+  - Professional tabbed interface matches modern developer tools
+
+- **Timeline Search/Filter System** - Operation discovery and analysis
+  - 🔍 Search bar with placeholder text "Filter operations..."
+  - Real-time filtering capability for large operation traces
+  - "Clear" button for quick filter reset
+  - Positioned above timeline tabs for logical workflow integration
+
+### Technical Improvements
+- **ImGui Advanced Features Integration** - Modern UI framework capabilities
+  - DockSpaceOverViewport for full-viewport docking workspace
+  - ImGuiConfigFlags_DockingEnable and ViewportsEnable configuration
+  - Custom drawing with ImDrawList for railway track visualization
+  - SetClipboardText integration for copy-to-clipboard functionality
+
+- **Responsive UI Design** - Adaptive interface across screen sizes
+  - Stats overlay positioning with proper viewport calculations
+  - Railway track rendering with size-based conditional display
+  - Tabbed interfaces reduce vertical space requirements
+  - Color-coded panels improve visual organization and workflow
+
 ## [0.0.11] - 2025-08-04
 
 ### Added - Memory Visualization Performance Optimizations ✅
