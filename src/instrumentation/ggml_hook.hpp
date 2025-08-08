@@ -117,6 +117,10 @@ public:
     void on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
     void on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
     void on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
+    
+    // Memory tracking functions
+    void on_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggml_backend* backend = nullptr);
+    void on_tensor_free(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
 
     // Destructor flushes data
     ~GGMLHook();

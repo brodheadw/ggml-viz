@@ -318,6 +318,11 @@ void Config::apply_env_overrides() {
         logging.level = ConfigLogLevel::DEBUG;
     }
     
+    const char* env_memory_tracking = std::getenv("GGML_VIZ_MEMORY_TRACKING");
+    if (env_memory_tracking && (std::string(env_memory_tracking) == "1" || std::string(env_memory_tracking) == "true")) {
+        instrumentation.enable_memory_tracking = true;
+    }
+    
     const char* env_disable = std::getenv("GGML_VIZ_DISABLE");
     if (env_disable && (std::string(env_disable) == "1" || std::string(env_disable) == "true")) {
         instrumentation.enable_op_timing = false;

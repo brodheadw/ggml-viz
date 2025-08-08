@@ -11,6 +11,7 @@
 #include <chrono>
 #include <ctime>
 #include <sys/stat.h>
+#include <unordered_map>
 
 namespace ggml_viz {
 
@@ -29,6 +30,12 @@ struct ImGuiApp::AppData {
     std::vector<Event> live_events;
     std::chrono::steady_clock::time_point last_live_update;
     std::atomic<bool> live_data_available{false};
+    
+    // Cached live memory stats for performance
+    size_t live_memory_last_processed_event = 0;
+    size_t live_total_allocs = 0, live_total_frees = 0;
+    size_t live_bytes_allocated = 0, live_current_usage = 0, live_peak_usage = 0;
+    std::unordered_map<const void*, size_t> live_allocations;
     
     // File monitoring for external processes
     std::string live_file_path;
@@ -823,22 +830,209 @@ void ImGuiApp::render_tensor_inspector() {
 }
 
 void ImGuiApp::render_memory_view() {
+    // Color-code memory view panel (orange)
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(1.0f, 0.60f, 0.0f, 1.0f)); // Orange color
+    
     if (ImGui::Begin("Memory View")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
+            ImGui::PopStyleColor(); // Pop orange memory view color
             return;
         }
         
         if (data_->live_mode) {
-            ImGui::Text("🔴 LIVE MODE - Memory View");
-            ImGui::Text("Live events: %zu", data_->live_events.size());
-            ImGui::Text("Memory visualization for live mode coming soon...");
+            render_live_memory_view();
         } else {
-            ImGui::Text("Memory visualization coming soon...");
+            render_static_memory_view();
         }
     }
     ImGui::End();
+    ImGui::PopStyleColor(); // Pop orange memory view color
+}
+
+void ImGuiApp::render_static_memory_view() {
+    if (!data_->trace_reader) return;
+    
+    // For now, show placeholder for static memory view
+    ImGui::Text("Static memory visualization coming soon...");
+    ImGui::Text("This will show memory statistics from trace files");
+}
+
+void ImGuiApp::render_live_memory_view() {
+    ImGui::TextColored(ImVec4(1.0f, 0.60f, 0.0f, 1.0f), "💾 LIVE MEMORY VIEW");
+    ImGui::Text("Live events: %zu", data_->live_events.size());
+    
+    // DEBUG: Show event type breakdown
+    size_t graph_events = 0, op_events = 0, memory_events = 0, other_events = 0;
+    for (const auto& event : data_->live_events) {
+        switch (event.type) {
+            case EventType::GRAPH_COMPUTE_BEGIN:
+            case EventType::GRAPH_COMPUTE_END:
+                graph_events++;
+                break;
+            case EventType::OP_COMPUTE_BEGIN:
+            case EventType::OP_COMPUTE_END:
+                op_events++;
+                break;
+            case EventType::TENSOR_ALLOC:
+            case EventType::TENSOR_FREE:
+                memory_events++;
+                break;
+            default:
+                other_events++;
+                break;
+        }
+    }
+    
+    ImGui::Text("🔍 DEBUG - Event breakdown:");
+    ImGui::BulletText("Graph events: %zu", graph_events);
+    ImGui::BulletText("Operation events: %zu", op_events);
+    ImGui::BulletText("Memory events: %zu", memory_events);
+    ImGui::BulletText("Other events: %zu", other_events);
+    
+    // Update cached memory stats incrementally
+    update_live_memory_stats();
+    
+    if (memory_events == 0) {
+        ImGui::Text("🔍 No memory events in live trace yet...");
+        ImGui::Separator();
+        ImGui::Text("💡 To see memory events, run your GGML application with memory tracking:");
+        
+        // Copy setup command buttons
+        if (ImGui::Button("📋 Copy macOS Command")) {
+            ImGui::SetClipboardText("env DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib GGML_VIZ_OUTPUT=trace.ggmlviz GGML_VIZ_MEMORY_TRACKING=true your_app");
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("📋 Copy Linux Command")) {
+            ImGui::SetClipboardText("env LD_PRELOAD=./build/src/libggml_viz_hook.so GGML_VIZ_OUTPUT=trace.ggmlviz GGML_VIZ_MEMORY_TRACKING=true your_app");
+        }
+        
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "✅ Memory tracking enabled and ready!");
+        return;
+    }
+    
+    // Memory tabs for compact display
+    if (ImGui::BeginTabBar("MemoryTabs")) {
+        if (ImGui::BeginTabItem("📊 Statistics")) {
+            ImGui::Columns(2, "LiveMemoryStats");
+            
+            ImGui::Text("Allocations:");
+            ImGui::NextColumn();
+            ImGui::Text("%zu", data_->live_total_allocs);
+            ImGui::NextColumn();
+            
+            ImGui::Text("Frees:");
+            ImGui::NextColumn();
+            ImGui::Text("%zu", data_->live_total_frees);
+            ImGui::NextColumn();
+            
+            ImGui::Text("Peak Usage:");
+            ImGui::NextColumn();
+            ImGui::Text("%.2f KB", data_->live_peak_usage / 1024.0);
+            ImGui::NextColumn();
+            
+            ImGui::Text("Current Usage:");
+            ImGui::NextColumn();
+            ImGui::Text("%.2f KB", data_->live_current_usage / 1024.0);
+            ImGui::NextColumn();
+            
+            size_t leaked_bytes = 0;
+            for (const auto& pair : data_->live_allocations) {
+                leaked_bytes += pair.second;
+            }
+            
+            if (leaked_bytes > 0) {
+                ImGui::Text("🔴 Active Allocs:");
+                ImGui::NextColumn();
+                ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.4f, 1.0f), "%.2f KB", leaked_bytes / 1024.0);
+            } else {
+                ImGui::Text("✅ Active Allocs:");
+                ImGui::NextColumn();
+                ImGui::Text("0 bytes");
+            }
+            
+            ImGui::Columns(1);
+            ImGui::EndTabItem();
+        }
+        
+        if (ImGui::BeginTabItem("📝 Events")) {
+            render_live_memory_events_list();
+            ImGui::EndTabItem();
+        }
+        
+        ImGui::EndTabBar();
+    }
+}
+
+void ImGuiApp::render_memory_timeline(const std::vector<const Event*>& memory_events) {
+    ImGui::Text("Memory timeline visualization coming soon...");
+    ImGui::Text("Events to visualize: %zu", memory_events.size());
+}
+
+void ImGuiApp::render_memory_events_list(const std::vector<const Event*>& memory_events) {
+    ImGui::Text("Memory events list coming soon...");
+    ImGui::Text("Events to list: %zu", memory_events.size());
+}
+
+void ImGuiApp::render_live_memory_events_list() {
+    ImGui::Text("📝 Recent Memory Events:");
+    
+    // Show last 10 memory events
+    int count = 0;
+    for (auto it = data_->live_events.rbegin(); it != data_->live_events.rend() && count < 10; ++it) {
+        const auto& event = *it;
+        if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+            const char* type_str = (event.type == EventType::TENSOR_ALLOC) ? "ALLOC" : "FREE";
+            const char* color = (event.type == EventType::TENSOR_ALLOC) ? "🟢" : "🔴";
+            
+            if (event.type == EventType::TENSOR_ALLOC) {
+                ImGui::Text("%s %s - %.2f KB", color, type_str, event.data.memory.size / 1024.0);
+            } else {
+                ImGui::Text("%s %s - ptr: %p", color, type_str, event.data.memory.ptr);
+            }
+            count++;
+        }
+    }
+    
+    if (count == 0) {
+        ImGui::Text("No memory events recorded yet");
+    }
+}
+
+void ImGuiApp::update_live_memory_stats() {
+    if (data_->live_events.empty()) return;
+    
+    // Only process new events since last update
+    size_t events_to_process = data_->live_events.size();
+    if (events_to_process <= data_->live_memory_last_processed_event) return;
+    
+    // Process new events incrementally
+    for (size_t i = data_->live_memory_last_processed_event; i < events_to_process; ++i) {
+        const auto& event = data_->live_events[i];
+        
+        if (event.type == EventType::TENSOR_ALLOC) {
+            data_->live_total_allocs++;
+            data_->live_bytes_allocated += event.data.memory.size;
+            data_->live_allocations[event.data.memory.ptr] = event.data.memory.size;
+            data_->live_current_usage += event.data.memory.size;
+            
+            if (data_->live_current_usage > data_->live_peak_usage) {
+                data_->live_peak_usage = data_->live_current_usage;
+            }
+        } else if (event.type == EventType::TENSOR_FREE) {
+            data_->live_total_frees++;
+            auto it = data_->live_allocations.find(event.data.memory.ptr);
+            if (it != data_->live_allocations.end()) {
+                data_->live_current_usage -= it->second;
+                data_->live_allocations.erase(it);
+            }
+        }
+    }
+    
+    // Update the last processed event count
+    data_->live_memory_last_processed_event = events_to_process;
 }
 
 } // namespace ggml_viz

@@ -416,6 +416,40 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* 
     record_event(event);
 }
 
+void GGMLHook::on_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggml_backend* backend) {
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+
+    Event event = {};
+    event.type = EventType::TENSOR_ALLOC;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = tensor;
+    event.data.memory.size = size;
+    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    
+    record_event(event);
+}
+
+void GGMLHook::on_tensor_free(const ggml_tensor* tensor, const ggml_backend* backend) {
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+
+    Event event = {};
+    event.type = EventType::TENSOR_FREE;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = tensor;
+    event.data.memory.size = 0; // Size not known at free time
+    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    
+    record_event(event);
+}
+
 // C-style hook functions that can be called from ggml
 extern "C" {
     void ggml_viz_hook_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
