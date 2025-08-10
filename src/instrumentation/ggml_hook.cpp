@@ -759,6 +759,86 @@ bool uninstall_ggml_hooks() {
     return true;
 }
 
+// New memory tracking function implementations
+
+void GGMLHook::on_buffer_alloc(void* buffer, size_t size, const ggml_backend* backend) {
+    if (!active_.load()) return;
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+
+    Event event = {};
+    event.type = EventType::BUFFER_ALLOC;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = buffer;
+    event.data.memory.size = size;
+
+    record_event(event);
+}
+
+void GGMLHook::on_buffer_free(void* buffer, const ggml_backend* backend) {
+    if (!active_.load()) return;
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+
+    Event event = {};
+    event.type = EventType::BUFFER_FREE;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = buffer;
+    event.data.memory.size = 0;  // Unknown size on free
+
+    record_event(event);
+}
+
+void GGMLHook::on_tensor_attach(const ggml_tensor* tensor, const ggml_backend* backend) {
+    if (!active_.load()) return;
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+    if (!tensor || !tensor->data) return;
+
+    // Deduplication: only emit TENSOR_ATTACH once per data pointer
+    {
+        std::lock_guard<std::mutex> lock(seen_tensors_mutex_);
+        if (!seen_tensor_data_.insert(tensor->data).second) {
+            return; // Already seen this tensor data
+        }
+    }
+
+    Event event = {};
+    event.type = EventType::TENSOR_ATTACH;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = tensor;
+    event.data.memory.size = ggml_nbytes(tensor);
+    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+
+    record_event(event);
+}
+
+void GGMLHook::on_tensor_detach(const ggml_tensor* tensor, const ggml_backend* backend) {
+    if (!active_.load()) return;
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+    if (!tensor || !tensor->data) return;
+
+    // Remove from seen set
+    {
+        std::lock_guard<std::mutex> lock(seen_tensors_mutex_);
+        seen_tensor_data_.erase(tensor->data);
+    }
+
+    Event event = {};
+    event.type = EventType::TENSOR_DETACH;
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = tensor;
+    event.data.memory.size = ggml_nbytes(tensor);
+    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+
+    record_event(event);
+}
+
 } // namespace ggml_viz
 
 // C wrapper functions for Objective-C interposer

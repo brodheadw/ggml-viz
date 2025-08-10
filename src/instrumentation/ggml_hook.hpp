@@ -8,6 +8,7 @@
 #include <atomic>
 #include <chrono>
 #include <mutex>
+#include <unordered_set>
 
 struct ggml_tensor;
 struct ggml_cgraph;
@@ -32,8 +33,14 @@ enum class EventType : uint8_t {
     GRAPH_COMPUTE_END,
     OP_COMPUTE_BEGIN,
     OP_COMPUTE_END,
+    // Legacy memory events (for backward compatibility)
     TENSOR_ALLOC,
     TENSOR_FREE,
+    // New proper memory event types
+    BUFFER_ALLOC,        // Workspace/backend buffer allocation
+    BUFFER_FREE,         // Workspace/backend buffer deallocation  
+    TENSOR_ATTACH,       // Logical tensor lifetime start
+    TENSOR_DETACH,       // Logical tensor lifetime end
     BARRIER_WAIT,
     THREAD_BEGIN,
     THREAD_FREE
@@ -118,9 +125,15 @@ public:
     void on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
     void on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
     
-    // Memory tracking functions
+    // Memory tracking functions (legacy)
     void on_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggml_backend* backend = nullptr);
     void on_tensor_free(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
+    
+    // New memory tracking functions
+    void on_buffer_alloc(void* buffer, size_t size, const ggml_backend* backend = nullptr);
+    void on_buffer_free(void* buffer, const ggml_backend* backend = nullptr);
+    void on_tensor_attach(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
+    void on_tensor_detach(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
 
     // Destructor flushes data
     ~GGMLHook();
@@ -152,6 +165,10 @@ private:
     
     // Dropped events counter for backpressure monitoring
     std::atomic<uint64_t> dropped_events_{0};
+    
+    // Tensor deduplication for TENSOR_ATTACH events
+    std::mutex seen_tensors_mutex_;
+    std::unordered_set<const void*> seen_tensor_data_;
     
     std::mutex file_mutex_;
 

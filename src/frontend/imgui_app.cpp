@@ -533,6 +533,9 @@ bool ImGuiApp::load_trace_file(const std::string& filename) {
 }
 
 void ImGuiApp::render_timeline_view() {
+    // Color-code timeline view panel (blue)
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.2f, 0.6f, 1.0f, 1.0f)); // Blue color
+    
     if (ImGui::Begin("Timeline View")) {
         // Handle both live mode and loaded traces
         const std::vector<Event>* events_ptr = nullptr;
@@ -719,13 +722,18 @@ void ImGuiApp::render_timeline_view() {
         }
     }
     ImGui::End();
+    ImGui::PopStyleColor(); // Pop blue timeline view color
 }
 
 void ImGuiApp::render_graph_view() {
+    // Color-code graph view panel (green)
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.2f, 1.0f, 0.4f, 1.0f)); // Green color
+    
     if (ImGui::Begin("Graph View")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
+            ImGui::PopStyleColor(); // Pop green graph view color
             return;
         }
         
@@ -775,13 +783,18 @@ void ImGuiApp::render_graph_view() {
         }
     }
     ImGui::End();
+    ImGui::PopStyleColor(); // Pop green graph view color
 }
 
 void ImGuiApp::render_tensor_inspector() {
+    // Color-code tensor inspector panel (purple)
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.8f, 0.4f, 1.0f, 1.0f)); // Purple color
+    
     if (ImGui::Begin("Tensor Inspector")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
+            ImGui::PopStyleColor(); // Pop purple tensor inspector color
             return;
         }
         
@@ -827,6 +840,7 @@ void ImGuiApp::render_tensor_inspector() {
         }
     }
     ImGui::End();
+    ImGui::PopStyleColor(); // Pop purple tensor inspector color
 }
 
 void ImGuiApp::render_memory_view() {
@@ -861,6 +875,8 @@ void ImGuiApp::render_static_memory_view() {
 
 void ImGuiApp::render_live_memory_view() {
     ImGui::TextColored(ImVec4(1.0f, 0.60f, 0.0f, 1.0f), "💾 LIVE MEMORY VIEW");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "[Mode: Tensor Lifetime Tracking]");
     ImGui::Text("Live events: %zu", data_->live_events.size());
     
     // DEBUG: Show event type breakdown
@@ -877,6 +893,10 @@ void ImGuiApp::render_live_memory_view() {
                 break;
             case EventType::TENSOR_ALLOC:
             case EventType::TENSOR_FREE:
+            case EventType::BUFFER_ALLOC:
+            case EventType::BUFFER_FREE:
+            case EventType::TENSOR_ATTACH:
+            case EventType::TENSOR_DETACH:
                 memory_events++;
                 break;
             default:
@@ -895,9 +915,12 @@ void ImGuiApp::render_live_memory_view() {
     update_live_memory_stats();
     
     if (memory_events == 0) {
-        ImGui::Text("🔍 No memory events in live trace yet...");
+        ImGui::Text("🔍 No memory events captured yet...");
         ImGui::Separator();
-        ImGui::Text("💡 To see memory events, run your GGML application with memory tracking:");
+        ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.6f, 1.0f), "ℹ️ Note: GGML allocates workspace once at startup, then reuses memory.");
+        ImGui::Text("   Most models show 0-1 buffer allocations, not per-token mallocs.");
+        ImGui::Separator();
+        ImGui::Text("💡 To capture tensor lifetime events, run with memory tracking:");
         
         // Copy setup command buttons
         if (ImGui::Button("📋 Copy macOS Command")) {
@@ -962,6 +985,19 @@ void ImGuiApp::render_live_memory_view() {
             ImGui::EndTabItem();
         }
         
+        if (ImGui::BeginTabItem("📈 Timeline")) {
+            // Filter memory events for timeline view
+            std::vector<const Event*> memory_events;
+            for (const auto& event : data_->live_events) {
+                if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE ||
+                    event.type == EventType::TENSOR_ATTACH || event.type == EventType::TENSOR_DETACH) {
+                    memory_events.push_back(&event);
+                }
+            }
+            render_memory_timeline(memory_events);
+            ImGui::EndTabItem();
+        }
+        
         ImGui::EndTabBar();
     }
 }
@@ -983,11 +1019,25 @@ void ImGuiApp::render_live_memory_events_list() {
     int count = 0;
     for (auto it = data_->live_events.rbegin(); it != data_->live_events.rend() && count < 10; ++it) {
         const auto& event = *it;
-        if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
-            const char* type_str = (event.type == EventType::TENSOR_ALLOC) ? "ALLOC" : "FREE";
-            const char* color = (event.type == EventType::TENSOR_ALLOC) ? "🟢" : "🔴";
+        if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE ||
+            event.type == EventType::TENSOR_ATTACH || event.type == EventType::TENSOR_DETACH) {
+            const char* type_str = "UNKNOWN";
+            const char* color = "⚪";
             
-            if (event.type == EventType::TENSOR_ALLOC) {
+            switch (event.type) {
+                case EventType::TENSOR_ALLOC:
+                    type_str = "ALLOC"; color = "🟢"; break;
+                case EventType::TENSOR_FREE:
+                    type_str = "FREE"; color = "🔴"; break;
+                case EventType::TENSOR_ATTACH:
+                    type_str = "ATTACH"; color = "🔵"; break;
+                case EventType::TENSOR_DETACH:
+                    type_str = "DETACH"; color = "🟣"; break;
+                default:
+                    break;
+            }
+            
+            if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_ATTACH) {
                 ImGui::Text("%s %s - %.2f KB", color, type_str, event.data.memory.size / 1024.0);
             } else {
                 ImGui::Text("%s %s - ptr: %p", color, type_str, event.data.memory.ptr);
@@ -1012,7 +1062,7 @@ void ImGuiApp::update_live_memory_stats() {
     for (size_t i = data_->live_memory_last_processed_event; i < events_to_process; ++i) {
         const auto& event = data_->live_events[i];
         
-        if (event.type == EventType::TENSOR_ALLOC) {
+        if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_ATTACH) {
             data_->live_total_allocs++;
             data_->live_bytes_allocated += event.data.memory.size;
             data_->live_allocations[event.data.memory.ptr] = event.data.memory.size;
@@ -1021,7 +1071,7 @@ void ImGuiApp::update_live_memory_stats() {
             if (data_->live_current_usage > data_->live_peak_usage) {
                 data_->live_peak_usage = data_->live_current_usage;
             }
-        } else if (event.type == EventType::TENSOR_FREE) {
+        } else if (event.type == EventType::TENSOR_FREE || event.type == EventType::TENSOR_DETACH) {
             data_->live_total_frees++;
             auto it = data_->live_allocations.find(event.data.memory.ptr);
             if (it != data_->live_allocations.end()) {
