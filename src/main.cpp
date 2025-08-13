@@ -99,7 +99,6 @@ namespace {
                   << "  Configuration Variables:\n"
                   << "    GGML_VIZ_MAX_EVENTS   Maximum events to capture (default: 10,000,000)\n"
                   << "    GGML_VIZ_OP_TIMING    Enable operation timing (default: true)\n"
-                  << "    GGML_VIZ_MEMORY_TRACKING  Enable memory tracking (default: false)\n"
                   << "    GGML_VIZ_THREAD_TRACKING  Enable thread tracking (default: false)\n"
                   << "    GGML_VIZ_TENSOR_NAMES     Capture tensor names (default: true)\n"
                   << "\n"
@@ -272,7 +271,6 @@ namespace {
             GGML_VIZ_LOG_INFO_FMT("  Output file: %s", app_config->output.filename.c_str());
             GGML_VIZ_LOG_INFO_FMT("  Max events: %llu", app_config->instrumentation.max_events);
             GGML_VIZ_LOG_INFO_FMT("  Op timing: %s", app_config->instrumentation.enable_op_timing ? "enabled" : "disabled");
-            GGML_VIZ_LOG_INFO_FMT("  Memory tracking: %s", app_config->instrumentation.enable_memory_tracking ? "enabled" : "disabled");
         }
     }
 }

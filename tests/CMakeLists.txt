@@ -85,18 +85,3 @@ target_link_libraries(test_config
 add_test(NAME config_basic
          COMMAND test_config)
 
-# test_memory_hooks
-add_executable(test_memory_hooks
-    test_memory_hooks.cpp
-)
-
-target_link_libraries(test_memory_hooks
-    PRIVATE
-      ggml_hook_test   # Use test-specific version without function overrides
-      ggml_utils       # For ConfigManager
-      ggml             # the ggml submodule library
-      Threads::Threads
-)
-
-add_test(NAME memory_hooks_basic
-         COMMAND test_memory_hooks)
