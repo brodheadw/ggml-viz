@@ -268,8 +268,8 @@ Readers should handle unknown event types gracefully by:
   - CLI usage: `./bin/ggml-viz --config config.json --live trace.ggmlviz`
   - Supports JSON configuration files for repeatable analysis workflows
 - **Demo Applications**: Production-ready demonstrations showcasing real-world usage
-  - `run_llama_vis`: LLaMA transformer simulation with 36 events
-  - `run_whisper_vis`: Whisper audio processing simulation with 1,414 events
+  - `run_llama_vis`: LLaMA transformer simulation (example: ~36 events)
+  - `run_whisper_vis`: Whisper audio processing simulation (example: ~1,414 events)
 - **TraceReader**: C++ library for programmatic access to GGMLVIZ files
 - **ConfigManager**: Thread-safe configuration management system
   - JSON schema validation and precedence handling
@@ -302,7 +302,7 @@ The project includes production-ready demonstration applications that showcase r
 **Features**:
 - Full transformer architecture simulation with realistic attention mechanisms
 - Feed-forward network operations and multi-head attention patterns
-- Generates **36 events** demonstrating graph computation, operation timing, and memory tracking
+- Generates example trace (~36 events) demonstrating graph computation, operation timing, and memory tracking
 - Uses 50,000 max events with enhanced instrumentation settings
 
 **Configuration Example**:
@@ -336,7 +336,7 @@ The project includes production-ready demonstration applications that showcase r
 - Comprehensive encoder-decoder architecture with cross-attention mechanisms
 - Audio preprocessing pipeline including FFT, mel filterbank, VAD, and language detection
 - Multiple audio scenarios (podcast, meeting, music) with different Whisper model sizes
-- Generates **1,414 events** in a 53KB trace file demonstrating complex speech recognition workflows
+- Generates example trace (~1,414 events, 53KB) demonstrating complex speech recognition workflows
 - Uses faster polling interval (75ms) and specialized settings for audio processing
 
 **Configuration Example**:
@@ -574,11 +574,11 @@ The project includes production-ready demonstrations that showcase the configura
 ```bash
 # Run LLaMA transformer simulation demo
 ./bin/run_llama_vis
-# Generates llama_trace.ggmlviz with 36 events using examples/llama_demo/llama_demo_config.json
+# Generates llama_trace.ggmlviz with example events using examples/llama_demo/llama_demo_config.json
 
 # Run Whisper audio processing simulation demo
 ./bin/run_whisper_vis  
-# Generates whisper_trace.ggmlviz with 1,414 events using examples/whisper_demo/whisper_demo_config.json
+# Generates whisper_trace.ggmlviz with example events using examples/whisper_demo/whisper_demo_config.json
 
 # View the traces in GUI
 ./bin/ggml-viz llama_trace.ggmlviz

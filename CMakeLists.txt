@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(ggml-viz VERSION 0.0.7 LANGUAGES C CXX)
+project(ggml-viz VERSION 0.0.12 LANGUAGES C CXX)
 
 # Enable Objective-C only on Apple platforms
 if(APPLE)

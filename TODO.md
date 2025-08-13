@@ -9,9 +9,9 @@ This file tracks remaining implementation work for the `ggml-viz` project, organ
 - **Desktop UI with visualization**: ✅ Complete - **GUI VERIFIED WORKING**
 - **Trace file generation/loading**: ✅ Complete - **EVENT RECORDING FIXED**
 - **Environment variable support**: ✅ Complete - **AUTO-START IMPLEMENTED**
-- **Cross-platform support**: ✅ Complete - **WINDOWS PRODUCTION READY!**
+- **Cross-platform support**: ✅ Complete - **WINDOWS EXPERIMENTAL**
 - **CI/CD automation**: ✅ Complete - **ALL PLATFORMS TESTED**
-- **Basic functionality**: **Production ready across macOS, Linux, and Windows!**
+- **Basic functionality**: **Production ready on macOS/Linux, experimental on Windows**
 
 ---
 
@@ -164,7 +164,7 @@ scripts/run_tests.sh                        - Test execution ✅ COMPLETE
 ## 📈 **Current Project Health**
 
 **Implementation**: ✅ Core system fully implemented across all platforms
-**Cross-Platform**: ✅ **COMPLETE PARITY** - Windows, macOS, Linux all production-ready
+**Cross-Platform**: ✅ **COMPLETE PARITY** - macOS/Linux production-ready, Windows experimental
 **Build System**: ✅ **STREAMLINED** - Zero external dependencies, automated everything
 **CI/CD Pipeline**: ✅ **COMPREHENSIVE** - All platforms tested automatically
 **Documentation**: ✅ **CURRENT** - Updated with Windows support and simplified processes
@@ -184,5 +184,5 @@ scripts/run_tests.sh                        - Test execution ✅ COMPLETE
 - ✅ **GUI**: Verified executable builds and loads trace files
 - ✅ **TESTING**: All components verified with end-to-end workflow
 
-**Overall Status**: 🚀 **Full cross-platform production deployment ready!**
+**Overall Status**: 🚀 **Production ready on macOS/Linux, experimental Windows support**
 **Milestone**: This represents complete platform parity - a major architectural achievement!
