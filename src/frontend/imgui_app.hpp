@@ -3,7 +3,9 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include "imgui_widgets.hpp"
+#include "../instrumentation/ggml_hook.hpp" // For Event type
 
 namespace ggml_viz {
 
@@ -36,6 +38,8 @@ private:
     
     // GUI panels
     void render_main_menu_bar();
+    void render_hook_status_notification();
+    void render_stats_overlay();
     void render_timeline_view();
     void render_graph_view();
     void render_tensor_inspector();

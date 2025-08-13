@@ -84,3 +84,4 @@ target_link_libraries(test_config
 
 add_test(NAME config_basic
          COMMAND test_config)
+

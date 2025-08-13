@@ -32,6 +32,20 @@ TraceReader::TraceReader(const std::string& filename) : filename_(filename) {
     }
 
     valid_ = load_events();
+    if (valid_) {
+        // Count actual memory events for better sizing
+        size_t memory_event_count = 0;
+        for (const auto& event : events_) {
+            if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+                memory_event_count++;
+            }
+        }
+        
+        // Reserve hash maps - assume 50% allocs, 50% frees
+        size_t estimated_allocs = std::max(memory_event_count / 2, size_t(1024));
+        allocations_.reserve(estimated_allocs);
+        freed_pointers_.reserve(estimated_allocs);
+    }
 }
 
 TraceReader::~TraceReader() {
@@ -130,6 +144,129 @@ std::vector<TraceReader::OpTiming> TraceReader::get_op_timings() const {
               });
     
     return timings;
+}
+
+std::vector<const Event*> TraceReader::get_memory_events() const {
+    std::vector<const Event*> memory_events;
+    for (const auto& event : events_) {
+        if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+            memory_events.push_back(&event);
+        }
+    }
+    return memory_events;
+}
+
+std::vector<const Event*> TraceReader::get_alloc_events() const {
+    std::vector<const Event*> alloc_events;
+    for (const auto& event : events_) {
+        if (event.type == EventType::TENSOR_ALLOC) {
+            alloc_events.push_back(&event);
+        }
+    }
+    return alloc_events;
+}
+
+std::vector<const Event*> TraceReader::get_free_events() const {
+    std::vector<const Event*> free_events;
+    for (const auto& event : events_) {
+        if (event.type == EventType::TENSOR_FREE) {
+            free_events.push_back(&event);
+        }
+    }
+    return free_events;
+}
+
+size_t TraceReader::get_peak_memory_usage() const {
+    if (memory_stats_dirty_) {
+        update_memory_stats();
+    }
+    return static_cast<size_t>(cached_memory_stats_.peak_usage);
+}
+
+size_t TraceReader::get_current_memory_usage() const {
+    if (memory_stats_dirty_) {
+        update_memory_stats();
+    }
+    return static_cast<size_t>(cached_memory_stats_.current_usage);
+}
+
+TraceReader::MemoryStats TraceReader::get_memory_stats() const {
+    if (memory_stats_dirty_) {
+        update_memory_stats();
+    }
+    return cached_memory_stats_;
+}
+
+void TraceReader::update_memory_stats() const {
+    // Reset state
+    cached_memory_stats_ = MemoryStats{};
+    allocations_.clear();
+    freed_pointers_.clear();
+    current_usage_ = 0;
+    
+    // Pre-reserve to avoid rehashing during processing
+    if (allocations_.bucket_count() < allocations_.size() * 2) {
+        size_t memory_event_count = 0;
+        for (const auto& event : events_) {
+            if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
+                memory_event_count++;
+            }
+        }
+        size_t estimated_allocs = std::max(memory_event_count / 2, size_t(1024));
+        allocations_.reserve(estimated_allocs);
+        freed_pointers_.reserve(estimated_allocs);
+    }
+    
+    for (const auto& event : events_) {
+        if (event.type == EventType::TENSOR_ALLOC) {
+            cached_memory_stats_.total_allocations++;
+            cached_memory_stats_.bytes_allocated += event.data.memory.size;
+            
+            if (cached_memory_stats_.first_alloc_time == 0) {
+                cached_memory_stats_.first_alloc_time = event.timestamp_ns;
+            }
+            
+            // Check for pointer reuse after free
+            if (freed_pointers_.count(event.data.memory.ptr) > 0) {
+                // This is expected in GGML - allocator reuses freed pointers
+                freed_pointers_.erase(event.data.memory.ptr);
+            }
+            
+            allocations_[event.data.memory.ptr] = event.data.memory.size;
+            current_usage_ += event.data.memory.size;
+            
+            if (current_usage_ > cached_memory_stats_.peak_usage) {
+                cached_memory_stats_.peak_usage = current_usage_;
+            }
+        } else if (event.type == EventType::TENSOR_FREE) {
+            cached_memory_stats_.total_frees++;
+            cached_memory_stats_.last_free_time = event.timestamp_ns;
+            
+            // Check for double-free
+            if (freed_pointers_.count(event.data.memory.ptr) > 0) {
+                std::cerr << "Warning: Double-free detected for pointer " << event.data.memory.ptr << "\n";
+                continue;
+            }
+            
+            auto it = allocations_.find(event.data.memory.ptr);
+            if (it != allocations_.end()) {
+                cached_memory_stats_.bytes_freed += it->second;
+                current_usage_ -= it->second;
+                allocations_.erase(it);
+                freed_pointers_.insert(event.data.memory.ptr);
+            } else {
+                std::cerr << "Warning: Free without matching alloc for pointer " << event.data.memory.ptr << "\n";
+            }
+        }
+    }
+    
+    // Calculate final values
+    cached_memory_stats_.current_usage = current_usage_;
+    for (const auto& pair : allocations_) {
+        cached_memory_stats_.leaked_bytes += pair.second;
+    }
+    
+    memory_stats_dirty_ = false;
 }
 
 } // namespace ggml_viz

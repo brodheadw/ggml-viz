@@ -118,7 +118,6 @@ if(WIN32)
     target_compile_definitions(ggml_viz_hook PRIVATE USE_MINHOOK)
 elseif(APPLE)
     target_sources(ggml_viz_hook PRIVATE 
-        instrumentation/dyld_interpose_simple.cpp
         instrumentation/sched_interpose.mm
     )
 # Linux uses the interposition functions directly from ggml_hook.cpp
