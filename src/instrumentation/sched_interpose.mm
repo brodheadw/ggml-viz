@@ -254,6 +254,51 @@ enum ggml_status viz_graph_compute_with_ctx(struct ggml_context* ctx, struct ggm
 
     return rc;
 }
+
+// Backend memory allocation tracking
+__attribute__((visibility("default")))
+ggml_backend_buffer_t viz_backend_buft_alloc_buffer(ggml_backend_buffer_type_t buft, size_t size) {
+    auto& hook = ggml_viz::GGMLHook::instance();
+    
+    if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+        hook.start();
+    }
+    
+    // Call original function
+    static ggml_backend_buffer_t (*original_alloc)(ggml_backend_buffer_type_t, size_t) = nullptr;
+    if (!original_alloc) {
+        original_alloc = (ggml_backend_buffer_t (*)(ggml_backend_buffer_type_t, size_t))dlsym(RTLD_NEXT, "ggml_backend_buft_alloc_buffer");
+    }
+    
+    ggml_backend_buffer_t buffer = original_alloc ? original_alloc(buft, size) : nullptr;
+    
+    // Track allocation
+    if (buffer && hook.is_active()) {
+        hook.on_backend_buffer_alloc(buffer, size);
+    }
+    
+    return buffer;
+}
+
+__attribute__((visibility("default")))
+void viz_backend_buffer_free(ggml_backend_buffer_t buffer) {
+    auto& hook = ggml_viz::GGMLHook::instance();
+    
+    // Track deallocation before freeing
+    if (buffer && hook.is_active()) {
+        hook.on_backend_buffer_free(buffer);
+    }
+    
+    // Call original function
+    static void (*original_free)(ggml_backend_buffer_t) = nullptr;
+    if (!original_free) {
+        original_free = (void (*)(ggml_backend_buffer_t))dlsym(RTLD_NEXT, "ggml_backend_buffer_free");
+    }
+    
+    if (original_free) {
+        original_free(buffer);
+    }
+}
 }
 
 // --- DYLD interpose glue --------------------------------------------------
@@ -268,3 +313,7 @@ DYLD_INTERPOSE(viz_backend_graph_compute,     ggml_backend_graph_compute)
 DYLD_INTERPOSE(viz_backend_graph_compute_async, ggml_backend_graph_compute_async)
 DYLD_INTERPOSE(viz_graph_compute,             ggml_graph_compute)
 DYLD_INTERPOSE(viz_graph_compute_with_ctx,    ggml_graph_compute_with_ctx)
+
+// Memory allocation interposition
+DYLD_INTERPOSE(viz_backend_buft_alloc_buffer, ggml_backend_buft_alloc_buffer)
+DYLD_INTERPOSE(viz_backend_buffer_free,       ggml_backend_buffer_free)

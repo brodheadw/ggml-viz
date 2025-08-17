@@ -33,6 +33,7 @@ int main() {
     std::cout << "  output.filename: " << config->output.filename << "\n";
     std::cout << "  output.write_to_file: " << (config->output.write_to_file ? "true" : "false") << "\n";
     std::cout << "  instrumentation.enable_op_timing: " << (config->instrumentation.enable_op_timing ? "true" : "false") << "\n";
+    std::cout << "  instrumentation.enable_memory_tracking: " << (config->instrumentation.enable_memory_tracking ? "true" : "false") << "\n";
 
     ggml_viz::GGMLHook::instance().start();
 

@@ -17,6 +17,9 @@
 #include <unistd.h> // for fsync
 #include <fcntl.h>  // for fcntl
 #endif
+#ifdef __APPLE__
+#include <objc/runtime.h>  // for objc_getClass
+#endif
 
 namespace ggml_viz {
 
@@ -61,6 +64,16 @@ namespace {
         }
         
         return total_elements * element_size;
+    }
+    
+    // Memory allocation tracking state
+    static uint32_t g_alloc_generation = 0;  // Monotonic allocation counter
+    static bool g_first_memory_event_logged = false;  // Banner control
+    
+    static void log_first_memory_event_banner(const char* event_type) {
+        if (g_first_memory_event_logged) return;
+        g_first_memory_event_logged = true;
+        fprintf(stderr, "[ggml-viz] First memory event captured: %s\n", event_type);
     }
 }
 
@@ -141,6 +154,16 @@ void GGMLHook::start() {
     if (config->logging.level == ConfigLogLevel::DEBUG) {
         std::cout << "GGML Viz verbose mode enabled.\n";
     }
+    
+    // Log startup configuration details
+    fprintf(stderr, "[ggml-viz] Startup config: memory_tracking=%s, op_timing=%s\n",
+            config->instrumentation.enable_memory_tracking ? "enabled" : "disabled",
+            config->instrumentation.enable_op_timing ? "enabled" : "disabled");
+#ifdef __APPLE__
+    fprintf(stderr, "[ggml-viz] Platform: macOS, targets: DYLD_INTERPOSE(ggml_backend_buft_alloc_buffer,ggml_backend_buffer_free), Metal fallback available\n");
+#else
+    fprintf(stderr, "[ggml-viz] Platform: Linux, targets: LD_PRELOAD(ggml_backend_buft_alloc_buffer,ggml_backend_buffer_free), CUDA fallback available\n");
+#endif
 }
 
 void GGMLHook::stop() {
@@ -426,6 +449,9 @@ void GGMLHook::on_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggm
     // Add NULL check for tensor pointer
     if (tensor == nullptr) return;
     
+    // Log first memory event banner
+    log_first_memory_event_banner("tensor_alloc");
+    
     Event event = {};
     event.type = EventType::TENSOR_ALLOC;
     event.timestamp_ns = get_timestamp_ns();
@@ -433,6 +459,10 @@ void GGMLHook::on_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggm
     event.data.memory.ptr = tensor;
     event.data.memory.size = size;
     event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    
+    // Debug: Log memory allocation hit
+    fprintf(stderr, "[ggml-viz] HIT: on_tensor_alloc tensor=%p size=%zu name=%s\n", 
+            tensor, size, tensor->name[0] ? tensor->name : "(null)");
     
     record_event(event);
 }
@@ -453,6 +483,60 @@ void GGMLHook::on_tensor_free(const ggml_tensor* tensor, const ggml_backend* bac
     event.data.memory.ptr = tensor;
     event.data.memory.size = 0; // Size not available for free events
     event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    
+    // Debug: Log memory free hit
+    fprintf(stderr, "[ggml-viz] HIT: on_tensor_free tensor=%p name=%s\n", 
+            tensor, tensor->name[0] ? tensor->name : "(null)");
+    
+    record_event(event);
+}
+
+void GGMLHook::on_backend_buffer_alloc(void* buffer, size_t size) {
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+    
+    // Add NULL check for buffer pointer
+    if (buffer == nullptr) return;
+    
+    // Log first memory event banner
+    log_first_memory_event_banner("backend_buffer_alloc");
+    
+    Event event = {};
+    event.type = EventType::TENSOR_ALLOC; // Reuse tensor alloc event type for now
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = buffer;
+    event.data.memory.size = size;
+    event.label = nullptr; // No name for backend buffers
+    
+    // Debug: Log backend buffer allocation hit
+    fprintf(stderr, "[ggml-viz] HIT: on_backend_buffer_alloc buffer=%p size=%zu\n", 
+            buffer, size);
+    
+    record_event(event);
+}
+
+void GGMLHook::on_backend_buffer_free(void* buffer) {
+    if (!active_.load()) return;
+    
+    auto config = ConfigManager::instance().get();
+    if (!config->instrumentation.enable_memory_tracking) return;
+    
+    // Add NULL check for buffer pointer
+    if (buffer == nullptr) return;
+    
+    Event event = {};
+    event.type = EventType::TENSOR_FREE; // Reuse tensor free event type
+    event.timestamp_ns = get_timestamp_ns();
+    event.thread_id = get_thread_id();
+    event.data.memory.ptr = buffer;
+    event.data.memory.size = 0; // Size not available for free events
+    event.label = nullptr; // No name for backend buffers
+    
+    // Debug: Log backend buffer free hit
+    fprintf(stderr, "[ggml-viz] HIT: on_backend_buffer_free buffer=%p\n", buffer);
     
     record_event(event);
 }
@@ -700,7 +784,69 @@ extern "C" {
         return result;
     }
     
-    // Memory allocation hooks
+    // New tensor lifecycle hooks - these are more likely to be interposable
+    GGML_VIZ_API struct ggml_tensor* ggml_new_tensor(struct ggml_context* ctx, enum ggml_type type, int n_dims, const int64_t* ne) {
+        auto& hook = GGMLHook::instance();
+        
+        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
+        if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            hook.start();
+        }
+        
+        fprintf(stderr, "[ggml-viz] HIT: ggml_new_tensor type=%d n_dims=%d\n", type, n_dims);
+        
+        // Call original function (use dlsym to find it)
+        using fn_type = struct ggml_tensor* (*)(struct ggml_context*, enum ggml_type, int, const int64_t*);
+        static fn_type real_fn = nullptr;
+        if (!real_fn) {
+            real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_new_tensor");
+        }
+        
+        struct ggml_tensor* result = nullptr;
+        if (real_fn) {
+            result = real_fn(ctx, type, n_dims, ne);
+        } else {
+            fprintf(stderr, "[ggml-viz] Warning: No original ggml_new_tensor function found\n");
+            return nullptr;
+        }
+        
+        // Track allocation if tensor was created and has data
+        if (result && hook.is_active()) {
+            if (result->data) {
+                size_t size = ggml_nbytes_simple(result);
+                hook.on_tensor_alloc(result, size, nullptr);
+            }
+        }
+        
+        return result;
+    }
+    
+    GGML_VIZ_API void ggml_free(struct ggml_context* ctx) {
+        auto& hook = GGMLHook::instance();
+        
+        fprintf(stderr, "[ggml-viz] HIT: ggml_free ctx=%p\n", ctx);
+        
+        // Emit context free event for tracking
+        if (hook.is_active()) {
+            // TODO: Could emit a CONTEXT_FREE event or iterate tensors in context
+        }
+        
+        // Call original function
+        using fn_type = void (*)(struct ggml_context*);
+        static fn_type real_fn = nullptr;
+        if (!real_fn) {
+            real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_free");
+        }
+        
+        if (real_fn) {
+            real_fn(ctx);
+        } else {
+            fprintf(stderr, "[ggml-viz] Warning: No original ggml_free function found\n");
+        }
+    }
+    
+    // Memory allocation hooks (keep existing but add HIT logs)
     GGML_VIZ_API enum ggml_status ggml_tallocr_alloc(struct ggml_tallocr* talloc, struct ggml_tensor* tensor) {
         auto& hook = GGMLHook::instance();
         
@@ -709,6 +855,8 @@ extern "C" {
             printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
+        
+        fprintf(stderr, "[ggml-viz] HIT: ggml_tallocr_alloc tensor=%p\n", tensor);
         
         // Calculate tensor size before allocation
         size_t tensor_size = 0;
@@ -743,6 +891,8 @@ extern "C" {
             printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
+        
+        fprintf(stderr, "[ggml-viz] HIT: ggml_gallocr_alloc_graph nodes=%d\n", graph ? graph->n_nodes : 0);
         
         if (hook.is_active() && graph) {
             printf("[DEBUG] Intercepted ggml_gallocr_alloc_graph, nodes: %d\n", graph->n_nodes);
@@ -790,6 +940,8 @@ extern "C" {
             printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
+        
+        fprintf(stderr, "[ggml-viz] HIT: ggml_backend_alloc_ctx_tensors ctx=%p\n", ctx);
         
         if (hook.is_active() && ctx) {
             printf("[DEBUG] Intercepted ggml_backend_alloc_ctx_tensors\n");
