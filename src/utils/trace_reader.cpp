@@ -269,4 +269,53 @@ void TraceReader::update_memory_stats() const {
     memory_stats_dirty_ = false;
 }
 
+std::vector<std::pair<uint64_t, uint64_t>> TraceReader::get_memory_curve_bytes() const {
+    // Scanline with size-on-free map (15-line implementation from user)
+    struct Delta { uint64_t ts; int64_t d; };
+    std::vector<Delta> deltas;
+    deltas.reserve(events_.size());
+
+    // ptr -> size map for correct FREE subtraction
+    std::unordered_map<const void*, uint64_t> size_by_ptr;
+    size_by_ptr.reserve(8192);
+
+    for (const auto& e : events_) {
+        if (e.type == EventType::TENSOR_ALLOC) {
+            deltas.push_back({ e.timestamp_ns, (int64_t)e.data.memory.size });
+            size_by_ptr[e.data.memory.ptr] = e.data.memory.size;
+        } else if (e.type == EventType::TENSOR_FREE) {
+            uint64_t sz = e.data.memory.size ? e.data.memory.size : (size_by_ptr.count(e.data.memory.ptr) ? size_by_ptr[e.data.memory.ptr] : 0);
+            if (sz) deltas.push_back({ e.timestamp_ns, - (int64_t)sz });
+            size_by_ptr.erase(e.data.memory.ptr);
+        }
+    }
+
+    std::sort(deltas.begin(), deltas.end(), [](const Delta& a, const Delta& b){
+        if (a.ts != b.ts) return a.ts < b.ts;
+        return a.d < b.d; // frees (-) before allocs (+) at same ts to avoid brief spikes
+    });
+
+    // coalesce same timestamp
+    std::vector<Delta> co;
+    co.reserve(deltas.size());
+    for (const auto& x : deltas) {
+        if (!co.empty() && co.back().ts == x.ts) co.back().d += x.d;
+        else co.push_back(x);
+    }
+
+    std::vector<std::pair<uint64_t,uint64_t>> curve;
+    curve.reserve(co.size());
+    uint64_t cur = 0, peak = 0;
+    for (auto &x : co) {
+        cur = (uint64_t)((int64_t)cur + x.d < 0 ? 0 : (int64_t)cur + x.d);
+        if (cur > peak) peak = cur;
+        curve.emplace_back(x.ts, cur);
+    }
+
+    // (optional) expose stats
+    cached_current_allocated_ = cur;
+    cached_peak_allocated_    = peak;
+    return curve;
+}
+
 } // namespace ggml_viz

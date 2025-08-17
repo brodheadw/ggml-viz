@@ -317,3 +317,170 @@ DYLD_INTERPOSE(viz_graph_compute_with_ctx,    ggml_graph_compute_with_ctx)
 // Memory allocation interposition
 DYLD_INTERPOSE(viz_backend_buft_alloc_buffer, ggml_backend_buft_alloc_buffer)
 DYLD_INTERPOSE(viz_backend_buffer_free,       ggml_backend_buffer_free)
+
+// ===================== ggml-viz Metal swizzles =====================
+#import <Metal/Metal.h>
+#import <objc/runtime.h>
+#import <objc/message.h>
+#import <unordered_map>
+#import <unordered_set>
+#import <mutex>
+
+namespace ggml_viz { class GGMLHook; } // fwd
+extern ggml_viz::GGMLHook& ggml_viz_get_hook(); // if you prefer, replace with GGMLHook::instance()
+
+static const void *kVizBufSizeKey = &kVizBufSizeKey;
+
+static std::mutex g_map_mtx;
+
+// Per-class original IMP maps
+static std::unordered_map<Class, IMP> g_orig_dev_len_opts;
+static std::unordered_map<Class, IMP> g_orig_dev_bytes_len_opts;
+static std::unordered_map<Class, IMP> g_orig_heap_len_opts;
+static std::unordered_map<Class, IMP> g_orig_dealloc_by_cls;
+static std::unordered_set<Class>      g_dealloc_swizzled;
+
+// -------- helpers
+static void swizzle_method(Class cls, SEL sel, IMP repl, std::unordered_map<Class, IMP> &store) {
+    if (!cls || !sel) return;
+    Method m = class_getInstanceMethod(cls, sel);
+    if (!m) return;
+    std::lock_guard<std::mutex> lock(g_map_mtx);
+    if (store.find(cls) != store.end()) return; // already
+    IMP old = method_getImplementation(m);
+    method_setImplementation(m, repl);
+    store.emplace(cls, old);
+}
+
+static void swizzle_dealloc_for_buffer_class_if_needed(id<MTLBuffer> buf);
+
+// -------- replacements
+static id<MTLBuffer> repl_dev_newBufferWithLength_options(id self, SEL _cmd, NSUInteger length, MTLResourceOptions opts) {
+    Class cls = object_getClass((id)self);
+    IMP old;
+    {
+        std::lock_guard<std::mutex> lock(g_map_mtx);
+        old = g_orig_dev_len_opts[cls];
+    }
+    auto orig = (id<MTLBuffer>(*)(id,SEL,NSUInteger,MTLResourceOptions))old;
+    id<MTLBuffer> b = orig ? orig(self,_cmd,length,opts) : nil;
+    if (b) {
+        objc_setAssociatedObject((id)b, kVizBufSizeKey, @(length), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        swizzle_dealloc_for_buffer_class_if_needed(b);
+        ggml_viz_get_hook().on_backend_buffer_alloc((void*)(__bridge void*)b, (size_t)length);
+    }
+    return b;
+}
+
+static id<MTLBuffer> repl_dev_newBufferWithBytes_length_options(id self, SEL _cmd, const void *bytes, NSUInteger length, MTLResourceOptions opts) {
+    Class cls = object_getClass((id)self);
+    IMP old;
+    {
+        std::lock_guard<std::mutex> lock(g_map_mtx);
+        old = g_orig_dev_bytes_len_opts[cls];
+    }
+    auto orig = (id<MTLBuffer>(*)(id,SEL,const void*,NSUInteger,MTLResourceOptions))old;
+    id<MTLBuffer> b = orig ? orig(self,_cmd,bytes,length,opts) : nil;
+    if (b) {
+        objc_setAssociatedObject((id)b, kVizBufSizeKey, @(length), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        swizzle_dealloc_for_buffer_class_if_needed(b);
+        ggml_viz_get_hook().on_backend_buffer_alloc((void*)(__bridge void*)b, (size_t)length);
+    }
+    return b;
+}
+
+static id<MTLBuffer> repl_heap_newBufferWithLength_options(id self, SEL _cmd, NSUInteger length, MTLResourceOptions opts) {
+    Class cls = object_getClass((id)self);
+    IMP old;
+    {
+        std::lock_guard<std::mutex> lock(g_map_mtx);
+        old = g_orig_heap_len_opts[cls];
+    }
+    auto orig = (id<MTLBuffer>(*)(id,SEL,NSUInteger,MTLResourceOptions))old;
+    id<MTLBuffer> b = orig ? orig(self,_cmd,length,opts) : nil;
+    if (b) {
+        objc_setAssociatedObject((id)b, kVizBufSizeKey, @(length), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        swizzle_dealloc_for_buffer_class_if_needed(b);
+        ggml_viz_get_hook().on_backend_buffer_alloc((void*)(__bridge void*)b, (size_t)length);
+    }
+    return b;
+}
+
+// dealloc swizzle (per concrete MTLBuffer subclass)
+static void repl_buffer_dealloc(id self, SEL _cmd) {
+    // capture size before it disappears
+    NSNumber *n = (NSNumber *)objc_getAssociatedObject(self, kVizBufSizeKey);
+    if (n) {
+        ggml_viz_get_hook().on_backend_buffer_free((void*)self);
+        objc_setAssociatedObject(self, kVizBufSizeKey, nil, OBJC_ASSOCIATION_ASSIGN);
+    }
+    // call original dealloc for this concrete class
+    Class cls = object_getClass(self);
+    IMP old;
+    {
+        std::lock_guard<std::mutex> lock(g_map_mtx);
+        old = g_orig_dealloc_by_cls[cls];
+    }
+    auto orig = (void(*)(id,SEL))old;
+    if (orig) orig(self, _cmd);
+    else {
+        // Fallback: call super dealloc if needed (rarely necessary)
+        struct objc_super sup = { self, class_getSuperclass(cls) };
+        ((void(*)(struct objc_super*, SEL))objc_msgSendSuper)(&sup, _cmd);
+    }
+}
+
+static void swizzle_dealloc_for_buffer_class_if_needed(id<MTLBuffer> buf) {
+    Class cls = object_getClass((id)buf);
+    std::lock_guard<std::mutex> lock(g_map_mtx);
+    if (g_dealloc_swizzled.count(cls)) return;
+    Method m = class_getInstanceMethod(cls, sel_registerName("dealloc"));
+    IMP old = method_getImplementation(m);
+    method_setImplementation(m, (IMP)repl_buffer_dealloc);
+    g_orig_dealloc_by_cls.emplace(cls, old);
+    g_dealloc_swizzled.insert(cls);
+}
+
+// -------- class enumeration (covers Apple's private subclasses)
+static void viz_swizzle_all_metal_classes(void) {
+    Protocol *pDev  = objc_getProtocol("MTLDevice");
+    Protocol *pHeap = objc_getProtocol("MTLHeap");
+
+    SEL sel_dev_len      = sel_registerName("newBufferWithLength:options:");
+    SEL sel_dev_bytes    = sel_registerName("newBufferWithBytes:length:options:");
+    SEL sel_heap_len     = sel_registerName("newBufferWithLength:options:");
+
+    int n = objc_getClassList(NULL, 0);
+    if (n <= 0) return;
+    Class *classes = (Class *)malloc(sizeof(Class) * n);
+    n = objc_getClassList(classes, n);
+
+    for (int i = 0; i < n; ++i) {
+        Class cls = classes[i];
+        if (!cls) continue;
+
+        if (pDev && class_conformsToProtocol(cls, pDev)) {
+            if (class_getInstanceMethod(cls, sel_dev_len))
+                swizzle_method(cls, sel_dev_len, (IMP)repl_dev_newBufferWithLength_options, g_orig_dev_len_opts);
+            if (class_getInstanceMethod(cls, sel_dev_bytes))
+                swizzle_method(cls, sel_dev_bytes, (IMP)repl_dev_newBufferWithBytes_length_options, g_orig_dev_bytes_len_opts);
+        }
+        if (pHeap && class_conformsToProtocol(cls, pHeap)) {
+            if (class_getInstanceMethod(cls, sel_heap_len))
+                swizzle_method(cls, sel_heap_len, (IMP)repl_heap_newBufferWithLength_options, g_orig_heap_len_opts);
+        }
+    }
+    free(classes);
+}
+
+// Call this early (ctor or your hook start)
+__attribute__((constructor))
+static void ggml_viz_init_metal_swizzles_ctor(void) {
+    // Swizzle best-effort; even if ggml symbols are hidden, this gives GPU bytes.
+    viz_swizzle_all_metal_classes();
+}
+
+// Provide the hook accessor (adjust to your codebase)
+#import "ggml_hook.hpp"
+ggml_viz::GGMLHook& ggml_viz_get_hook() { return ggml_viz::GGMLHook::instance(); }
+// ================== end ggml-viz Metal swizzles ====================

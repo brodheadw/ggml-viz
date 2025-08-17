@@ -59,6 +59,9 @@ public:
         uint64_t last_free_time = 0;
     };
     MemoryStats get_memory_stats() const;
+    
+    // Memory curve generation with proper FREE size handling
+    std::vector<std::pair<uint64_t, uint64_t>> get_memory_curve_bytes() const;
 
 private: 
     bool load_events();
@@ -76,6 +79,10 @@ private:
     mutable std::unordered_map<const void*, uint64_t> allocations_;
     mutable std::unordered_set<const void*> freed_pointers_; // Debug: detect double-free
     mutable uint64_t current_usage_ = 0;
+    
+    // Cached curve data
+    mutable uint64_t cached_current_allocated_ = 0;
+    mutable uint64_t cached_peak_allocated_ = 0;
 };
 
 } // namespace ggml_viz
