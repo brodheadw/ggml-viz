@@ -452,6 +452,13 @@ extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_cla
 
     int n = objc_getClassList(NULL, 0);
     if (n <= 0) return;
+    
+    // Safety: limit to reasonable number of classes to prevent hash table overflow
+    if (n > 50000) {
+        fprintf(stderr, "[ggml-viz] Warning: objc_getClassList returned %d classes, limiting to 50000\n", n);
+        n = 50000;
+    }
+    
     Class *classes = (Class *)malloc(sizeof(Class) * n);
     n = objc_getClassList(classes, n);
 
