@@ -473,20 +473,8 @@ static void viz_swizzle_all_metal_classes(void) {
     free(classes);
 }
 
-// Call this early (ctor or your hook start)
-__attribute__((constructor))
-static void ggml_viz_init_metal_swizzles_ctor(void) {
-    const char* dis = getenv("GGML_VIZ_DISABLE_METAL");
-    if (dis && *dis && strcmp(dis, "0") != 0) return;
-    try {
-        // Swizzle best-effort; even if ggml symbols are hidden, this gives GPU bytes.
-        viz_swizzle_all_metal_classes();
-    } catch (const std::exception& e) {
-        fprintf(stderr, "[ggml-viz] Metal swizzle init failed: %s\n", e.what());
-    } catch (...) {
-        fprintf(stderr, "[ggml-viz] Metal swizzle init failed (unknown)\n");
-    }
-}
+// Metal swizzle initialization - now called from GGMLHook::start() for safer init
+// Removed constructor to avoid early C++ initialization issues
 
 // Hook accessor is now defined in ggml_hook.cpp to avoid duplication
 #import "ggml_hook.hpp"

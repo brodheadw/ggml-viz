@@ -19,6 +19,8 @@
 #endif
 #ifdef __APPLE__
 #include <objc/runtime.h>  // for objc_getClass
+// Forward declaration for Metal swizzle
+extern "C" void viz_swizzle_all_metal_classes();
 #endif
 
 namespace ggml_viz {
