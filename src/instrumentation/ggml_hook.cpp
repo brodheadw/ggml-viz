@@ -504,7 +504,7 @@ void GGMLHook::on_backend_buffer_alloc(void* buffer, size_t size) {
     log_first_memory_event_banner("backend_buffer_alloc");
     
     Event event = {};
-    event.type = EventType::TENSOR_ALLOC; // Reuse tensor alloc event type for now
+    event.type = EventType::BACKEND_BUFFER_ALLOC;
     event.timestamp_ns = get_timestamp_ns();
     event.thread_id = get_thread_id();
     event.data.memory.ptr = buffer;
@@ -528,7 +528,7 @@ void GGMLHook::on_backend_buffer_free(void* buffer) {
     if (buffer == nullptr) return;
     
     Event event = {};
-    event.type = EventType::TENSOR_FREE; // Reuse tensor free event type
+    event.type = EventType::BACKEND_BUFFER_FREE;
     event.timestamp_ns = get_timestamp_ns();
     event.thread_id = get_thread_id();
     event.data.memory.ptr = buffer;
@@ -1116,4 +1116,9 @@ extern "C" {
     void ggml_viz_hook_on_graph_compute_end(void* hook, const struct ggml_cgraph* graph, const void* backend) {
         static_cast<ggml_viz::GGMLHook*>(hook)->on_graph_compute_end(graph, static_cast<const ggml_backend*>(backend));
     }
+}
+
+// Helper function for CUDA wrapper and Metal swizzle to access GGMLHook instance
+ggml_viz::GGMLHook& ggml_viz_get_hook() { 
+    return ggml_viz::GGMLHook::instance(); 
 }

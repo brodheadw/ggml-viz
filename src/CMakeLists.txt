@@ -119,9 +119,11 @@ if(WIN32)
 elseif(APPLE)
     target_sources(ggml_viz_hook PRIVATE 
         instrumentation/sched_interpose.mm
+        instrumentation/cuda_wrap.cpp
     )
-# Linux uses the interposition functions directly from ggml_hook.cpp
-# No additional files needed - LD_PRELOAD works with the existing function definitions
+elseif(UNIX)
+    # Linux uses LD_PRELOAD with CUDA wrapper
+    target_sources(ggml_viz_hook PRIVATE instrumentation/cuda_wrap.cpp)
 endif()
 
 target_include_directories(ggml_viz_hook

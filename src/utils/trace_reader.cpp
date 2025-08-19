@@ -280,10 +280,10 @@ std::vector<std::pair<uint64_t, uint64_t>> TraceReader::get_memory_curve_bytes()
     size_by_ptr.reserve(8192);
 
     for (const auto& e : events_) {
-        if (e.type == EventType::TENSOR_ALLOC) {
+        if (e.type == EventType::TENSOR_ALLOC || e.type == EventType::BACKEND_BUFFER_ALLOC) {
             deltas.push_back({ e.timestamp_ns, (int64_t)e.data.memory.size });
             size_by_ptr[e.data.memory.ptr] = e.data.memory.size;
-        } else if (e.type == EventType::TENSOR_FREE) {
+        } else if (e.type == EventType::TENSOR_FREE || e.type == EventType::BACKEND_BUFFER_FREE) {
             uint64_t sz = e.data.memory.size ? e.data.memory.size : (size_by_ptr.count(e.data.memory.ptr) ? size_by_ptr[e.data.memory.ptr] : 0);
             if (sz) deltas.push_back({ e.timestamp_ns, - (int64_t)sz });
             size_by_ptr.erase(e.data.memory.ptr);

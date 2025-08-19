@@ -1,8 +1,9 @@
 // cuda_wrap.cpp — interpose CUDA allocations (runtime + driver API)
 #include <dlfcn.h>
 #include <stdint.h>
+#include <cstddef>
+#include "ggml_hook.hpp"
 
-namespace ggml_viz { class GGMLHook; }
 extern ggml_viz::GGMLHook& ggml_viz_get_hook(); // or GGMLHook::instance()
 
 // --- Minimal types to avoid <cuda*.h>

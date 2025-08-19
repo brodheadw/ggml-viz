@@ -480,7 +480,6 @@ static void ggml_viz_init_metal_swizzles_ctor(void) {
     viz_swizzle_all_metal_classes();
 }
 
-// Provide the hook accessor (adjust to your codebase)
+// Hook accessor is now defined in ggml_hook.cpp to avoid duplication
 #import "ggml_hook.hpp"
-ggml_viz::GGMLHook& ggml_viz_get_hook() { return ggml_viz::GGMLHook::instance(); }
 // ================== end ggml-viz Metal swizzles ====================
