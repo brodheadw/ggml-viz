@@ -19,8 +19,6 @@
 #endif
 #ifdef __APPLE__
 #include <objc/runtime.h>  // for objc_getClass
-// Forward declaration for Metal swizzle
-extern "C" void viz_swizzle_all_metal_classes();
 #endif
 
 namespace ggml_viz {
@@ -167,13 +165,19 @@ void GGMLHook::start() {
     // Initialize Metal swizzle for GPU memory tracking (safer here vs constructor)
     if (config->instrumentation.enable_memory_tracking &&
         !(getenv("GGML_VIZ_DISABLE_METAL") && strcmp(getenv("GGML_VIZ_DISABLE_METAL"), "0") != 0)) {
-        try {
-            viz_swizzle_all_metal_classes();
-            fprintf(stderr, "[ggml-viz] Metal swizzle initialized successfully\n");
-        } catch (const std::exception& e) {
-            fprintf(stderr, "[ggml-viz] Metal swizzle failed: %s\n", e.what());
-        } catch (...) {
-            fprintf(stderr, "[ggml-viz] Metal swizzle failed (unknown)\n");
+        // Use dlsym to dynamically find the function (only available in shared library)
+        void (*swizzle_func)() = (void(*)())dlsym(RTLD_DEFAULT, "viz_swizzle_all_metal_classes");
+        if (swizzle_func) {
+            try {
+                swizzle_func();
+                fprintf(stderr, "[ggml-viz] Metal swizzle initialized successfully\n");
+            } catch (const std::exception& e) {
+                fprintf(stderr, "[ggml-viz] Metal swizzle failed: %s\n", e.what());
+            } catch (...) {
+                fprintf(stderr, "[ggml-viz] Metal swizzle failed (unknown)\n");
+            }
+        } else {
+            fprintf(stderr, "[ggml-viz] Metal swizzle not available (function not found)\n");
         }
     } else {
         fprintf(stderr, "[ggml-viz] Metal swizzle disabled\n");
