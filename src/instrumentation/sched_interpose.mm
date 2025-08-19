@@ -324,6 +324,7 @@ DYLD_INTERPOSE(viz_backend_buffer_free,       ggml_backend_buffer_free)
 #import <objc/message.h>
 #import <unordered_map>
 #import <unordered_set>
+#import <algorithm>
 #import <mutex>
 
 namespace ggml_viz { class GGMLHook; } // fwd
