@@ -442,7 +442,7 @@ static void swizzle_dealloc_for_buffer_class_if_needed(id<MTLBuffer> buf) {
 }
 
 // -------- class enumeration (covers Apple's private subclasses)
-extern "C" void viz_swizzle_all_metal_classes(void) {
+extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_classes(void) {
     Protocol *pDev  = objc_getProtocol("MTLDevice");
     Protocol *pHeap = objc_getProtocol("MTLHeap");
 
