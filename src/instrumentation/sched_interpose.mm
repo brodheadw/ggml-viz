@@ -461,6 +461,9 @@ extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_cla
     
     Class *classes = (Class *)malloc(sizeof(Class) * n);
     n = objc_getClassList(classes, n);
+    
+    // Pre-reserve hash set to avoid rehashing (assume ~10% of classes need dealloc swizzling)
+    g_dealloc_swizzled.reserve(std::min(n / 10 + 100, 5000));
 
     for (int i = 0; i < n; ++i) {
         Class cls = classes[i];
