@@ -448,7 +448,7 @@ static void swizzle_dealloc_for_buffer_class_if_needed(id<MTLBuffer> buf) {
 extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_classes(void) {
     fprintf(stderr, "[ggml-viz] Starting targeted Metal swizzle...\n");
     
-    // Initialize all swizzling state containers FIRST with safe reservations
+    // Initialize all swizzling state containers FIRST 
     fprintf(stderr, "[ggml-viz] Initializing swizzling state...\n");
     {
         std::lock_guard<std::mutex> lock(g_map_mtx);
@@ -457,13 +457,6 @@ extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_cla
         g_orig_heap_len_opts.clear();
         g_orig_dealloc_by_cls.clear();
         g_dealloc_swizzled.clear();
-        
-        // Reserve small, safe amounts - we only expect a few classes
-        g_orig_dev_len_opts.reserve(5);
-        g_orig_dev_bytes_len_opts.reserve(5);
-        g_orig_heap_len_opts.reserve(5);
-        g_orig_dealloc_by_cls.reserve(10);
-        g_dealloc_swizzled.reserve(10);
     }
     fprintf(stderr, "[ggml-viz] Swizzling state initialized\n");
     
