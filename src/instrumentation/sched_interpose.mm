@@ -324,8 +324,8 @@ DYLD_INTERPOSE(viz_backend_buffer_free,       ggml_backend_buffer_free)
 #import <Metal/Metal.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
-#import <unordered_map>
-#import <unordered_set>
+#import <map>
+#import <set>
 #import <algorithm>
 #import <mutex>
 
@@ -336,15 +336,15 @@ static const void *kVizBufSizeKey = &kVizBufSizeKey;
 
 static std::mutex g_map_mtx;
 
-// Per-class original IMP maps
-static std::unordered_map<Class, IMP> g_orig_dev_len_opts;
-static std::unordered_map<Class, IMP> g_orig_dev_bytes_len_opts;
-static std::unordered_map<Class, IMP> g_orig_heap_len_opts;
-static std::unordered_map<Class, IMP> g_orig_dealloc_by_cls;
-static std::unordered_set<Class>      g_dealloc_swizzled;
+// Per-class original IMP maps - using std::map instead of unordered_map to avoid hash issues
+static std::map<Class, IMP> g_orig_dev_len_opts;
+static std::map<Class, IMP> g_orig_dev_bytes_len_opts;
+static std::map<Class, IMP> g_orig_heap_len_opts;
+static std::map<Class, IMP> g_orig_dealloc_by_cls;
+static std::set<Class>      g_dealloc_swizzled;
 
 // -------- helpers
-static void swizzle_method(Class cls, SEL sel, IMP repl, std::unordered_map<Class, IMP> &store) {
+static void swizzle_method(Class cls, SEL sel, IMP repl, std::map<Class, IMP> &store) {
     if (!cls || !sel) return;
     Method m = class_getInstanceMethod(cls, sel);
     if (!m) return;
@@ -448,6 +448,25 @@ static void swizzle_dealloc_for_buffer_class_if_needed(id<MTLBuffer> buf) {
 extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_classes(void) {
     fprintf(stderr, "[ggml-viz] Starting targeted Metal swizzle...\n");
     
+    // Initialize all swizzling state containers FIRST with safe reservations
+    fprintf(stderr, "[ggml-viz] Initializing swizzling state...\n");
+    {
+        std::lock_guard<std::mutex> lock(g_map_mtx);
+        g_orig_dev_len_opts.clear();
+        g_orig_dev_bytes_len_opts.clear(); 
+        g_orig_heap_len_opts.clear();
+        g_orig_dealloc_by_cls.clear();
+        g_dealloc_swizzled.clear();
+        
+        // Reserve small, safe amounts - we only expect a few classes
+        g_orig_dev_len_opts.reserve(5);
+        g_orig_dev_bytes_len_opts.reserve(5);
+        g_orig_heap_len_opts.reserve(5);
+        g_orig_dealloc_by_cls.reserve(10);
+        g_dealloc_swizzled.reserve(10);
+    }
+    fprintf(stderr, "[ggml-viz] Swizzling state initialized\n");
+    
     // Get the system default device (the one llama.cpp will actually use)
     fprintf(stderr, "[ggml-viz] Creating Metal device...\n");
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
@@ -458,27 +477,32 @@ extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_cla
     fprintf(stderr, "[ggml-viz] Metal device created successfully\n");
     
     // Swizzle only this concrete device class
+    fprintf(stderr, "[ggml-viz] Getting device class...\n");
     Class deviceClass = object_getClass(device);
+    fprintf(stderr, "[ggml-viz] Device class: %s\n", class_getName(deviceClass));
+    
+    fprintf(stderr, "[ggml-viz] Registering selectors...\n");
     SEL sel_dev_len   = sel_registerName("newBufferWithLength:options:");
     SEL sel_dev_bytes = sel_registerName("newBufferWithBytes:length:options:");
+    fprintf(stderr, "[ggml-viz] Selectors registered\n");
     
+    fprintf(stderr, "[ggml-viz] Checking for newBufferWithLength method...\n");
     if (class_getInstanceMethod(deviceClass, sel_dev_len)) {
+        fprintf(stderr, "[ggml-viz] About to swizzle newBufferWithLength...\n");
         swizzle_method(deviceClass, sel_dev_len, (IMP)repl_dev_newBufferWithLength_options, g_orig_dev_len_opts);
         fprintf(stderr, "[ggml-viz] Swizzled newBufferWithLength:options: on device class %s\n", 
                 class_getName(deviceClass));
     }
     
+    fprintf(stderr, "[ggml-viz] Checking for newBufferWithBytes method...\n");
     if (class_getInstanceMethod(deviceClass, sel_dev_bytes)) {
+        fprintf(stderr, "[ggml-viz] About to swizzle newBufferWithBytes...\n");
         swizzle_method(deviceClass, sel_dev_bytes, (IMP)repl_dev_newBufferWithBytes_length_options, g_orig_dev_bytes_len_opts);
         fprintf(stderr, "[ggml-viz] Swizzled newBufferWithBytes:length:options: on device class %s\n", 
                 class_getName(deviceClass));
     }
     
-    // Initialize dealloc swizzling state (but don't enumerate classes)
-    fprintf(stderr, "[ggml-viz] Initializing dealloc state...\n");
-    g_dealloc_swizzled.clear();
-    g_dealloc_swizzled.reserve(50); // Much smaller - only for classes we actually see
-    fprintf(stderr, "[ggml-viz] Dealloc state initialized\n");
+    fprintf(stderr, "[ggml-viz] Metal swizzle completed successfully\n");
     
     // Release the device (we only needed it for swizzling)
 #if !__has_feature(objc_arc)
