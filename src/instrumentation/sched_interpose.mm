@@ -315,8 +315,10 @@ DYLD_INTERPOSE(viz_graph_compute,             ggml_graph_compute)
 DYLD_INTERPOSE(viz_graph_compute_with_ctx,    ggml_graph_compute_with_ctx)
 
 // Memory allocation interposition
+#if !defined(__APPLE__)
 DYLD_INTERPOSE(viz_backend_buft_alloc_buffer, ggml_backend_buft_alloc_buffer)
 DYLD_INTERPOSE(viz_backend_buffer_free,       ggml_backend_buffer_free)
+#endif
 
 // ===================== ggml-viz Metal swizzles =====================
 #import <Metal/Metal.h>
@@ -442,46 +444,38 @@ static void swizzle_dealloc_for_buffer_class_if_needed(id<MTLBuffer> buf) {
     g_dealloc_swizzled.insert(cls);
 }
 
-// -------- class enumeration (covers Apple's private subclasses)
+// -------- targeted device swizzling (no class enumeration)
 extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_classes(void) {
-    Protocol *pDev  = objc_getProtocol("MTLDevice");
-    Protocol *pHeap = objc_getProtocol("MTLHeap");
-
-    SEL sel_dev_len      = sel_registerName("newBufferWithLength:options:");
-    SEL sel_dev_bytes    = sel_registerName("newBufferWithBytes:length:options:");
-    SEL sel_heap_len     = sel_registerName("newBufferWithLength:options:");
-
-    int n = objc_getClassList(NULL, 0);
-    if (n <= 0) return;
-    
-    // Safety: limit to reasonable number of classes to prevent hash table overflow
-    if (n > 50000) {
-        fprintf(stderr, "[ggml-viz] Warning: objc_getClassList returned %d classes, limiting to 50000\n", n);
-        n = 50000;
+    // Get the system default device (the one llama.cpp will actually use)
+    id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+    if (!device) {
+        fprintf(stderr, "[ggml-viz] No Metal device available\n");
+        return;
     }
     
-    Class *classes = (Class *)malloc(sizeof(Class) * n);
-    n = objc_getClassList(classes, n);
+    // Swizzle only this concrete device class
+    Class deviceClass = object_getClass(device);
+    SEL sel_dev_len   = sel_registerName("newBufferWithLength:options:");
+    SEL sel_dev_bytes = sel_registerName("newBufferWithBytes:length:options:");
     
-    // Pre-reserve hash set to avoid rehashing (assume ~10% of classes need dealloc swizzling)
-    g_dealloc_swizzled.reserve(std::min(n / 10 + 100, 5000));
-
-    for (int i = 0; i < n; ++i) {
-        Class cls = classes[i];
-        if (!cls) continue;
-
-        if (pDev && class_conformsToProtocol(cls, pDev)) {
-            if (class_getInstanceMethod(cls, sel_dev_len))
-                swizzle_method(cls, sel_dev_len, (IMP)repl_dev_newBufferWithLength_options, g_orig_dev_len_opts);
-            if (class_getInstanceMethod(cls, sel_dev_bytes))
-                swizzle_method(cls, sel_dev_bytes, (IMP)repl_dev_newBufferWithBytes_length_options, g_orig_dev_bytes_len_opts);
-        }
-        if (pHeap && class_conformsToProtocol(cls, pHeap)) {
-            if (class_getInstanceMethod(cls, sel_heap_len))
-                swizzle_method(cls, sel_heap_len, (IMP)repl_heap_newBufferWithLength_options, g_orig_heap_len_opts);
-        }
+    if (class_getInstanceMethod(deviceClass, sel_dev_len)) {
+        swizzle_method(deviceClass, sel_dev_len, (IMP)repl_dev_newBufferWithLength_options, g_orig_dev_len_opts);
+        fprintf(stderr, "[ggml-viz] Swizzled newBufferWithLength:options: on device class %s\n", 
+                class_getName(deviceClass));
     }
-    free(classes);
+    
+    if (class_getInstanceMethod(deviceClass, sel_dev_bytes)) {
+        swizzle_method(deviceClass, sel_dev_bytes, (IMP)repl_dev_newBufferWithBytes_length_options, g_orig_dev_bytes_len_opts);
+        fprintf(stderr, "[ggml-viz] Swizzled newBufferWithBytes:length:options: on device class %s\n", 
+                class_getName(deviceClass));
+    }
+    
+    // Initialize dealloc swizzling state (but don't enumerate classes)
+    g_dealloc_swizzled.clear();
+    g_dealloc_swizzled.reserve(50); // Much smaller - only for classes we actually see
+    
+    // Release the device (we only needed it for swizzling)
+    [device release];
 }
 
 // Metal swizzle initialization - now called from GGMLHook::start() for safer init
