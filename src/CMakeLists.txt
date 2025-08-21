@@ -159,6 +159,9 @@ target_link_libraries(ggml_viz_hook
 # Links directory to minhook and psapi targets from FetchContent
 if(WIN32)
     target_link_libraries(ggml_viz_hook PRIVATE MinHook psapi)
+elseif(APPLE)
+    # Link Metal frameworks for Metal swizzling
+    target_link_libraries(ggml_viz_hook PRIVATE "-framework Metal" "-framework Foundation" "-framework ObjectiveC")
 endif()
 
 # Platform-specific link options
