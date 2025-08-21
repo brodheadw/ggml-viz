@@ -19,6 +19,8 @@
 #endif
 #ifdef __APPLE__
 #include <objc/runtime.h>  // for objc_getClass
+// Forward declaration for Metal swizzle function
+extern "C" void viz_swizzle_all_metal_classes(void);
 #endif
 
 namespace ggml_viz {
@@ -163,8 +165,6 @@ void GGMLHook::start() {
     fprintf(stderr, "[ggml-viz] Platform: macOS, targets: DYLD_INTERPOSE(ggml_backend_buft_alloc_buffer,ggml_backend_buffer_free), Metal fallback available\n");
     
     // Initialize Metal swizzle for GPU memory tracking (safer here vs constructor)
-    extern "C" void viz_swizzle_all_metal_classes(void);
-    
     const bool disable_metal = getenv("GGML_VIZ_DISABLE_METAL") && strcmp(getenv("GGML_VIZ_DISABLE_METAL"), "0") != 0;
     
     if (config->instrumentation.enable_memory_tracking && !disable_metal) {

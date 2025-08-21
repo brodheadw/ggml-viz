@@ -161,7 +161,7 @@ if(WIN32)
     target_link_libraries(ggml_viz_hook PRIVATE MinHook psapi)
 elseif(APPLE)
     # Link Metal frameworks for Metal swizzling
-    target_link_libraries(ggml_viz_hook PRIVATE "-framework Metal" "-framework Foundation" "-framework ObjectiveC")
+    target_link_libraries(ggml_viz_hook PRIVATE "-framework Metal" "-framework Foundation" "-lobjc")
 endif()
 
 # Platform-specific link options
