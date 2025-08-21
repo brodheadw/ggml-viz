@@ -165,21 +165,31 @@ void GGMLHook::start() {
     // Initialize Metal swizzle for GPU memory tracking (safer here vs constructor)
     extern "C" void viz_swizzle_all_metal_classes(void);
     
-    if (config->instrumentation.enable_memory_tracking &&
-        !(getenv("GGML_VIZ_DISABLE_METAL") && strcmp(getenv("GGML_VIZ_DISABLE_METAL"), "0") != 0)) {
-        // Use dlsym to dynamically find the function (only available in shared library)
-        void (*swizzle_func)() = (void(*)())dlsym(RTLD_DEFAULT, "viz_swizzle_all_metal_classes");
-        if (swizzle_func) {
-            try {
-                swizzle_func();
-                fprintf(stderr, "[ggml-viz] Metal swizzle initialized successfully\n");
-            } catch (const std::exception& e) {
-                fprintf(stderr, "[ggml-viz] Metal swizzle failed: %s\n", e.what());
-            } catch (...) {
-                fprintf(stderr, "[ggml-viz] Metal swizzle failed (unknown)\n");
+    const bool disable_metal = getenv("GGML_VIZ_DISABLE_METAL") && strcmp(getenv("GGML_VIZ_DISABLE_METAL"), "0") != 0;
+    
+    if (config->instrumentation.enable_memory_tracking && !disable_metal) {
+        static std::atomic<bool> g_metal_swizzled{false};
+        if (!g_metal_swizzled.exchange(true)) {
+            // Use dlsym to dynamically find the function (only available in shared library)
+            void (*swizzle_func)() = (void(*)())dlsym(RTLD_DEFAULT, "viz_swizzle_all_metal_classes");
+            if (swizzle_func) {
+                try {
+                    swizzle_func();
+                    fprintf(stderr, "[ggml-viz] Metal swizzle initialized successfully\n");
+                    fflush(stderr);
+                } catch (const std::exception& e) {
+                    fprintf(stderr, "[ggml-viz] Metal swizzle failed: %s\n", e.what());
+                    fflush(stderr);
+                } catch (...) {
+                    fprintf(stderr, "[ggml-viz] Metal swizzle failed (unknown)\n");
+                    fflush(stderr);
+                }
+            } else {
+                fprintf(stderr, "[ggml-viz] Metal swizzle not available (function not found)\n");
+                fflush(stderr);
             }
         } else {
-            fprintf(stderr, "[ggml-viz] Metal swizzle not available (function not found)\n");
+            fprintf(stderr, "[ggml-viz] Metal swizzle already initialized (skipped)\n");
         }
     } else {
         fprintf(stderr, "[ggml-viz] Metal swizzle disabled\n");
