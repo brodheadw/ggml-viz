@@ -446,6 +446,8 @@ static void swizzle_dealloc_for_buffer_class_if_needed(id<MTLBuffer> buf) {
 
 // -------- targeted device swizzling (no class enumeration)
 extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_classes(void) {
+    fprintf(stderr, "[ggml-viz] Starting targeted Metal swizzle...\n");
+    
     // Get the system default device (the one llama.cpp will actually use)
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     if (!device) {
@@ -475,7 +477,11 @@ extern "C" __attribute__((visibility("default"))) void viz_swizzle_all_metal_cla
     g_dealloc_swizzled.reserve(50); // Much smaller - only for classes we actually see
     
     // Release the device (we only needed it for swizzling)
+#if !__has_feature(objc_arc)
     [device release];
+#else
+    (void)device; // ARC handles it
+#endif
 }
 
 // Metal swizzle initialization - now called from GGMLHook::start() for safer init

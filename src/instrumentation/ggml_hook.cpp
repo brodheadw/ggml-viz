@@ -163,6 +163,8 @@ void GGMLHook::start() {
     fprintf(stderr, "[ggml-viz] Platform: macOS, targets: DYLD_INTERPOSE(ggml_backend_buft_alloc_buffer,ggml_backend_buffer_free), Metal fallback available\n");
     
     // Initialize Metal swizzle for GPU memory tracking (safer here vs constructor)
+    extern "C" void viz_swizzle_all_metal_classes(void);
+    
     if (config->instrumentation.enable_memory_tracking &&
         !(getenv("GGML_VIZ_DISABLE_METAL") && strcmp(getenv("GGML_VIZ_DISABLE_METAL"), "0") != 0)) {
         // Use dlsym to dynamically find the function (only available in shared library)

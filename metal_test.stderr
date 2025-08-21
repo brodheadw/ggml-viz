@@ -1,0 +1,3 @@
+Warning: GGMLHook::configure() is deprecated. Use ConfigManager::load_with_precedence() instead.
+[ggml-viz] Startup config: memory_tracking=enabled, op_timing=enabled
+[ggml-viz] Platform: macOS, targets: DYLD_INTERPOSE(ggml_backend_buft_alloc_buffer,ggml_backend_buffer_free), Metal fallback available
