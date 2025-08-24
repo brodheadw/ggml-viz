@@ -3,6 +3,7 @@
 #include "utils/trace_reader.hpp"
 #include "instrumentation/ggml_hook.hpp"
 #include "imgui.h"
+#include "imgui_internal.h"  // For ImRect
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
@@ -12,6 +13,7 @@
 #include <ctime>
 #include <sys/stat.h>
 #include <unordered_map>
+#include <cinttypes>  // For PRIu64
 
 namespace ggml_viz {
 
@@ -930,20 +932,162 @@ void ImGuiApp::render_tensor_inspector() {
 }
 
 void ImGuiApp::render_memory_view() {
-    // Color-code memory view panel (orange)
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(1.0f, 0.60f, 0.0f, 1.0f)); // Orange color
-    
-    if (ImGui::Begin("Memory View")) {
-        if (!data_->trace_reader && !data_->live_mode) {
-            ImGui::Text("No trace loaded and live mode not active");
-            ImGui::End();
-            return;
-        }
-        
-        ImGui::Text("Memory visualization coming soon...");
+    // Orange header styling for all states
+    ImGui::PushStyleColor(ImGuiCol_TitleBg,        ImVec4(1.0f, 0.60f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive,  ImVec4(1.0f, 0.60f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(1.0f, 0.60f, 0.0f, 1.0f));
+
+    if (!ImGui::Begin("Memory View", &show_memory_view_)) {
+        ImGui::End();
+        ImGui::PopStyleColor(3);
+        return;
     }
+
+    // Choose appropriate data source
+    TraceReader* reader = nullptr;
+    if (data_) {
+        reader = data_->live_mode && data_->live_trace_reader
+               ? data_->live_trace_reader.get()
+               : data_->trace_reader.get();
+    }
+
+    if (!reader) {
+        ImGui::TextUnformatted("No memory data available");
+        ImGui::End();
+        ImGui::PopStyleColor(3);
+        return;
+    }
+
+    // Memory Statistics Section
+    if (ImGui::CollapsingHeader("Memory Statistics", ImGuiTreeNodeFlags_DefaultOpen)) {
+        const auto stats = reader->get_memory_stats();
+
+        if (ImGui::BeginTable("mem_stats", 2, ImGuiTableFlags_SizingStretchProp)) {
+            auto mb = [](uint64_t b){ return double(b) / (1024.0*1024.0); };
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("Peak Memory:");
+            ImGui::TableSetColumnIndex(1); ImGui::Text("%.2f MB", mb(stats.peak_usage));
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("Current Memory:");
+            ImGui::TableSetColumnIndex(1); ImGui::Text("%.2f MB", mb(stats.current_usage));
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("Total Allocations:");
+            ImGui::TableSetColumnIndex(1); ImGui::Text("%" PRIu64, stats.total_allocations);
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("Total Frees:");
+            ImGui::TableSetColumnIndex(1); ImGui::Text("%" PRIu64, stats.total_frees);
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("Bytes Allocated:");
+            ImGui::TableSetColumnIndex(1); ImGui::Text("%.2f MB", mb(stats.bytes_allocated));
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("Bytes Freed:");
+            ImGui::TableSetColumnIndex(1); ImGui::Text("%.2f MB", mb(stats.bytes_freed));
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("Leaked Memory:");
+            ImGui::TableSetColumnIndex(1);
+            if (stats.leaked_bytes > 0) {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
+                ImGui::Text("%.2f MB", mb(stats.leaked_bytes));
+                ImGui::PopStyleColor();
+            } else {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 1.0f, 0.4f, 1.0f));
+                ImGui::TextUnformatted("None");
+                ImGui::PopStyleColor();
+            }
+            ImGui::EndTable();
+        }
+    }
+
+    // Memory Usage Over Time Section
+    if (ImGui::CollapsingHeader("Memory Usage Over Time", ImGuiTreeNodeFlags_DefaultOpen)) {
+        const auto curve = reader->get_memory_curve_bytes();
+        if (curve.empty()) {
+            ImGui::TextUnformatted("No memory events recorded");
+        } else {
+            std::vector<float> ys; ys.reserve(curve.size());
+            std::vector<float> xs; xs.reserve(curve.size());
+            const uint64_t t0 = curve.front().first;
+            float yMax = 0.0f;
+
+            for (const auto& p : curve) {
+                float t = float(p.first - t0) / 1e9f;
+                float mb = float(p.second) / (1024.0f*1024.0f);
+                xs.push_back(t);
+                ys.push_back(mb);
+                if (mb > yMax) yMax = mb;
+            }
+
+            ImVec2 sz(ImGui::GetContentRegionAvail().x, 200.0f);
+            ImGui::PlotLines("##mem_curve", ys.data(), (int)ys.size(), 0, nullptr, 0.0f, yMax*1.1f, sz);
+
+            // Hover tooltip mapping index -> (time, value)
+            if (ImGui::IsItemHovered()) {
+                const ImRect r(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+                float u = (ImGui::GetIO().MousePos.x - r.Min.x) / std::max(1.0f, r.GetWidth());
+                int idx = std::clamp(int(u * (ys.size()-1)), 0, int(ys.size()-1));
+                ImGui::BeginTooltip();
+                ImGui::Text("t = %.3f s", xs[idx]);
+                ImGui::Text("y = %.2f MB", ys[idx]);
+                ImGui::EndTooltip();
+            }
+
+            ImGui::Text("Duration: %.2f s | Peak: %.2f MB", xs.back(), yMax);
+        }
+    }
+
+    // Memory Events Section
+    if (ImGui::CollapsingHeader("Memory Events")) {
+        const auto events = reader->get_memory_events();
+        if (events.empty()) {
+            ImGui::TextUnformatted("No memory events recorded");
+        } else if (ImGui::BeginTable("mem_events", 4, ImGuiTableFlags_ScrollY|ImGuiTableFlags_RowBg|ImGuiTableFlags_Borders, ImVec2(0, 220))) {
+            ImGui::TableSetupColumn("Time (s)");
+            ImGui::TableSetupColumn("Type");
+            ImGui::TableSetupColumn("Size (MB)");
+            ImGui::TableSetupColumn("Pointer");
+            ImGui::TableHeadersRow();
+
+            const uint64_t t0 = events.front()->timestamp_ns;
+            const size_t start = events.size() > 100 ? events.size() - 100 : 0;
+
+            for (size_t i = start; i < events.size(); ++i) {
+                const Event* e = events[i];
+                const float t = float(e->timestamp_ns - t0) / 1e9f;
+
+                // Only show alloc/free types; skip others if present
+                bool is_alloc = (e->type == EventType::TENSOR_ALLOC || e->type == EventType::BACKEND_BUFFER_ALLOC);
+                bool is_free  = (e->type == EventType::TENSOR_FREE  || e->type == EventType::BACKEND_BUFFER_FREE);
+                if (!is_alloc && !is_free) continue;
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn(); ImGui::Text("%.3f", t);
+                ImGui::TableNextColumn();
+                if (is_alloc) { 
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f,1.0f,0.4f,1.0f)); 
+                    ImGui::TextUnformatted("ALLOC"); 
+                    ImGui::PopStyleColor(); 
+                } else { 
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f,0.6f,0.4f,1.0f)); 
+                    ImGui::TextUnformatted("FREE");  
+                    ImGui::PopStyleColor(); 
+                }
+
+                ImGui::TableNextColumn(); ImGui::Text("%.2f", double(e->data.memory.size)/(1024.0*1024.0));
+                ImGui::TableNextColumn(); ImGui::Text("%p",   e->data.memory.ptr);
+            }
+            ImGui::EndTable();
+        }
+    }
+
     ImGui::End();
-    ImGui::PopStyleColor(); // Pop orange memory view color
+    ImGui::PopStyleColor(3);
 }
 
 void ImGuiApp::render_hook_status_notification() {
