@@ -4,6 +4,7 @@
 #include "ggml-impl.h" // for ggml_cgraph, ggml_tensor
 #include "ggml-backend.h" // for ggml_backend_t
 #include "ggml-alloc.h" // for memory allocation functions
+#include "ggml.h" // for ggml_op_name, ggml_type_name
 #include <thread>
 #include <cstring>
 #include <cassert>
@@ -76,6 +77,71 @@ namespace {
         if (g_first_memory_event_logged) return;
         g_first_memory_event_logged = true;
         fprintf(stderr, "[ggml-viz] First memory event captured: %s\n", event_type);
+    }
+    
+    // Verbose debugging helpers
+    static bool is_verbose_debug() {
+        static bool verbose = (getenv("GGML_VIZ_VERBOSE_DEBUG") != nullptr);
+        return verbose;
+    }
+    
+    static const char* safe_tensor_name(const ggml_tensor* tensor) {
+        if (!tensor) return "(null_tensor)";
+        if (!tensor->name || tensor->name[0] == '\0') return "(unnamed)";
+        return tensor->name;
+    }
+    
+    static std::string format_tensor_shape(const ggml_tensor* tensor) {
+        if (!tensor) return "null";
+        return "[" + std::to_string(tensor->ne[0]) + "x" + 
+                     std::to_string(tensor->ne[1]) + "x" + 
+                     std::to_string(tensor->ne[2]) + "x" + 
+                     std::to_string(tensor->ne[3]) + "]";
+    }
+    
+    static void log_verbose_memory_alloc(const char* type, const void* ptr, size_t size, const ggml_tensor* tensor = nullptr) {
+        if (!is_verbose_debug()) return;
+        
+        if (tensor) {
+            fprintf(stderr, "[ggml-viz] 🟢 Memory allocation here: %s ptr=%p size=%zu bytes (%.2f MB) tensor=%s shape=%s type=%s op=%s\n",
+                    type, ptr, size, size / (1024.0 * 1024.0),
+                    safe_tensor_name(tensor),
+                    format_tensor_shape(tensor).c_str(),
+                    ggml_type_name(tensor->type),
+                    ggml_op_name(tensor->op));
+        } else {
+            fprintf(stderr, "[ggml-viz] 🟢 Memory allocation here: %s ptr=%p size=%zu bytes (%.2f MB)\n",
+                    type, ptr, size, size / (1024.0 * 1024.0));
+        }
+    }
+    
+    static void log_verbose_memory_free(const char* type, const void* ptr, const ggml_tensor* tensor = nullptr) {
+        if (!is_verbose_debug()) return;
+        
+        if (tensor) {
+            fprintf(stderr, "[ggml-viz] 🔴 Memory deallocation: %s ptr=%p tensor=%s shape=%s\n",
+                    type, ptr, safe_tensor_name(tensor), format_tensor_shape(tensor).c_str());
+        } else {
+            fprintf(stderr, "[ggml-viz] 🔴 Memory deallocation: %s ptr=%p\n", type, ptr);
+        }
+    }
+    
+    static void log_verbose_op_begin(const ggml_tensor* tensor) {
+        if (!is_verbose_debug()) return;
+        
+        fprintf(stderr, "[ggml-viz] ⚡ Tensor operation BEGIN: %s name=%s shape=%s type=%s → %s\n",
+                ggml_op_name(tensor->op),
+                safe_tensor_name(tensor),
+                format_tensor_shape(tensor).c_str(),
+                ggml_type_name(tensor->type),
+                ggml_op_desc(tensor));
+    }
+    
+    static void log_verbose_op_end(const ggml_tensor* tensor) {
+        if (!is_verbose_debug()) return;
+        
+        fprintf(stderr, "[ggml-viz] ✅ Tensor operation END: %s name=%s\n",
+                ggml_op_name(tensor->op), safe_tensor_name(tensor));
     }
 }
 
@@ -429,6 +495,9 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend
     }
 
     std::cout << "[DEBUG] Op compute begin: " << tensor->name << " type: " << tensor->op << ", backend: " << (backend ? "yes" : "no") << "\n";
+    
+    // Verbose debugging
+    log_verbose_op_begin(tensor);
         
     Event event = {};
     event.type = EventType::OP_COMPUTE_BEGIN;
@@ -459,6 +528,9 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* 
             return;
         }
     }
+    
+    // Verbose debugging
+    log_verbose_op_end(tensor);
     
     Event event = {};
     event.type = EventType::OP_COMPUTE_END;
@@ -497,6 +569,9 @@ void GGMLHook::on_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggm
     fprintf(stderr, "[ggml-viz] HIT: on_tensor_alloc tensor=%p size=%zu name=%s\n", 
             tensor, size, tensor->name[0] ? tensor->name : "(null)");
     
+    // Verbose debugging
+    log_verbose_memory_alloc("TENSOR_ALLOC", tensor, size, tensor);
+    
     record_event(event);
 }
 
@@ -520,6 +595,9 @@ void GGMLHook::on_tensor_free(const ggml_tensor* tensor, const ggml_backend* bac
     // Debug: Log memory free hit
     fprintf(stderr, "[ggml-viz] HIT: on_tensor_free tensor=%p name=%s\n", 
             tensor, tensor->name[0] ? tensor->name : "(null)");
+    
+    // Verbose debugging
+    log_verbose_memory_free("TENSOR_FREE", tensor, tensor);
     
     record_event(event);
 }
@@ -548,6 +626,9 @@ void GGMLHook::on_backend_buffer_alloc(void* buffer, size_t size) {
     fprintf(stderr, "[ggml-viz] HIT: on_backend_buffer_alloc buffer=%p size=%zu\n", 
             buffer, size);
     
+    // Verbose debugging
+    log_verbose_memory_alloc("BACKEND_BUFFER_ALLOC", buffer, size);
+    
     record_event(event);
 }
 
@@ -570,6 +651,9 @@ void GGMLHook::on_backend_buffer_free(void* buffer) {
     
     // Debug: Log backend buffer free hit
     fprintf(stderr, "[ggml-viz] HIT: on_backend_buffer_free buffer=%p\n", buffer);
+    
+    // Verbose debugging
+    log_verbose_memory_free("BACKEND_BUFFER_FREE", buffer);
     
     record_event(event);
 }
