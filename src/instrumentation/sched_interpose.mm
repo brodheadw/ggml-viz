@@ -37,7 +37,7 @@ enum ggml_status viz_sched_graph_compute(ggml_backend_sched_t sched, struct ggml
     // Call the original function if it exists
     using fn_type = enum ggml_status (*)(ggml_backend_sched_t, struct ggml_cgraph*);
     static fn_type real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_backend_sched_graph_compute");
-    
+     
     enum ggml_status rc = GGML_STATUS_SUCCESS;
     if (real_fn) {
         rc = real_fn(sched, cg);  // delegate to actual compute
