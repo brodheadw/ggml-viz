@@ -225,6 +225,32 @@ void test_env_overrides() {
     std::cout << "✅ Environment override test passed" << std::endl;
 }
 
+void test_invalid_env_override_fallback() {
+    std::cout << "Testing invalid env override fallback..." << std::endl;
+
+    // Set a non-default initial value
+    Config config = Config::default_config();
+    config.instrumentation.max_events = 555555;
+
+    // Set an invalid environment variable
+    putenv(const_cast<char*>("GGML_VIZ_MAX_EVENTS=not-a-number"));
+
+    // Apply overrides
+    config.apply_env_overrides();
+
+    // The value should be reset to the default, not stay at 555555
+    assert(config.instrumentation.max_events == Config::default_config().instrumentation.max_events);
+
+    // Cleanup
+#ifdef _WIN32
+    putenv(const_cast<char*>("GGML_VIZ_MAX_EVENTS="));
+#else
+    unsetenv("GGML_VIZ_MAX_EVENTS");
+#endif
+
+    std::cout << "✅ Invalid env override fallback test passed" << std::endl;
+}
+
 void test_config_manager_singleton() {
     std::cout << "Testing ConfigManager singleton..." << std::endl;
     
@@ -394,6 +420,7 @@ int main() {
         test_partial_config_loading();
         test_config_merging();
         test_env_overrides();
+        test_invalid_env_override_fallback();
         test_config_manager_singleton();
         test_file_loading();
         test_precedence_loading();

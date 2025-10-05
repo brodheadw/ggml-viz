@@ -310,6 +310,7 @@ void Config::apply_env_overrides() {
             instrumentation.max_events = std::stoull(env_max_events);
         } catch (...) {
             std::cerr << "[GGML_VIZ] Warning: Invalid GGML_VIZ_MAX_EVENTS value, using default\n";
+            instrumentation.max_events = default_config().instrumentation.max_events;
         }
     }
     
