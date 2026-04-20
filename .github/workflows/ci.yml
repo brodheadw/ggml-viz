@@ -75,7 +75,16 @@ jobs:
       shell: bash
       run: |
         if [ "${{ matrix.platform }}" = "macos" ]; then
-          cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DGGML_METAL=OFF
+          # GGML_NATIVE=OFF + explicit ARM arch avoids a feature-detection
+          # mismatch on macos-latest runners where -mcpu=native+i8mm passes
+          # the CMake check but then quants.c fails to compile because the
+          # function target attributes aren't i8mm-aware (always_inline
+          # intrinsic rejected). The pinned arch matches ggml's
+          # GGML_CPU_ALL_VARIANTS baseline minus the post-8.6 features.
+          cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+                   -DGGML_METAL=OFF \
+                   -DGGML_NATIVE=OFF \
+                   -DGGML_CPU_ARM_ARCH=armv8.4-a+dotprod+fp16
         elif [ "${{ matrix.platform }}" = "windows" ]; then
           cmake .. -A x64 -DCMAKE_BUILD_TYPE=$BUILD_TYPE
         else
