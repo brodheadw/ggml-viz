@@ -113,7 +113,7 @@ struct ggmlviz_file_t {
 - **GRAPH_COMPUTE_BEGIN**: Marks the start of graph computation
   - `data.graph.graph_ptr`: Pointer to the `ggml_cgraph` structure
   - `data.graph.n_nodes`: Number of nodes in the computation graph
-  - `data.graph.n_threads`: Number of threads allocated for computation
+  - `data.graph.n_threads`: Number of threads allocated for computation, or `0` if not known at the intercepted call site (most scheduler/backend paths don't expose it; the `ggml_graph_compute_with_ctx` path does)
   - `data.graph.backend_ptr`: Backend used (Metal, CUDA, etc.) or NULL for CPU
 
 - **GRAPH_COMPUTE_END**: Marks the end of graph computation

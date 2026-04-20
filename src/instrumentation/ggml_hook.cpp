@@ -305,9 +305,9 @@ void GGMLHook::flush_to_file() {
 #endif
 }
 
-void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend) {
+void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend, int n_threads) {
     if (!active_.load()) return;
-    
+
     auto config = ConfigManager::instance().get();
     if (!config->instrumentation.enable_op_timing) return;
 
@@ -320,16 +320,16 @@ void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backe
     event.thread_id = get_thread_id();
     event.data.graph.graph_ptr = graph;
     event.data.graph.n_nodes = n_nodes;
-    event.data.graph.n_threads = 1; // TODO: Get actual thread count
+    event.data.graph.n_threads = n_threads < 0 ? 0 : static_cast<uint32_t>(n_threads);
     event.data.graph.backend_ptr = backend;
     event.label = nullptr;
 
     record_event(event);
 }
 
-void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend) {
+void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend, int n_threads) {
     if (!active_.load()) return;
-    
+
     auto config = ConfigManager::instance().get();
     if (!config->instrumentation.enable_op_timing) return;
 
@@ -342,7 +342,7 @@ void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend
     event.thread_id = get_thread_id();
     event.data.graph.graph_ptr = graph;
     event.data.graph.n_nodes = n_nodes;
-    event.data.graph.n_threads = 1; // TODO: Get actual thread count
+    event.data.graph.n_threads = n_threads < 0 ? 0 : static_cast<uint32_t>(n_threads);
     event.data.graph.backend_ptr = backend;
     event.label = nullptr;
 
@@ -608,8 +608,8 @@ extern "C" {
         
         if (hook.is_active()) {
             printf("[DEBUG] Intercepted ggml_graph_compute_with_ctx, nodes: %d\n", cgraph->n_nodes);
-            hook.on_graph_compute_begin(cgraph, nullptr);
-            
+            hook.on_graph_compute_begin(cgraph, nullptr, n_threads);
+
             // Call each node's begin hook
             for (int i = 0; i < cgraph->n_nodes; i++) {
                 if (cgraph->nodes[i]) {
@@ -617,23 +617,23 @@ extern "C" {
                 }
             }
         }
-        
+
         // Call the original function
         enum ggml_status result = GGML_STATUS_SUCCESS;
-        
+
         // Initialize function pointers if needed
         if (!hooks_initialized) {
             install_ggml_hooks();
             hooks_initialized = true;
         }
-        
+
         if (original_graph_compute_with_ctx) {
             result = original_graph_compute_with_ctx(ctx, cgraph, n_threads);
         } else {
             printf("[GGML_VIZ] Warning: No original ggml_graph_compute_with_ctx function found\n");
             // Continue without calling original - this allows pure instrumentation mode
         }
-        
+
         if (hook.is_active()) {
             // Call each node's end hook
             for (int i = 0; i < cgraph->n_nodes; i++) {
@@ -641,8 +641,8 @@ extern "C" {
                     hook.on_op_compute_end(cgraph->nodes[i], nullptr);
                 }
             }
-            
-            hook.on_graph_compute_end(cgraph, nullptr);
+
+            hook.on_graph_compute_end(cgraph, nullptr, n_threads);
         }
         
         return result;
