@@ -65,4 +65,13 @@ benchmark_results/
 # Additional runtime files
 *.ini
 
-.gitignore
+# Shared-memory dumps at repo root
+/shm
+
+# Compiled manual-test binaries (sources in tests/manual/*.cpp|*.c)
+tests/manual/controlled_test
+tests/manual/minimal_test
+tests/manual/test_direct_hooks
+tests/manual/test_ggml_hook
+tests/manual/test_interpose
+tests/manual/test_symbol_override

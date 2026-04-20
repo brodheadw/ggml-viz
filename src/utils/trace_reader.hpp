@@ -69,6 +69,9 @@ private:
     bool valid_ = false;
     TraceHeader header_;
     std::vector<Event> events_;
+
+    // Owns label strings that Event::label pointers reference.
+    std::vector<std::unique_ptr<char[]>> label_pool_;
     
     // Cached memory analysis state
     mutable bool memory_stats_dirty_ = true;

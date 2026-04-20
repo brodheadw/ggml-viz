@@ -113,8 +113,9 @@ public:
     size_t get_current_read_pos() const { return read_pos_.v.load(std::memory_order_acquire); }
     size_t get_dropped_events() const { return dropped_events_.load(std::memory_order_relaxed); }
 
-    void on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
-    void on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend = nullptr);
+    // n_threads == 0 means unknown (most interposition paths don't expose it).
+    void on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend = nullptr, int n_threads = 0);
+    void on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend = nullptr, int n_threads = 0);
     void on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
     void on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* backend = nullptr);
     
