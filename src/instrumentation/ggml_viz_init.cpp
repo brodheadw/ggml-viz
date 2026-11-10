@@ -6,9 +6,6 @@
 #include <string>
 #include <thread>
 #include <chrono>
-#ifndef _WIN32
-#include <signal.h>
-#endif
 
 namespace ggml_viz {
 
@@ -114,24 +111,6 @@ struct AutoInitializer {
                 }
             });
             
-            // Additional cleanup for abnormal termination (Unix signals)
-            #ifndef _WIN32
-            signal(SIGINT, [](int) {
-                log_message("Received SIGINT - saving trace before exit");
-                if (GGMLHook::instance().is_active()) {
-                    GGMLHook::instance().stop();
-                }
-                std::exit(0);
-            });
-            
-            signal(SIGTERM, [](int) {
-                log_message("Received SIGTERM - saving trace before exit");
-                if (GGMLHook::instance().is_active()) {
-                    GGMLHook::instance().stop();
-                }
-                std::exit(0);
-            });
-            #endif
             
         } catch (const std::exception& e) {
             log_message("Exception during initialization: " + std::string(e.what()), true);
