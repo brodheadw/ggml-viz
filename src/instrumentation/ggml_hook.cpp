@@ -4,12 +4,14 @@
 #include "ggml-impl.h" // for ggml_cgraph, ggml_tensor
 #include "ggml-backend.h" // for ggml_backend_t
 #include "ggml-alloc.h" // for memory allocation functions
+#include "ggml-cpu.h"   // declares ggml_graph_compute; keeps our overrides signature-checked
 #include <thread>
 #include <cstring>
 #include <cassert>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <unordered_set>
 #ifdef _WIN32
 #include <io.h>     // for _commit, _fileno
 #else
@@ -33,6 +35,15 @@ namespace {
         ).count();
     }
     
+    // Events outlive the tensors they describe, so labels must not point into tensor->name.
+    // Intentionally leaked: the singleton's destructor flushes labels after statics are torn down.
+    const char* intern_label(const char* name) {
+        static auto* mutex = new std::mutex;
+        static auto* pool = new std::unordered_set<std::string>;
+        std::lock_guard<std::mutex> lock(*mutex);
+        return pool->emplace(name).first->c_str();
+    }
+
     // Simple implementation of ggml_nbytes to avoid linking dependencies
     size_t ggml_nbytes_simple(const ggml_tensor* tensor) {
         if (!tensor) return 0;
@@ -381,7 +392,7 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend
     event.data.op.op_type = tensor->op;
     event.data.op.op_size = ggml_nbytes_simple(tensor);
     event.data.op.backend_ptr = backend;
-    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    event.label = config->instrumentation.record_tensor_names ? intern_label(tensor->name) : nullptr;
     
     record_event(event);
 }
@@ -411,7 +422,7 @@ void GGMLHook::on_op_compute_end(const ggml_tensor* tensor, const ggml_backend* 
     event.data.op.op_type = tensor->op;
     event.data.op.op_size = ggml_nbytes_simple(tensor);
     event.data.op.backend_ptr = backend;
-    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    event.label = config->instrumentation.record_tensor_names ? intern_label(tensor->name) : nullptr;
     
     record_event(event);
 }
@@ -431,7 +442,7 @@ void GGMLHook::on_tensor_alloc(const ggml_tensor* tensor, size_t size, const ggm
     event.thread_id = get_thread_id();
     event.data.memory.ptr = tensor;
     event.data.memory.size = size;
-    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    event.label = config->instrumentation.record_tensor_names ? intern_label(tensor->name) : nullptr;
     
     record_event(event);
 }
@@ -451,7 +462,7 @@ void GGMLHook::on_tensor_free(const ggml_tensor* tensor, const ggml_backend* bac
     event.thread_id = get_thread_id();
     event.data.memory.ptr = tensor;
     event.data.memory.size = 0; // Size not available for free events
-    event.label = config->instrumentation.record_tensor_names ? tensor->name : nullptr;
+    event.label = config->instrumentation.record_tensor_names ? intern_label(tensor->name) : nullptr;
     
     record_event(event);
 }
@@ -485,7 +496,7 @@ extern "C" {
 
 // Function pointers to original implementations
 static enum ggml_status (*original_backend_graph_compute)(ggml_backend_t, struct ggml_cgraph*) = nullptr;
-static void (*original_graph_compute)(struct ggml_context*, struct ggml_cgraph*) = nullptr;
+static enum ggml_status (*original_graph_compute)(struct ggml_cgraph*, struct ggml_cplan*) = nullptr;
 static enum ggml_status (*original_graph_compute_with_ctx)(struct ggml_context*, struct ggml_cgraph*, int) = nullptr;
 static enum ggml_status (*original_metal_graph_compute)(ggml_backend_t, struct ggml_cgraph*) = nullptr;
 
@@ -551,8 +562,7 @@ extern "C" {
         return result;
     }
     
-    // Alternative override for older GGML versions that might use ggml_graph_compute
-    GGML_VIZ_API void ggml_graph_compute(struct ggml_context* ctx, struct ggml_cgraph* cgraph) {
+    GGML_VIZ_API enum ggml_status ggml_graph_compute(struct ggml_cgraph* cgraph, struct ggml_cplan* cplan) {
         auto& hook = GGMLHook::instance();
         
         // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
@@ -572,8 +582,8 @@ extern "C" {
             }
         }
         
-        // Call the original function
-        
+        enum ggml_status result = GGML_STATUS_SUCCESS;
+
         // Initialize function pointers if needed
         if (!hooks_initialized) {
             install_ggml_hooks();
@@ -581,7 +591,7 @@ extern "C" {
         }
         
         if (original_graph_compute) {
-            original_graph_compute(ctx, cgraph);
+            result = original_graph_compute(cgraph, cplan);
         } else {
             printf("[GGML_VIZ] Warning: No original ggml_graph_compute function found\n");
             // Continue without calling original - this allows pure instrumentation mode
@@ -597,6 +607,8 @@ extern "C" {
             
             hook.on_graph_compute_end(cgraph, nullptr);
         }
+
+        return result;
     }
     
     // Override for ggml_graph_compute_with_ctx (commonly used in tests)
@@ -831,7 +843,7 @@ bool install_ggml_hooks() {
         // Look for the original functions in case they're not weak symbols
         auto backend_func = reinterpret_cast<enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*)>
             (dlsym(handle, "ggml_backend_graph_compute"));
-        auto graph_func = reinterpret_cast<void (*)(struct ggml_context*, struct ggml_cgraph*)>
+        auto graph_func = reinterpret_cast<enum ggml_status (*)(struct ggml_cgraph*, struct ggml_cplan*)>
             (dlsym(handle, "ggml_graph_compute"));
         auto graph_with_ctx_func = reinterpret_cast<enum ggml_status (*)(struct ggml_context*, struct ggml_cgraph*, int)>
             (dlsym(handle, "ggml_graph_compute_with_ctx"));
