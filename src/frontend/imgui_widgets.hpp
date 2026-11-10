@@ -160,7 +160,8 @@ private:
     
     int selected_node_ = -1;
     std::vector<GraphNode> cached_nodes_;
-    bool nodes_dirty_ = true;
+    const TraceReader* built_from_ = nullptr;
+    size_t built_event_count_ = 0;
 };
 
 } // namespace ggml_viz

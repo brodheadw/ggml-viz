@@ -71,6 +71,7 @@ bool TraceReader::load_events() {
         if (has_label) {
             uint32_t label_len;
             if (fread(&label_len, sizeof(label_len), 1, file_) != 1) break;
+            if (label_len > 4096) break; // corrupt length; tensor names are <= GGML_MAX_NAME
 
             auto owned = std::make_unique<char[]>(label_len + 1);
             if (fread(owned.get(), 1, label_len, file_) != label_len) break;
@@ -232,6 +233,11 @@ void TraceReader::update_memory_stats() const {
                 freed_pointers_.erase(event.data.memory.ptr);
             }
             
+            // ggml re-allocs live tensors each graph without a free; replace, don't add
+            auto existing = allocations_.find(event.data.memory.ptr);
+            if (existing != allocations_.end()) {
+                current_usage_ -= existing->second;
+            }
             allocations_[event.data.memory.ptr] = event.data.memory.size;
             current_usage_ += event.data.memory.size;
             

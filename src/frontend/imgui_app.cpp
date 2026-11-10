@@ -499,10 +499,6 @@ void ImGuiApp::render_file_browser() {
 
 bool ImGuiApp::load_trace_file(const std::string& filename) {
     try {
-        // if live mode is active, disable it first
-        if (data_->live_mode) {
-            disable_live_mode();
-        }
         // First check if file exists and is accessible
         FILE* test_file = fopen(filename.c_str(), "rb");
         if (!test_file) {
@@ -572,7 +568,10 @@ bool ImGuiApp::load_trace_file(const std::string& filename) {
             // Still allow loading empty traces for debugging
         }
         
-        // Success - load the trace
+        // Success - only now leave live mode, so a bad path doesn't kill a running session
+        if (data_->live_mode) {
+            disable_live_mode();
+        }
         data_->trace_reader = std::move(reader);
         data_->trace_loaded = true;
         data_->current_filename = filename.substr(filename.find_last_of("/\\") + 1); // Just filename for display
@@ -1018,7 +1017,9 @@ void ImGuiApp::render_hook_status_notification() {
                           "or enable Live Mode to capture real-time data.";
     }
     
-    if (should_show_notification) {
+    // Remember which message the user dismissed so OK doesn't immediately reopen it
+    static std::string dismissed_text;
+    if (should_show_notification && notification_text != dismissed_text) {
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
         ImGui::SetNextWindowBgAlpha(0.9f);
         
@@ -1028,13 +1029,14 @@ void ImGuiApp::render_hook_status_notification() {
             
             ImGui::Separator();
             if (ImGui::Button("OK")) {
+                dismissed_text = notification_text;
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
         }
         
         // Auto-open the popup
-        if (!ImGui::IsPopupOpen("Hook Status")) {
+        if (notification_text != dismissed_text && !ImGui::IsPopupOpen("Hook Status")) {
             ImGui::OpenPopup("Hook Status");
         }
     }
