@@ -370,12 +370,14 @@ bool GraphWidget::render(const char* label, const TraceReader* trace_reader, Gra
     ImGui::PushID(label);
     
     // Rebuild graph if needed
-    if (nodes_dirty_) {
+    if (trace_reader != built_from_ || trace_reader->event_count() != built_event_count_) {
         cached_nodes_ = build_graph_from_trace(trace_reader);
         if (config.auto_layout) {
             auto_layout_nodes(cached_nodes_, config);
         }
-        nodes_dirty_ = false;
+        built_from_ = trace_reader;
+        built_event_count_ = trace_reader->event_count();
+        selected_node_ = -1;
     }
     
     // Render graph controls
