@@ -11,101 +11,35 @@
 // Forward-declare the scheduler type used in headers
 typedef struct ggml_backend_sched * ggml_backend_sched_t;
 
-// Replacement functions - capture events AND call original functions
+namespace ggml_viz {
+enum ggml_status sched_compute(ggml_backend_sched_t sched, struct ggml_cgraph* graph,
+                               enum ggml_status (*real_fn)(ggml_backend_sched_t, struct ggml_cgraph*));
+void sched_set_eval_callback(ggml_backend_sched_t sched, ggml_backend_sched_eval_callback cb, void* user_data);
+}
+
+// Replacement functions - capture events AND call original functions.
+// Calls by name reach the originals: dyld doesn't apply interposing to the interposing image,
+// and dlsym(RTLD_NEXT) returns null for a DYLD_INSERT_LIBRARIES library.
 extern "C" {
 __attribute__((visibility("default")))
 enum ggml_status viz_sched_graph_compute(ggml_backend_sched_t sched, struct ggml_cgraph* cg) {
-    auto& hook = ggml_viz::GGMLHook::instance();
-
-    if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-        hook.start();
-    }
-
-    if (hook.is_active()) {
-        hook.on_graph_compute_begin(cg, reinterpret_cast<const ggml_backend*>(sched));
-        
-        // Capture individual operation events
-        if (cg && cg->nodes) {
-            for (int i = 0; i < cg->n_nodes; i++) {
-                if (cg->nodes[i]) {
-                    hook.on_op_compute_begin(cg->nodes[i], reinterpret_cast<const ggml_backend*>(sched));
-                }
-            }
-        }
-    }
-
-    // Call the original function if it exists
     using fn_type = enum ggml_status (*)(ggml_backend_sched_t, struct ggml_cgraph*);
-    static fn_type real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_backend_sched_graph_compute");
-    
-    enum ggml_status rc = GGML_STATUS_SUCCESS;
-    if (real_fn) {
-        rc = real_fn(sched, cg);  // delegate to actual compute
-    }
-
-    if (hook.is_active()) {
-        // Capture individual operation end events
-        if (cg && cg->nodes) {
-            for (int i = 0; i < cg->n_nodes; i++) {
-                if (cg->nodes[i]) {
-                    hook.on_op_compute_end(cg->nodes[i], reinterpret_cast<const ggml_backend*>(sched));
-                }
-            }
-        }
-        
-        hook.on_graph_compute_end(cg, reinterpret_cast<const ggml_backend*>(sched));
-    }
-
-    return rc;
+    static fn_type real_fn = &ggml_backend_sched_graph_compute;
+    return ggml_viz::sched_compute(sched, cg, real_fn);
 }
 
 __attribute__((visibility("default")))
 enum ggml_status viz_sched_graph_compute_async(ggml_backend_sched_t sched, struct ggml_cgraph* cg) {
-    auto& hook = ggml_viz::GGMLHook::instance();
-
-    if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-        hook.start();
-    }
-
-    if (hook.is_active()) {
-        hook.on_graph_compute_begin(cg, reinterpret_cast<const ggml_backend*>(sched));
-        
-        // Capture individual operation events
-        if (cg && cg->nodes) {
-            for (int i = 0; i < cg->n_nodes; i++) {
-                if (cg->nodes[i]) {
-                    hook.on_op_compute_begin(cg->nodes[i], reinterpret_cast<const ggml_backend*>(sched));
-                }
-            }
-        }
-    }
-
-    // Call the original function if it exists
     using fn_type = enum ggml_status (*)(ggml_backend_sched_t, struct ggml_cgraph*);
-    static fn_type real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_backend_sched_graph_compute_async");
-    
-    enum ggml_status rc = GGML_STATUS_SUCCESS;
-    if (real_fn) {
-        rc = real_fn(sched, cg);  // delegate to actual compute
-    }
-
-    if (hook.is_active()) {
-        // Capture individual operation end events
-        if (cg && cg->nodes) {
-            for (int i = 0; i < cg->n_nodes; i++) {
-                if (cg->nodes[i]) {
-                    hook.on_op_compute_end(cg->nodes[i], reinterpret_cast<const ggml_backend*>(sched));
-                }
-            }
-        }
-        
-        hook.on_graph_compute_end(cg, reinterpret_cast<const ggml_backend*>(sched));
-    }
-
-    return rc;
+    static fn_type real_fn = &ggml_backend_sched_graph_compute_async;
+    return ggml_viz::sched_compute(sched, cg, real_fn);
 }
 
-// Additional backend graph compute functions
+__attribute__((visibility("default")))
+void viz_sched_set_eval_callback(ggml_backend_sched_t sched, ggml_backend_sched_eval_callback cb, void* user_data) {
+    ggml_viz::sched_set_eval_callback(sched, cb, user_data);
+}
+
 __attribute__((visibility("default")))
 enum ggml_status viz_backend_graph_compute(ggml_backend_t backend, struct ggml_cgraph* cg) {
     auto& hook = ggml_viz::GGMLHook::instance();
@@ -117,34 +51,19 @@ enum ggml_status viz_backend_graph_compute(ggml_backend_t backend, struct ggml_c
     if (hook.is_active()) {
         hook.on_graph_compute_begin(cg, reinterpret_cast<const ggml_backend*>(backend));
         
-        // Capture individual operation events
-        if (cg && cg->nodes) {
-            for (int i = 0; i < cg->n_nodes; i++) {
-                if (cg->nodes[i]) {
-                    hook.on_op_compute_begin(cg->nodes[i], reinterpret_cast<const ggml_backend*>(backend));
-                }
-            }
-        }
     }
 
     // Call the original function if it exists
     using fn_type = enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*);
-    static fn_type real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_backend_graph_compute");
+    static fn_type real_fn = &ggml_backend_graph_compute;
     
     enum ggml_status rc = GGML_STATUS_SUCCESS;
     if (real_fn) {
+        ggml_viz::NestedComputeScope scope;
         rc = real_fn(backend, cg);  // delegate to actual compute
     }
 
     if (hook.is_active()) {
-        // Capture individual operation end events
-        if (cg && cg->nodes) {
-            for (int i = 0; i < cg->n_nodes; i++) {
-                if (cg->nodes[i]) {
-                    hook.on_op_compute_end(cg->nodes[i], reinterpret_cast<const ggml_backend*>(backend));
-                }
-            }
-        }
         
         hook.on_graph_compute_end(cg, reinterpret_cast<const ggml_backend*>(backend));
     }
@@ -163,34 +82,19 @@ enum ggml_status viz_backend_graph_compute_async(ggml_backend_t backend, struct 
     if (hook.is_active()) {
         hook.on_graph_compute_begin(cg, reinterpret_cast<const ggml_backend*>(backend));
         
-        // Capture individual operation events
-        if (cg && cg->nodes) {
-            for (int i = 0; i < cg->n_nodes; i++) {
-                if (cg->nodes[i]) {
-                    hook.on_op_compute_begin(cg->nodes[i], reinterpret_cast<const ggml_backend*>(backend));
-                }
-            }
-        }
     }
 
     // Call the original function if it exists
     using fn_type = enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*);
-    static fn_type real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_backend_graph_compute_async");
+    static fn_type real_fn = &ggml_backend_graph_compute_async;
     
     enum ggml_status rc = GGML_STATUS_SUCCESS;
     if (real_fn) {
+        ggml_viz::NestedComputeScope scope;
         rc = real_fn(backend, cg);  // delegate to actual compute
     }
 
     if (hook.is_active()) {
-        // Capture individual operation end events
-        if (cg && cg->nodes) {
-            for (int i = 0; i < cg->n_nodes; i++) {
-                if (cg->nodes[i]) {
-                    hook.on_op_compute_end(cg->nodes[i], reinterpret_cast<const ggml_backend*>(backend));
-                }
-            }
-        }
         
         hook.on_graph_compute_end(cg, reinterpret_cast<const ggml_backend*>(backend));
     }
@@ -213,10 +117,11 @@ enum ggml_status viz_graph_compute(struct ggml_cgraph* cg, struct ggml_cplan* cp
 
     // Call the original function if it exists
     using fn_type = enum ggml_status (*)(struct ggml_cgraph*, struct ggml_cplan*);
-    static fn_type real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_graph_compute");
+    static fn_type real_fn = &ggml_graph_compute;
     
     enum ggml_status rc = GGML_STATUS_SUCCESS;
     if (real_fn) {
+        ggml_viz::NestedComputeScope scope;
         rc = real_fn(cg, cplan);  // delegate to actual compute
     }
 
@@ -241,10 +146,11 @@ enum ggml_status viz_graph_compute_with_ctx(struct ggml_context* ctx, struct ggm
 
     // Call the original function if it exists
     using fn_type = enum ggml_status (*)(struct ggml_context*, struct ggml_cgraph*, int);
-    static fn_type real_fn = (fn_type)dlsym(RTLD_NEXT, "ggml_graph_compute_with_ctx");
+    static fn_type real_fn = &ggml_graph_compute_with_ctx;
     
     enum ggml_status rc = GGML_STATUS_SUCCESS;
     if (real_fn) {
+        ggml_viz::NestedComputeScope scope;
         rc = real_fn(ctx, cg, n_threads);  // delegate to actual compute
     }
 
@@ -264,6 +170,7 @@ _interpose_##_orig  __attribute__((section("__DATA,__interpose"))) = { \
 
 DYLD_INTERPOSE(viz_sched_graph_compute,       ggml_backend_sched_graph_compute)
 DYLD_INTERPOSE(viz_sched_graph_compute_async, ggml_backend_sched_graph_compute_async)
+DYLD_INTERPOSE(viz_sched_set_eval_callback,   ggml_backend_sched_set_eval_callback)
 DYLD_INTERPOSE(viz_backend_graph_compute,     ggml_backend_graph_compute)
 DYLD_INTERPOSE(viz_backend_graph_compute_async, ggml_backend_graph_compute_async)
 DYLD_INTERPOSE(viz_graph_compute,             ggml_graph_compute)

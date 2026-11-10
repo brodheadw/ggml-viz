@@ -166,6 +166,30 @@ jobs:
           ./bin/test_trace_reader "$EXPECTED_TRACE_FILE"
         fi
         
+    - name: Preload test against shared ggml
+      if: matrix.platform != 'windows'
+      shell: bash
+      run: |
+        # The hook only intercepts calls into a *shared* ggml, which the project build doesn't use.
+        GGML_FLAGS="-DBUILD_SHARED_LIBS=ON -DGGML_BUILD_TESTS=OFF -DGGML_BUILD_EXAMPLES=OFF -DGGML_METAL=OFF -DGGML_BLAS=OFF"
+        if [ "${{ matrix.platform }}" = "macos" ]; then
+          GGML_FLAGS="$GGML_FLAGS -DGGML_NATIVE=OFF -DGGML_CPU_ARM_ARCH=armv8.4-a+dotprod+fp16"
+        fi
+        cmake -S third_party/ggml -B build-ggml-shared -DCMAKE_BUILD_TYPE=Release $GGML_FLAGS
+        cmake --build build-ggml-shared -j 4
+        LIBDIR=$PWD/build-ggml-shared/src
+        $CC -O1 tests/preload/sched_check.c -Ithird_party/ggml/include -L$LIBDIR -Wl,-rpath,$LIBDIR \
+            -lggml -lggml-base -lggml-cpu -lm -o sched_check
+        for args in "" "cb"; do
+          rm -f preload.ggmlviz
+          if [ "${{ matrix.platform }}" = "macos" ]; then
+            DYLD_INSERT_LIBRARIES=$PWD/build/src/libggml_viz_hook.dylib GGML_VIZ_OUTPUT=$PWD/preload.ggmlviz ./sched_check $args
+          else
+            LD_PRELOAD=$PWD/build/src/libggml_viz_hook.so GGML_VIZ_OUTPUT=$PWD/preload.ggmlviz ./sched_check $args
+          fi
+          python3 tests/preload/check_trace.py preload.ggmlviz
+        done
+
     - name: Run performance benchmark
       working-directory: build/..
       shell: bash

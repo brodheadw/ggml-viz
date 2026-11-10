@@ -11,6 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <unordered_map>
 #include <unordered_set>
 #ifdef _WIN32
 #include <io.h>     // for _commit, _fileno
@@ -35,6 +36,9 @@ namespace {
         ).count();
     }
     
+    // >0 while a compute we wrap is running on this thread
+    thread_local int t_compute_depth = 0;
+
     // Events outlive the tensors they describe, so labels must not point into tensor->name.
     // Intentionally leaked: the singleton's destructor flushes labels after statics are torn down.
     const char* intern_label(const char* name) {
@@ -74,6 +78,9 @@ namespace {
         return total_elements * element_size;
     }
 }
+
+NestedComputeScope::NestedComputeScope() { ++t_compute_depth; }
+NestedComputeScope::~NestedComputeScope() { --t_compute_depth; }
 
 // Private constructor - configuration now handled by ConfigManager
 GGMLHook::GGMLHook() : event_buffer_{}, write_pos_{}, read_pos_{} {
@@ -318,6 +325,7 @@ void GGMLHook::flush_to_file() {
 
 void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backend* backend, int n_threads) {
     if (!active_.load()) return;
+    if (t_compute_depth > 0) return; // nested compute, already recorded by the outer call
 
     auto config = ConfigManager::instance().get();
     if (!config->instrumentation.enable_op_timing) return;
@@ -340,6 +348,7 @@ void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backe
 
 void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend, int n_threads) {
     if (!active_.load()) return;
+    if (t_compute_depth > 0) return; // nested compute, already recorded by the outer call
 
     auto config = ConfigManager::instance().get();
     if (!config->instrumentation.enable_op_timing) return;
@@ -507,8 +516,90 @@ static struct ggml_backend_buffer* (*original_backend_alloc_ctx_tensors)(struct 
 
 static bool hooks_initialized = false;
 
-// Our intercepted functions - only for shared library builds (not static library or test builds)
-#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
+#if !defined(_WIN32) && !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
+// Per-op timing: ggml only exposes node boundaries through the scheduler's eval callback.
+// Asking for every node makes the scheduler compute and synchronize one node at a time,
+// so OP_BEGIN/OP_END bracket that node's real execution (at the cost of per-node syncs).
+namespace {
+    struct SchedState {
+        ggml_backend_sched_eval_callback user_cb = nullptr;
+        void* user_ud = nullptr;
+        bool user_need = false;
+    };
+
+    using set_eval_cb_fn = void (*)(ggml_backend_sched_t, ggml_backend_sched_eval_callback, void*);
+
+    set_eval_cb_fn real_set_eval_callback() {
+#ifdef __APPLE__
+        // dyld doesn't apply interposing to the interposing image, so the name is the original.
+        // (dlsym(RTLD_NEXT) returns null for an inserted library.)
+        static auto fn = &ggml_backend_sched_set_eval_callback;
+#else
+        static auto fn = reinterpret_cast<set_eval_cb_fn>(dlsym(RTLD_NEXT, "ggml_backend_sched_set_eval_callback"));
+#endif
+        return fn;
+    }
+
+    // unordered_map keeps element addresses stable, so &state is safe to hand to ggml
+    SchedState& sched_state(ggml_backend_sched_t sched) {
+        static auto* mutex = new std::mutex;
+        static auto* states = new std::unordered_map<ggml_backend_sched_t, SchedState>;
+        std::lock_guard<std::mutex> lock(*mutex);
+        return (*states)[sched];
+    }
+
+    bool viz_eval_callback(struct ggml_tensor* t, bool ask, void* user_data) {
+        auto* st = static_cast<SchedState*>(user_data);
+        auto& hook = GGMLHook::instance();
+        if (ask) {
+            st->user_need = st->user_cb && st->user_cb(t, true, st->user_ud);
+            hook.on_op_compute_begin(t, nullptr);
+            return true;
+        }
+        hook.on_op_compute_end(t, nullptr);
+        return st->user_need ? st->user_cb(t, false, st->user_ud) : true;
+    }
+}
+
+enum ggml_status sched_compute(ggml_backend_sched_t sched, struct ggml_cgraph* graph,
+                               enum ggml_status (*real_fn)(ggml_backend_sched_t, struct ggml_cgraph*)) {
+    if (!real_fn) return GGML_STATUS_FAILED;
+    auto& hook = GGMLHook::instance();
+    if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+        hook.start();
+    }
+    // sched_graph_compute calls sched_graph_compute_async; only the outermost call instruments
+    if (t_compute_depth > 0 || !hook.is_active() || !real_set_eval_callback()) {
+        return real_fn(sched, graph);
+    }
+
+    auto& st = sched_state(sched);
+    auto backend_id = reinterpret_cast<const ggml_backend*>(sched);
+    hook.on_graph_compute_begin(graph, backend_id);
+    real_set_eval_callback()(sched, viz_eval_callback, &st);
+    enum ggml_status rc;
+    {
+        NestedComputeScope scope;
+        rc = real_fn(sched, graph);
+    }
+    real_set_eval_callback()(sched, st.user_cb, st.user_ud);
+    hook.on_graph_compute_end(graph, backend_id);
+    return rc;
+}
+
+void sched_set_eval_callback(ggml_backend_sched_t sched, ggml_backend_sched_eval_callback cb, void* user_data) {
+    auto& st = sched_state(sched);
+    st.user_cb = cb;
+    st.user_ud = user_data;
+    if (real_set_eval_callback()) real_set_eval_callback()(sched, cb, user_data);
+}
+#endif
+
+
+// Our intercepted functions - only for shared library builds (not static library or test builds).
+// macOS interposes via DYLD_INTERPOSE in sched_interpose.mm instead: defining these symbols here
+// would make its interpose entries (and its by-name calls to the originals) bind to our own copies.
+#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD) && !defined(__APPLE__)
 extern "C" {
     // Override ggml_backend_graph_compute
     GGML_VIZ_API enum ggml_status ggml_backend_graph_compute(ggml_backend_t backend, struct ggml_cgraph* cgraph) {
@@ -522,13 +613,6 @@ extern "C" {
         
         if (hook.is_active()) {
             hook.on_graph_compute_begin(cgraph, backend);
-            
-            // Call each node's begin hook
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                if (cgraph->nodes[i]) {
-                    hook.on_op_compute_begin(cgraph->nodes[i], backend);
-                }
-            }
         }
         
         // Call the original function
@@ -541,6 +625,7 @@ extern "C" {
         }
         
         if (original_backend_graph_compute) {
+            NestedComputeScope scope;
             result = original_backend_graph_compute(backend, cgraph);
         } else {
             printf("[GGML_VIZ] Warning: No original ggml_backend_graph_compute function found\n");
@@ -549,13 +634,6 @@ extern "C" {
         }
         
         if (hook.is_active()) {
-            // Call each node's end hook
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                if (cgraph->nodes[i]) {
-                    hook.on_op_compute_end(cgraph->nodes[i], backend);
-                }
-            }
-            
             hook.on_graph_compute_end(cgraph, backend);
         }
         
@@ -573,13 +651,6 @@ extern "C" {
         
         if (hook.is_active()) {
             hook.on_graph_compute_begin(cgraph, nullptr);
-            
-            // Call each node's begin hook
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                if (cgraph->nodes[i]) {
-                    hook.on_op_compute_begin(cgraph->nodes[i], nullptr);
-                }
-            }
         }
         
         enum ggml_status result = GGML_STATUS_SUCCESS;
@@ -591,6 +662,7 @@ extern "C" {
         }
         
         if (original_graph_compute) {
+            NestedComputeScope scope;
             result = original_graph_compute(cgraph, cplan);
         } else {
             printf("[GGML_VIZ] Warning: No original ggml_graph_compute function found\n");
@@ -598,13 +670,6 @@ extern "C" {
         }
         
         if (hook.is_active()) {
-            // Call each node's end hook
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                if (cgraph->nodes[i]) {
-                    hook.on_op_compute_end(cgraph->nodes[i], nullptr);
-                }
-            }
-            
             hook.on_graph_compute_end(cgraph, nullptr);
         }
 
@@ -617,13 +682,6 @@ extern "C" {
         
         if (hook.is_active()) {
             hook.on_graph_compute_begin(cgraph, nullptr, n_threads);
-
-            // Call each node's begin hook
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                if (cgraph->nodes[i]) {
-                    hook.on_op_compute_begin(cgraph->nodes[i], nullptr);
-                }
-            }
         }
 
         // Call the original function
@@ -636,6 +694,7 @@ extern "C" {
         }
 
         if (original_graph_compute_with_ctx) {
+            NestedComputeScope scope;
             result = original_graph_compute_with_ctx(ctx, cgraph, n_threads);
         } else {
             printf("[GGML_VIZ] Warning: No original ggml_graph_compute_with_ctx function found\n");
@@ -643,13 +702,6 @@ extern "C" {
         }
 
         if (hook.is_active()) {
-            // Call each node's end hook
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                if (cgraph->nodes[i]) {
-                    hook.on_op_compute_end(cgraph->nodes[i], nullptr);
-                }
-            }
-
             hook.on_graph_compute_end(cgraph, nullptr, n_threads);
         }
         
@@ -668,13 +720,6 @@ extern "C" {
         
         if (hook.is_active()) {
             hook.on_graph_compute_begin(cgraph, backend);
-            
-            // Call each node's begin hook
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                if (cgraph->nodes[i]) {
-                    hook.on_op_compute_begin(cgraph->nodes[i], backend);
-                }
-            }
         }
         
         // Call the original function
@@ -687,6 +732,7 @@ extern "C" {
         }
         
         if (original_metal_graph_compute) {
+            NestedComputeScope scope;
             result = original_metal_graph_compute(backend, cgraph);
         } else {
             printf("[GGML_VIZ] Warning: No original ggml_backend_metal_graph_compute function found\n");
@@ -694,13 +740,6 @@ extern "C" {
         }
         
         if (hook.is_active()) {
-            // Call each node's end hook
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                if (cgraph->nodes[i]) {
-                    hook.on_op_compute_end(cgraph->nodes[i], backend);
-                }
-            }
-            
             hook.on_graph_compute_end(cgraph, backend);
         }
         
@@ -822,6 +861,24 @@ extern "C" {
         
         return result;
     }
+
+#if !defined(_WIN32)
+    GGML_VIZ_API enum ggml_status ggml_backend_sched_graph_compute(ggml_backend_sched_t sched, struct ggml_cgraph* graph) {
+        static auto real = reinterpret_cast<enum ggml_status (*)(ggml_backend_sched_t, struct ggml_cgraph*)>(
+            dlsym(RTLD_NEXT, "ggml_backend_sched_graph_compute"));
+        return sched_compute(sched, graph, real);
+    }
+
+    GGML_VIZ_API enum ggml_status ggml_backend_sched_graph_compute_async(ggml_backend_sched_t sched, struct ggml_cgraph* graph) {
+        static auto real = reinterpret_cast<enum ggml_status (*)(ggml_backend_sched_t, struct ggml_cgraph*)>(
+            dlsym(RTLD_NEXT, "ggml_backend_sched_graph_compute_async"));
+        return sched_compute(sched, graph, real);
+    }
+
+    GGML_VIZ_API void ggml_backend_sched_set_eval_callback(ggml_backend_sched_t sched, ggml_backend_sched_eval_callback cb, void* user_data) {
+        sched_set_eval_callback(sched, cb, user_data);
+    }
+#endif
 }
 #endif // !GGML_VIZ_TEST_MODE
 
@@ -833,7 +890,7 @@ bool install_ggml_hooks() {
     // overrides the weak symbols. This function just confirms setup.
     
     #ifndef _WIN32
-#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
+#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD) && !defined(__APPLE__)
     // Our overrides are first in lookup order under LD_PRELOAD, so search past this library.
     void* handle = RTLD_NEXT;
 #else
@@ -859,7 +916,7 @@ bool install_ggml_hooks() {
             (dlsym(handle, "ggml_backend_alloc_ctx_tensors"));
 
         // Only store if they're different from our overrides (shared library builds only)
-#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
+#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD) && !defined(__APPLE__)
         if (backend_func && backend_func != ggml_backend_graph_compute) {
             original_backend_graph_compute = backend_func;
             printf("[GGML_VIZ] Found original ggml_backend_graph_compute\n");
