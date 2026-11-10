@@ -48,9 +48,15 @@ namespace {
         return pool->emplace(name).first->c_str();
     }
 
-    // Simple implementation of ggml_nbytes to avoid linking dependencies
+    // Exact size from the traced process's own ggml (quantized types are block-sized, not
+    // per-element); the approximation below is only a fallback when ggml_nbytes isn't visible.
     size_t ggml_nbytes_simple(const ggml_tensor* tensor) {
         if (!tensor) return 0;
+#ifndef _WIN32
+        using nbytes_fn = size_t (*)(const struct ggml_tensor*);
+        static auto real_nbytes = reinterpret_cast<nbytes_fn>(dlsym(RTLD_DEFAULT, "ggml_nbytes"));
+        if (real_nbytes) return real_nbytes(tensor);
+#endif
         
         // Calculate total elements
         size_t total_elements = 1;
