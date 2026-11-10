@@ -38,6 +38,7 @@ struct ImGuiApp::AppData {
     std::time_t last_file_mod_time = 0;
     size_t last_file_size = 0;
     std::unique_ptr<TraceReader> live_trace_reader;
+    size_t live_events_offset = 0;  // index of live_events[0] in live_trace_reader->events()
     
     // File browser state
     char file_path_buffer[512] = {0};
@@ -123,6 +124,7 @@ void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
     data_->live_mode = true;
     data_->live_mode_no_hook = no_hook;  // Store the no_hook flag
     data_->live_events.clear();
+    data_->live_events_offset = 0;
     data_->last_live_update = std::chrono::steady_clock::now();
     data_->current_filename = "[Live Mode]";
     
@@ -183,6 +185,7 @@ void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
 void ImGuiApp::disable_live_mode() {
     data_->live_mode = false;
     data_->live_events.clear();
+    data_->live_events_offset = 0;
     
     // Stop the GGML hook (if it was started)
     try {
@@ -270,8 +273,8 @@ void ImGuiApp::update_live_data() {
             struct stat file_stat;
             if (stat(data_->live_file_path.c_str(), &file_stat) == 0) {
                 // Check if file has been modified
-                if (file_stat.st_mtime > data_->last_file_mod_time || 
-                    static_cast<size_t>(file_stat.st_size) > data_->last_file_size) {
+                if (file_stat.st_mtime != data_->last_file_mod_time ||
+                    static_cast<size_t>(file_stat.st_size) != data_->last_file_size) {
                     
                     // File has been updated, reload it
                     std::cout << "[ImGuiApp] File changed - reloading: " << data_->live_file_path 
@@ -279,48 +282,33 @@ void ImGuiApp::update_live_data() {
                     auto new_trace_reader = std::make_unique<TraceReader>(data_->live_file_path);
                     if (new_trace_reader->is_valid()) {
                         const auto& events = new_trace_reader->events();
-                        
-                        // Handle file recreation/truncation by detecting if file has fewer events than expected
-                        static size_t last_file_event_count = 0;
-                        size_t start_idx = 0;
-                        
-                        if (data_->live_trace_reader && events.size() >= last_file_event_count) {
-                            // File appears to be growing normally, only load new events
-                            start_idx = last_file_event_count;
-                        } else {
-                            // File was recreated/truncated or this is first load, load all events
-                            start_idx = 0;
-                            std::cout << "[ImGuiApp] File appears to be recreated/truncated, loading all events" << std::endl;
+
+                        // Each reload re-parses the whole file, so show its newest events directly rather
+                        // than appending increments: a recreated or truncated file can't skip or duplicate
+                        // events, and labels point into the reader we keep instead of a destroyed one.
+                        const auto* previous = data_->live_trace_reader.get();
+                        size_t previous_count = previous ? previous->event_count() : 0;
+                        bool recreated = previous && (events.size() < previous_count ||
+                            (!events.empty() && previous_count > 0 &&
+                             events.front().timestamp_ns != previous->events().front().timestamp_ns));
+                        if (recreated) {
+                            data_->selected_event = -1;  // indices refer to the old file
                         }
-                        
-                        if (events.size() > start_idx) {
-                            // Add new events to our live buffer
-                            size_t new_event_count = events.size() - start_idx;
-                            data_->live_events.insert(data_->live_events.end(), 
-                                                     events.begin() + start_idx, events.end());
+
+                        const size_t max_events = 50000;
+                        data_->live_events_offset = events.size() > max_events ? events.size() - max_events : 0;
+                        data_->live_events.assign(events.begin() + data_->live_events_offset, events.end());
+
+                        if (recreated || events.size() != previous_count) {
                             data_->last_live_update = std::chrono::steady_clock::now();
                             data_->live_data_available = true;
-                            
-                            std::cout << "[ImGuiApp] Loaded " << new_event_count 
-                                      << " new events from external file (total events in file: " << events.size() << ")" << std::endl;
-                            
-                            last_file_event_count = events.size();
-                        } else {
-                            std::cout << "[ImGuiApp] No new events to load (file has " << events.size() 
-                                      << " events, last processed: " << last_file_event_count << ")" << std::endl;
+                            std::cout << "[ImGuiApp] Live file now has " << events.size() << " events"
+                                      << (recreated ? " (file was recreated)" : "") << std::endl;
                         }
-                        
-                        // Update file monitoring state
+
                         data_->last_file_mod_time = file_stat.st_mtime;
                         data_->last_file_size = file_stat.st_size;
                         data_->live_trace_reader = std::move(new_trace_reader);
-                        
-                        // Limit buffer size
-                        const size_t max_events = 50000;
-                        if (data_->live_events.size() > max_events) {
-                            data_->live_events.erase(data_->live_events.begin(), 
-                                                   data_->live_events.begin() + (data_->live_events.size() - max_events));
-                        }
                     }
                 }
             }
@@ -733,7 +721,9 @@ void ImGuiApp::render_timeline_view() {
                         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
                             const auto& event = events[i];
                             
-                            bool is_selected = (data_->selected_event == i);
+                            // selected_event indexes the full trace; live_events is its newest window
+                            int index = static_cast<int>(data_->live_mode ? data_->live_events_offset : 0) + i;
+                            bool is_selected = (data_->selected_event == index);
                             
                             // Format event info
                             std::string event_name;
@@ -760,8 +750,8 @@ void ImGuiApp::render_timeline_view() {
                             }
                             
                             if (ImGui::Selectable(label.c_str(), is_selected)) {
-                                data_->selected_event = i;
-                                timeline_widget_.set_selected_event(i);
+                                data_->selected_event = index;
+                                timeline_widget_.set_selected_event(index);
                             }
                             
                             if (ImGui::IsItemHovered()) {
@@ -905,9 +895,10 @@ void ImGuiApp::render_tensor_inspector() {
             ImGui::TextColored(ImVec4(0.91f, 0.12f, 0.39f, 1.0f), "🔬 LIVE TENSOR INSPECTOR");
             ImGui::Text("Live events: %zu", data_->live_events.size());
             
-            if (data_->selected_event >= 0 && 
-                data_->selected_event < static_cast<int>(data_->live_events.size())) {
-                const auto& event = data_->live_events[data_->selected_event];
+            int live_index = data_->selected_event - static_cast<int>(data_->live_events_offset);
+            if (data_->selected_event >= 0 && live_index >= 0 &&
+                live_index < static_cast<int>(data_->live_events.size())) {
+                const auto& event = data_->live_events[live_index];
                 
                 ImGui::Separator();
                 ImGui::Text("Selected Live Event Details:");
