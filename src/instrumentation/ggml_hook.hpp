@@ -86,6 +86,13 @@ struct HookConfig {
     size_t max_events = 1000000;
 };
 
+// Marks a wrapped compute call on this thread; graph events from computes nested inside it
+// (e.g. ggml_graph_compute_with_ctx -> ggml_graph_compute) are dropped as duplicates.
+struct NestedComputeScope {
+    NestedComputeScope();
+    ~NestedComputeScope();
+};
+
 class GGMLHook {
 public:
     static GGMLHook& instance();
