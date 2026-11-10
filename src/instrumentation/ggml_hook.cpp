@@ -862,6 +862,7 @@ extern "C" {
         return result;
     }
 
+#if !defined(_WIN32)
     GGML_VIZ_API enum ggml_status ggml_backend_sched_graph_compute(ggml_backend_sched_t sched, struct ggml_cgraph* graph) {
         static auto real = reinterpret_cast<enum ggml_status (*)(ggml_backend_sched_t, struct ggml_cgraph*)>(
             dlsym(RTLD_NEXT, "ggml_backend_sched_graph_compute"));
@@ -877,6 +878,7 @@ extern "C" {
     GGML_VIZ_API void ggml_backend_sched_set_eval_callback(ggml_backend_sched_t sched, ggml_backend_sched_eval_callback cb, void* user_data) {
         sched_set_eval_callback(sched, cb, user_data);
     }
+#endif
 }
 #endif // !GGML_VIZ_TEST_MODE
 
