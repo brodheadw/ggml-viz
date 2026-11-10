@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <cmath>
 
 int main() {
     // Initialize ggml
@@ -103,6 +104,15 @@ int main() {
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
     std::cout << "Total time: " << duration.count() << " ms\n";
+
+    // Under LD_PRELOAD the hook must still run the real compute, not just record it.
+    double expected = c_data[0];
+    for (int k = 0; k < n; k++) expected += (double)a_data[k] * b_data[k];
+    float got = static_cast<float*>(result->data)[0];
+    if (std::fabs(got - expected) > 1e-3 * std::fabs(expected)) {
+        std::cerr << "❌ Wrong compute result: got " << got << ", expected " << expected << "\n";
+        return 1;
+    }
 
     // Stop hooks and flush data
     ggml_viz::GGMLHook::instance().stop();

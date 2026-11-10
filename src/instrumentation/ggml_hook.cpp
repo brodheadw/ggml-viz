@@ -372,7 +372,6 @@ void GGMLHook::on_op_compute_begin(const ggml_tensor* tensor, const ggml_backend
         }
     }
 
-    std::cout << "[DEBUG] Op compute begin: " << tensor->name << " type: " << tensor->op << ", backend: " << (backend ? "yes" : "no") << "\n";
         
     Event event = {};
     event.type = EventType::OP_COMPUTE_BEGIN;
@@ -511,7 +510,6 @@ extern "C" {
         }
         
         if (hook.is_active()) {
-            printf("[DEBUG] Intercepted ggml_backend_graph_compute, nodes: %d\n", cgraph->n_nodes);
             hook.on_graph_compute_begin(cgraph, backend);
             
             // Call each node's begin hook
@@ -564,7 +562,6 @@ extern "C" {
         }
         
         if (hook.is_active()) {
-            printf("[DEBUG] Intercepted ggml_graph_compute, nodes: %d\n", cgraph->n_nodes);
             hook.on_graph_compute_begin(cgraph, nullptr);
             
             // Call each node's begin hook
@@ -607,7 +604,6 @@ extern "C" {
         auto& hook = GGMLHook::instance();
         
         if (hook.is_active()) {
-            printf("[DEBUG] Intercepted ggml_graph_compute_with_ctx, nodes: %d\n", cgraph->n_nodes);
             hook.on_graph_compute_begin(cgraph, nullptr, n_threads);
 
             // Call each node's begin hook
@@ -659,7 +655,6 @@ extern "C" {
         }
         
         if (hook.is_active()) {
-            printf("[DEBUG] Intercepted ggml_backend_metal_graph_compute, nodes: %d\n", cgraph->n_nodes);
             hook.on_graph_compute_begin(cgraph, backend);
             
             // Call each node's begin hook
@@ -745,7 +740,6 @@ extern "C" {
         }
         
         if (hook.is_active() && graph) {
-            printf("[DEBUG] Intercepted ggml_gallocr_alloc_graph, nodes: %d\n", graph->n_nodes);
             
             // Record allocation events for all tensors in the graph
             for (int i = 0; i < graph->n_nodes; i++) {
@@ -792,7 +786,6 @@ extern "C" {
         }
         
         if (hook.is_active() && ctx) {
-            printf("[DEBUG] Intercepted ggml_backend_alloc_ctx_tensors\n");
             
             // We'll record allocations for all tensors in the context
             // Note: This is a simplified approach - in reality we'd need to traverse the context's tensor list
@@ -828,8 +821,12 @@ bool install_ggml_hooks() {
     // overrides the weak symbols. This function just confirms setup.
     
     #ifndef _WIN32
-    // Try to locate original functions for fallback
+#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
+    // Our overrides are first in lookup order under LD_PRELOAD, so search past this library.
+    void* handle = RTLD_NEXT;
+#else
     void* handle = dlopen(NULL, RTLD_LAZY);
+#endif
     if (handle) {
         // Look for the original functions in case they're not weak symbols
         auto backend_func = reinterpret_cast<enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*)>
@@ -915,7 +912,7 @@ bool install_ggml_hooks() {
         }
 #endif
         
-        dlclose(handle);
+        if (handle != RTLD_NEXT) dlclose(handle);
     }
     #endif
     
