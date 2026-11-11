@@ -203,8 +203,8 @@ namespace {
     }
     
     void validate_config(const Config& config) {
-        // Validate trace file exists if specified (live mode waits for it to appear)
-        if (!config.trace_file.empty() && !config.live_mode) {
+        // Validate trace file exists if specified (live and web modes wait for it to appear)
+        if (!config.trace_file.empty() && !config.live_mode && !config.web_mode) {
             std::ifstream file(config.trace_file);
             if (!file.good()) {
                 std::cerr << "Error: Cannot open trace file: " << config.trace_file << "\n";
@@ -303,6 +303,10 @@ int main(int argc, char* argv[]) {
             ggml_viz::LiveStreamServer::StreamConfig stream_config;
             stream_config.port = config.port;
             stream_config.host = "localhost";
+            // The traced program writes the file; the server streams what it appends.
+            const char* env_output = std::getenv("GGML_VIZ_OUTPUT");
+            stream_config.trace_file = !config.trace_file.empty() ? config.trace_file
+                                     : env_output ? env_output : "trace.ggmlviz";
             
             auto live_server = std::make_unique<ggml_viz::LiveStreamServer>(stream_config);
             
@@ -321,6 +325,7 @@ int main(int argc, char* argv[]) {
             std::cout << "🌐 Web Dashboard: http://localhost:" << config.port << "\n";
             std::cout << "📡 Event Stream:  http://localhost:" << config.port << "/events\n";
             std::cout << "📊 Status API:    http://localhost:" << config.port << "/status\n";
+            std::cout << "📄 Trace file:    " << stream_config.trace_file << "\n";
             std::cout << "Press Ctrl+C to stop\n\n";
             
             // Keep server running until interrupted
