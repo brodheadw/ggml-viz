@@ -27,7 +27,6 @@ struct ImGuiApp::AppData {
     
     // Live mode support
     bool live_mode = false;
-    bool live_mode_no_hook = false;  // Track if we're using --no-hook flag
     std::vector<Event> live_events;
     
     std::chrono::steady_clock::time_point last_live_update;
@@ -120,47 +119,14 @@ bool ImGuiApp::initialize() {
     return true;
 }
 
-void ImGuiApp::enable_live_mode(bool no_hook, const std::string& trace_file) {
+void ImGuiApp::enable_live_mode(const std::string& trace_file) {
     data_->live_mode = true;
-    data_->live_mode_no_hook = no_hook;  // Store the no_hook flag
     data_->live_events.clear();
     data_->live_events_offset = 0;
     data_->last_live_update = std::chrono::steady_clock::now();
     data_->current_filename = "[Live Mode]";
     
-    // Initialize and start the GGML hook (unless disabled)
-    if (!no_hook) {
-        try {
-            auto& hook = GGMLHook::instance();
-            
-            // Configure the hook
-            HookConfig config;
-            config.enable_op_timing = true;
-            config.enable_thread_tracking = false;
-            config.enable_tensor_names = true;
-            config.write_to_file = false;  // Don't write to file in live mode
-            config.max_events = 100000;   // Buffer for live events
-            
-            hook.configure(config);
-            hook.start();
-            
-            std::cout << "[ImGuiApp] Live mode enabled and GGML hook started" << std::endl;
-            std::cout << "[ImGuiApp] Hook active: " << (hook.is_active() ? "YES" : "NO") << std::endl;
-            std::cout << "[ImGuiApp] DEBUG: Configuration applied:" << std::endl;
-            std::cout << "[ImGuiApp]   - Op timing: " << (config.enable_op_timing ? "ENABLED" : "DISABLED") << std::endl;
-            std::cout << "[ImGuiApp]   - Thread tracking: " << (config.enable_thread_tracking ? "ENABLED" : "DISABLED") << std::endl;
-            std::cout << "[ImGuiApp]   - Tensor names: " << (config.enable_tensor_names ? "ENABLED" : "DISABLED") << std::endl;
-            std::cout << "[ImGuiApp]   - Write to file: " << (config.write_to_file ? "ENABLED" : "DISABLED") << std::endl;
-            std::cout << "[ImGuiApp]   - Max events: " << config.max_events << std::endl;
-            
-        } catch (const std::exception& e) {
-            std::cerr << "[ImGuiApp] Error starting GGML hook: " << e.what() << std::endl;
-        }
-    } else {
-        std::cout << "[ImGuiApp] Live mode enabled with built-in hook disabled (--no-hook)" << std::endl;
-    }
-    
-    // Set up file monitoring for external processes
+    // The traced program runs in another process, so live mode follows the trace file it writes.
     // Priority: 1) command line argument, 2) environment variable, 3) default
     if (!trace_file.empty()) {
         data_->live_file_path = trace_file;
@@ -187,19 +153,6 @@ void ImGuiApp::disable_live_mode() {
     data_->live_events.clear();
     data_->live_events_offset = 0;
     
-    // Stop the GGML hook (if it was started)
-    try {
-        auto& hook = GGMLHook::instance();
-        if (hook.is_active()) {
-            hook.stop();
-            std::cout << "[ImGuiApp] Live mode disabled and GGML hook stopped" << std::endl;
-        } else {
-            std::cout << "[ImGuiApp] Live mode disabled (hook was not active)" << std::endl;
-        }
-    } catch (const std::exception& e) {
-        std::cerr << "[ImGuiApp] Error stopping GGML hook: " << e.what() << std::endl;
-    }
-    
     // Clean up file monitoring
     data_->live_file_path.clear();
     data_->last_file_mod_time = 0;
@@ -220,47 +173,6 @@ void ImGuiApp::update_live_data() {
                   << ", events: " << data_->live_events.size() << ")" << std::endl;
     }
     
-    // Try to get live events from GGMLHook (in-process events)
-    try {
-        auto& hook = GGMLHook::instance();
-        if (hook.is_active()) {
-            auto new_events = hook.consume_available_events();
-            if (!new_events.empty()) {
-                // DEBUG: Count event types in new batch
-                size_t new_memory_events = 0;
-                for (const auto& event : new_events) {
-                    if (event.type == EventType::TENSOR_ALLOC || event.type == EventType::TENSOR_FREE) {
-                        new_memory_events++;
-                    }
-                }
-                
-                if (call_count % 100 == 0) {  // Only print every 100 calls
-                    std::cout << "[ImGuiApp] DEBUG: Got " << new_events.size() << " new events (" 
-                              << new_memory_events << " memory events)" << std::endl;
-                }
-                
-                // Add new events to our live buffer
-                data_->live_events.insert(data_->live_events.end(), new_events.begin(), new_events.end());
-                data_->last_live_update = std::chrono::steady_clock::now();
-                data_->live_data_available = true;
-                
-                // Limit buffer size to prevent memory issues
-                const size_t max_events = 50000;
-                if (data_->live_events.size() > max_events) {
-                    data_->live_events.erase(data_->live_events.begin(), 
-                                           data_->live_events.begin() + (data_->live_events.size() - max_events));
-                }
-            }
-        } else {
-            if (call_count % 100 == 0) {
-                std::cout << "[ImGuiApp] DEBUG: Hook is not active" << std::endl;
-            }
-        }
-    } catch (const std::exception& e) {
-        std::cerr << "[ImGuiApp] Error updating live data from hook: " << e.what() << std::endl;
-    }
-    
-    // Also monitor external trace file for events from external processes
     // Only check file every 100ms to avoid too frequent polling
     static auto last_file_check = std::chrono::steady_clock::now();
     auto now = std::chrono::steady_clock::now();
@@ -441,13 +353,7 @@ void ImGuiApp::render_main_menu_bar() {
         if (data_->trace_loaded || data_->live_mode) {
             ImGui::SameLine(ImGui::GetWindowWidth() - 350);
             if (data_->live_mode) {
-                try {
-                    auto& hook = GGMLHook::instance();
-                    const char* status = hook.is_active() ? "good" : "bad";
-                    ImGui::Text("%s Live: %zu events", status, data_->live_events.size());
-                } catch (...) {
-                    ImGui::Text("Live: %zu events", data_->live_events.size());
-                }
+                ImGui::Text("Live: %zu events", data_->live_events.size());
             } else {
                 ImGui::Text("Loaded: %s (%zu events)",
                            data_->current_filename.c_str(),
@@ -600,11 +506,10 @@ void ImGuiApp::render_timeline_view() {
             mode_info = "[LIVE MODE]";
             
             // Show live mode status
-            auto& hook = GGMLHook::instance();
-            if (hook.is_active()) {
-                ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "✅ LIVE MODE ACTIVE");
+            if (data_->live_trace_reader) {
+                ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "✅ LIVE: %s", data_->live_file_path.c_str());
             } else {
-                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "❌ HOOK INACTIVE");
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Waiting for %s", data_->live_file_path.c_str());
             }
             ImGui::Text("Live Events: %zu", event_count);
             
@@ -960,46 +865,16 @@ void ImGuiApp::render_hook_status_notification() {
     std::string notification_text;
     
     if (data_->live_mode) {
-        if (data_->live_mode_no_hook) {
-            // File-based live mode
-            if (!data_->live_trace_reader || data_->live_trace_reader->events().empty()) {
-                should_show_notification = true;
-                notification_text = "📄  FILE-BASED LIVE MODE - WAITING FOR DATA\n\n"
-                                  "Monitoring trace file: " + data_->live_file_path + "\n\n"
-                                  "To generate data, run:\n\n"
-                                  "env GGML_VIZ_OUTPUT=" + data_->live_file_path + " \\\n"
-                                  "    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \\\n"
-                                  "    ./third_party/llama.cpp/build/bin/llama-cli \\\n"
-                                  "    -m ./models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \\\n"
-                                  "    -p \"Hello world\" -n 10";
-            }
-        } else {
-            // Ring buffer live mode
-            try {
-                auto& hook = GGMLHook::instance();
-                if (!hook.is_active()) {
-                    should_show_notification = true;
-                    notification_text = "⚠️  RING BUFFER LIVE MODE - HOOK INACTIVE\n\n"
-                                      "The GGML hook is not capturing events. To fix this:\n\n"
-                                      "1. Set environment variables:\n"
-                                      "   export GGML_VIZ_OUTPUT=trace.ggmlviz\n\n"
-                                      "2. Run your GGML application with:\n"
-                                      "   env DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \\\n"
-                                      "       ./third_party/llama.cpp/build/bin/llama-cli \\\n"
-                                      "       -m ./models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \\\n"
-                                      "       -p \"Hello world\" -n 10\n\n"
-                                      "3. Or for Linux:\n"
-                                      "   env LD_PRELOAD=./build/src/libggml_viz_hook.so your_app";
-                } else if (hook.event_count() == 0) {
-                    should_show_notification = true;
-                    notification_text = "ℹ️  RING BUFFER HOOK ACTIVE - WAITING FOR OPERATIONS\n\n"
-                                      "The GGML hook is active and ready to capture events.\n"
-                                      "Run GGML operations in your application to see data here.";
-                }
-            } catch (const std::exception& e) {
-                should_show_notification = true;
-                notification_text = "❌  HOOK ERROR\n\nError accessing GGML hook: " + std::string(e.what());
-            }
+        if (!data_->live_trace_reader || data_->live_trace_reader->events().empty()) {
+            should_show_notification = true;
+            notification_text = "📄  FILE-BASED LIVE MODE - WAITING FOR DATA\n\n"
+                              "Monitoring trace file: " + data_->live_file_path + "\n\n"
+                              "To generate data, run:\n\n"
+                              "env GGML_VIZ_OUTPUT=" + data_->live_file_path + " \\\n"
+                              "    DYLD_INSERT_LIBRARIES=./build/src/libggml_viz_hook.dylib \\\n"
+                              "    ./third_party/llama.cpp/build/bin/llama-cli \\\n"
+                              "    -m ./models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \\\n"
+                              "    -p \"Hello world\" -n 10";
         }
     } else if (!data_->trace_loaded) {
         should_show_notification = true;
@@ -1053,14 +928,7 @@ void ImGuiApp::render_stats_overlay() {
         
         // Event stats
         if (data_->live_mode) {
-            try {
-                auto& hook = GGMLHook::instance();
-                ImGui::Text("Events: %zu", hook.event_count());
-                ImGui::Text("Dropped: %zu", hook.get_dropped_events());
-                ImGui::Text("Hook: %s", hook.is_active() ? "✅" : "❌");
-            } catch (const std::exception&) {
-                ImGui::Text("Hook: ❌");
-            }
+            ImGui::Text("Events: %zu", data_->live_events.size());
         } else if (data_->trace_reader) {
             ImGui::Text("Events: %zu", data_->trace_reader->events().size());
             ImGui::Text("Duration: %.1fms", data_->trace_reader->get_total_duration_ns() / 1e6);
