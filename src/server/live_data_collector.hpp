@@ -2,13 +2,16 @@
 #pragma once
 
 #include "instrumentation/ggml_hook.hpp"
+#include "utils/trace_reader.hpp"
+#include <sys/stat.h>
+#include <deque>
+#include <string>
 #include <vector>
 #include <mutex>
 #include <thread>
 #include <atomic>
 #include <functional>
 #include <chrono>
-#include <queue>
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -22,39 +25,35 @@
 
 namespace ggml_viz {
 
+// Follows a trace file written by another process (the hook runs in the traced program, not here).
 class LiveDataCollector {
 public:
-    using EventCallback = std::function<void(const std::vector<Event>&)>;
+    // Called with each batch of events read from the file; the events are only valid during the call.
+    using EventCallback = std::function<void(const Event* events, size_t count)>;
 
 private:
     std::atomic<bool> running_{false};
     std::thread collector_thread_;
     EventCallback event_callback_;
-    std::chrono::milliseconds poll_interval_{10}; // 10ms polling
-    
-    // Buffer for accumulating events before sending
-    std::vector<Event> event_buffer_;
-    std::mutex buffer_mutex_;
-    
+    std::string trace_file_;
+    std::chrono::milliseconds poll_interval_{200};
+
 public:
     LiveDataCollector() = default;
     ~LiveDataCollector() {
         stop();
     }
 
-    // Start live collection with callback for new events
-    void start(EventCallback callback, std::chrono::milliseconds poll_interval = std::chrono::milliseconds(10)) {
+    void start(const std::string& trace_file, EventCallback callback) {
         if (running_.load()) {
             stop();
         }
-        
+        trace_file_ = trace_file;
         event_callback_ = callback;
-        poll_interval_ = poll_interval;
         running_ = true;
-        
         collector_thread_ = std::thread(&LiveDataCollector::collector_loop, this);
     }
-    
+
     void stop() {
         if (running_.load()) {
             running_ = false;
@@ -63,33 +62,38 @@ public:
             }
         }
     }
-    
+
     bool is_running() const {
         return running_.load();
     }
 
 private:
     void collector_loop() {
-        auto& hook = GGMLHook::instance();
-        
+        std::time_t last_mtime = 0;
+        long long last_size = -1;
+        size_t sent = 0;
+        uint64_t first_ts = 0;
+
         while (running_.load()) {
-            // Check if hook is active
-            if (!hook.is_active()) {
-                std::this_thread::sleep_for(poll_interval_);
-                continue;
-            }
-            
-            // Consume available events from the ring buffer
-            auto new_events = hook.consume_available_events();
-            
-            if (!new_events.empty()) {
-                // Send events to callback
-                if (event_callback_) {
-                    event_callback_(new_events);
+            struct stat st;
+            if (stat(trace_file_.c_str(), &st) == 0 &&
+                (st.st_mtime != last_mtime || (long long)st.st_size != last_size)) {
+                TraceReader reader(trace_file_);
+                if (reader.is_valid()) {
+                    const auto& events = reader.events();
+                    // A smaller file or a different first event means it was recreated: start over.
+                    if (events.size() < sent || (!events.empty() && sent > 0 && events.front().timestamp_ns != first_ts)) {
+                        sent = 0;
+                    }
+                    if (events.size() > sent && event_callback_) {
+                        event_callback_(events.data() + sent, events.size() - sent);
+                    }
+                    sent = events.size();
+                    first_ts = events.empty() ? 0 : events.front().timestamp_ns;
+                    last_mtime = st.st_mtime;
+                    last_size = st.st_size;
                 }
             }
-            
-            // Sleep for polling interval
             std::this_thread::sleep_for(poll_interval_);
         }
     }
@@ -101,6 +105,7 @@ public:
     struct StreamConfig {
         int port = 8080;
         std::string host = "localhost";
+        std::string trace_file;
         bool enable_websocket = true;
         bool enable_http_sse = true; // Server-Sent Events
     };
@@ -111,9 +116,11 @@ private:
     std::atomic<bool> server_running_{false};
     std::thread server_thread_;
     
-    // Simple event queue for streaming
-    std::queue<Event> event_queue_;
+    // Recent events as JSON, each with a sequence number so every client keeps its own position
+    std::deque<std::string> history_;
+    uint64_t next_seq_ = 0;  // sequence number of the event after history_.back()
     std::mutex queue_mutex_;
+    static constexpr size_t kMaxHistory = 10000;
     std::atomic<size_t> connected_clients_{0};
 
 public:
@@ -130,8 +137,8 @@ public:
         server_running_ = true;
         
         // Start the data collector with our event handler
-        collector_.start([this](const std::vector<Event>& events) {
-            handle_new_events(events);
+        collector_.start(config_.trace_file, [this](const Event* events, size_t count) {
+            handle_new_events(events, count);
         });
         
         // Start the streaming server
@@ -162,23 +169,14 @@ public:
     }
 
 private:
-    void handle_new_events(const std::vector<Event>& events) {
+    void handle_new_events(const Event* events, size_t count) {
         std::lock_guard<std::mutex> lock(queue_mutex_);
-        
-        // Add events to streaming queue
-        for (const auto& event : events) {
-            event_queue_.push(event);
+        for (size_t i = 0; i < count; i++) {
+            history_.push_back(format_event_as_json(events[i]));
         }
-        
-        // Limit queue size to prevent memory issues
-        while (event_queue_.size() > 10000) {
-            event_queue_.pop();
-        }
-        
-        // In a real implementation, this would trigger WebSocket sends
-        if (connected_clients_.load() > 0) {
-            printf("[LiveStreamServer] Queued %zu events for %zu clients\n", 
-                   events.size(), connected_clients_.load());
+        next_seq_ += count;
+        while (history_.size() > kMaxHistory) {
+            history_.pop_front();
         }
     }
     
@@ -376,20 +374,20 @@ private:
     void stream_events_to_client(int client_fd) {
         printf("[LiveStreamServer] Client connected for event streaming\n");
         
+        uint64_t cursor = 0;  // next sequence number this client needs
         while (server_running_.load()) {
-            // Get events from queue
-            std::vector<Event> events_to_send;
+            std::vector<std::string> events_to_send;
             {
                 std::lock_guard<std::mutex> lock(queue_mutex_);
-                while (!event_queue_.empty() && events_to_send.size() < 10) {
-                    events_to_send.push_back(event_queue_.front());
-                    event_queue_.pop();
+                uint64_t oldest = next_seq_ - history_.size();
+                if (cursor < oldest) cursor = oldest;  // fell behind the retained history
+                for (; cursor < next_seq_; cursor++) {
+                    events_to_send.push_back(history_[cursor - oldest]);
                 }
             }
             
             // Send events as SSE
-            for (const auto& event : events_to_send) {
-                std::string event_data = format_event_as_json(event);
+            for (const auto& event_data : events_to_send) {
                 std::string sse_message = "data: " + event_data + "\n\n";
                 
 #ifdef _WIN32
@@ -409,14 +407,25 @@ private:
     }
     
     std::string format_event_as_json(const Event& event) {
-        char json[512];
-        snprintf(json, sizeof(json),
-            "{\"type\":\"%s\",\"timestamp\":%llu,\"thread_id\":%u,\"label\":\"%s\"}",
-            event_type_to_string(event.type),
-            (unsigned long long)event.timestamp_ns,
-            event.thread_id,
-            event.label ? event.label : "unknown");
-        return std::string(json);
+        char head[160];
+        snprintf(head, sizeof(head), "{\"type\":\"%s\",\"timestamp\":%llu,\"thread_id\":%u,\"label\":\"",
+            event_type_to_string(event.type), (unsigned long long)event.timestamp_ns, event.thread_id);
+        std::string json = head;
+        for (const char* c = event.label ? event.label : "unknown"; *c; c++) {
+            unsigned char ch = static_cast<unsigned char>(*c);
+            if (ch == '"' || ch == '\\') {
+                json += '\\';
+                json += *c;
+            } else if (ch < 0x20) {
+                char esc[8];
+                snprintf(esc, sizeof(esc), "\\u%04x", ch);
+                json += esc;
+            } else {
+                json += *c;
+            }
+        }
+        json += "\"}";
+        return json;
     }
     
     const char* event_type_to_string(EventType type) {
@@ -436,7 +445,7 @@ private:
     
     size_t get_queue_size() const {
         std::lock_guard<std::mutex> lock(const_cast<std::mutex&>(queue_mutex_));
-        return event_queue_.size();
+        return history_.size();
     }
 };
 
