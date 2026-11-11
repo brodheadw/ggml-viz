@@ -21,11 +21,12 @@ bool TimelineWidget::render(const char* label, const TraceReader* trace_reader, 
     bool changed = false;
     float total_duration_ms = trace_reader->get_total_duration_ns() / 1e6f;
     
-    // Auto-adjust zoom if this is the first time or data changed
-    if (last_total_duration_ != total_duration_ms) {
+    // Reset the view for a different trace, but keep it while a live trace grows
+    uint64_t first_ts = trace_reader->events().front().timestamp_ns;
+    if (first_ts != last_first_timestamp_) {
         config.zoom = 1.0f;
         config.scroll_x = 0.0f;
-        last_total_duration_ = total_duration_ms;
+        last_first_timestamp_ = first_ts;
     }
     
     // Process trace events into timeline events
@@ -129,8 +130,9 @@ void TimelineWidget::render_timeline_canvas(const std::vector<TimelineEvent>& ti
     else if (time_step < 100.0f) marker_step = 10.0f;
     else marker_step = 100.0f;
     
-    for (float t = 0; t <= total_duration_ms; t += marker_step) {
-        if (t < start_time || t > end_time) continue;
+    // Walk only the visible range rather than every marker from 0
+    for (float t = std::floor(start_time / marker_step) * marker_step; t <= std::min(end_time, total_duration_ms); t += marker_step) {
+        if (t < start_time) continue;
         
         float x = time_to_pixel(t, total_duration_ms, timeline_width, config);
         draw_list->AddLine(ImVec2(canvas_pos.x + x, canvas_pos.y),
@@ -251,7 +253,7 @@ void TimelineWidget::render_timeline_controls(TimelineConfig& config, float tota
     ImGui::Text("Zoom:");
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100);
-    if (ImGui::SliderFloat("##zoom", &config.zoom, 0.1f, 10.0f, "%.1fx")) {
+    if (ImGui::SliderFloat("##zoom", &config.zoom, 0.1f, 10.0f, "%.1fx", ImGuiSliderFlags_AlwaysClamp)) {
         config.scroll_x = std::max(0.0f, std::min(config.scroll_x, 1.0f - 1.0f/config.zoom));
     }
     
@@ -261,7 +263,7 @@ void TimelineWidget::render_timeline_controls(TimelineConfig& config, float tota
     ImGui::SameLine();
     ImGui::SetNextItemWidth(200);
     float max_scroll = std::max(0.0f, 1.0f - 1.0f/config.zoom);
-    ImGui::SliderFloat("##scroll", &config.scroll_x, 0.0f, max_scroll, "%.2f");
+    ImGui::SliderFloat("##scroll", &config.scroll_x, 0.0f, max_scroll, "%.2f", ImGuiSliderFlags_AlwaysClamp);
     
     // Display options
     ImGui::SameLine();
@@ -541,14 +543,14 @@ void GraphWidget::render_graph_canvas(std::vector<GraphNode>& nodes, GraphConfig
         ImU32 grid_color = IM_COL32(50, 50, 50, 100);
         
         // Vertical lines
-        for (float x = fmod(config.pan_offset.x, grid_step); x < canvas_size.x; x += grid_step) {
+        for (float x = fmod(config.pan_offset.x * config.zoom, grid_step); x < canvas_size.x; x += grid_step) {
             draw_list->AddLine(ImVec2(canvas_pos.x + x, canvas_pos.y),
                               ImVec2(canvas_pos.x + x, canvas_pos.y + canvas_size.y),
                               grid_color);
         }
         
         // Horizontal lines
-        for (float y = fmod(config.pan_offset.y, grid_step); y < canvas_size.y; y += grid_step) {
+        for (float y = fmod(config.pan_offset.y * config.zoom, grid_step); y < canvas_size.y; y += grid_step) {
             draw_list->AddLine(ImVec2(canvas_pos.x, canvas_pos.y + y),
                               ImVec2(canvas_pos.x + canvas_size.x, canvas_pos.y + y),
                               grid_color);
@@ -599,22 +601,21 @@ void GraphWidget::render_graph_canvas(std::vector<GraphNode>& nodes, GraphConfig
         // Handle panning
         if (ImGui::IsMouseDragging(0) && hovered_node < 0) {
             ImVec2 delta = ImGui::GetMouseDragDelta(0);
-            config.pan_offset.x += delta.x;
-            config.pan_offset.y += delta.y;
+            config.pan_offset.x += delta.x / config.zoom;  // pan is in graph units
+            config.pan_offset.y += delta.y / config.zoom;
             ImGui::ResetMouseDragDelta(0);
         }
         
         // Handle zoom
         if (ImGui::GetIO().MouseWheel != 0.0f) {
             float wheel = ImGui::GetIO().MouseWheel;
-            float old_zoom = config.zoom;
+            ImVec2 mouse_graph = screen_to_graph(mouse_pos, config, canvas_pos);
             config.zoom *= (1.0f + wheel * 0.1f);
             config.zoom = std::max(0.1f, std::min(config.zoom, 5.0f));
             
-            // Adjust pan to zoom towards mouse
-            ImVec2 mouse_graph = screen_to_graph(mouse_pos, config, canvas_pos);
-            config.pan_offset.x += (mouse_pos.x - canvas_pos.x) * (1.0f - config.zoom / old_zoom);
-            config.pan_offset.y += (mouse_pos.y - canvas_pos.y) * (1.0f - config.zoom / old_zoom);
+            // Keep the graph point under the mouse fixed
+            config.pan_offset.x = (mouse_pos.x - canvas_pos.x) / config.zoom - mouse_graph.x;
+            config.pan_offset.y = (mouse_pos.y - canvas_pos.y) / config.zoom - mouse_graph.y;
         }
         
         // Show tooltip for hovered node
@@ -658,7 +659,7 @@ void GraphWidget::render_graph_controls(GraphConfig& config) {
     ImGui::Text("Zoom:");
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100);
-    ImGui::SliderFloat("##zoom", &config.zoom, 0.1f, 5.0f, "%.1fx");
+    ImGui::SliderFloat("##zoom", &config.zoom, 0.1f, 5.0f, "%.1fx", ImGuiSliderFlags_AlwaysClamp);
 }
 
 void GraphWidget::render_node(ImDrawList* draw_list, const GraphNode& node, const GraphConfig& config, 

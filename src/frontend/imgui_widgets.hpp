@@ -67,7 +67,7 @@ private:
 
     int selected_event_ = -1;
     std::vector<int> thread_ids_;          // Map thread IDs to lane indices
-    float last_total_duration_ = 0.0f;     // Cache for auto-zoom calculations
+    uint64_t last_first_timestamp_ = 0;    // identifies the trace the view was set up for
 };
 
 // Utility functions for timeline rendering
