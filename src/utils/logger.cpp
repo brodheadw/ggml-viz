@@ -181,12 +181,8 @@ void Logger::log(LogLevel level, const std::string& message) {
     // Add message
     oss << message;
     
-    // Output to appropriate stream
-    if (level >= LogLevel::ERROR_LEVEL) {
-        std::cerr << oss.str() << std::endl;
-    } else {
-        std::cout << oss.str() << std::endl;
-    }
+    // stderr only: the hook runs inside the traced program, whose stdout may be parsed or redirected
+    std::cerr << oss.str() << std::endl;
 }
 
 void Logger::debug(const std::string& message) {

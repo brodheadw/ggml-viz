@@ -7,7 +7,7 @@ BOOL APIENTRY DllMain(HMODULE hMod, DWORD reason, LPVOID) {
     DisableThreadLibraryCalls(hMod);
 
     MH_Initialize();
-    printf("[ggml-viz] Win32 hook loaded (PID %lu)\n", GetCurrentProcessId());
+    fprintf(stderr, "[ggml-viz] Win32 hook loaded (PID %lu)\n", GetCurrentProcessId());
     // TODO: MH_CreateHook for ggml_backend_sched_graph_compute
     return TRUE;
 }
