@@ -514,7 +514,7 @@ The preferred method for configuring GGMLVIZ trace capture is through JSON confi
   - Values: `0` (default), `1` (disabled)
   - Useful for temporarily disabling without removing interposition
 - **`GGML_VIZ_MAX_EVENTS`**: Maximum events to capture
-  - Default: `10000000` (10 million events)
+  - Default: `1000000` (1 million events)
   - Example: `export GGML_VIZ_MAX_EVENTS=50000000`
 
 #### Advanced Configuration

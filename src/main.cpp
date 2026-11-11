@@ -97,7 +97,7 @@ namespace {
                   << "    LD_PRELOAD            Path to libggml_viz_hook.so (Linux)\n"
                   << "\n"
                   << "  Configuration Variables:\n"
-                  << "    GGML_VIZ_MAX_EVENTS   Maximum events to capture (default: 10,000,000)\n"
+                  << "    GGML_VIZ_MAX_EVENTS   Maximum events to capture (default: 1,000,000)\n"
                   << "    GGML_VIZ_OP_TIMING    Enable operation timing (default: true)\n"
                   << "    GGML_VIZ_THREAD_TRACKING  Enable thread tracking (default: false)\n"
                   << "    GGML_VIZ_TENSOR_NAMES     Capture tensor names (default: true)\n"
