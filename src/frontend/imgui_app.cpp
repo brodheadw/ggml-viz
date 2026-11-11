@@ -138,7 +138,7 @@ void ImGuiApp::enable_live_mode(const std::string& trace_file) {
             std::cout << "[ImGuiApp] Monitoring external trace file: " << data_->live_file_path << std::endl;
         } else {
             // Default to monitoring a temporary file
-            data_->live_file_path = "test.ggmlviz";
+            data_->live_file_path = "trace.ggmlviz";
             std::cout << "[ImGuiApp] No GGML_VIZ_OUTPUT set, monitoring default: " << data_->live_file_path << std::endl;
         }
     }
