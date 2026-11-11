@@ -93,7 +93,6 @@ void TimelineWidget::render_timeline_canvas(const std::vector<TimelineEvent>& ti
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     ImVec2 canvas_pos = ImGui::GetCursorScreenPos();
     ImVec2 canvas_size = ImGui::GetContentRegionAvail();
-    canvas_size.y = config.height;
     
     // Ensure minimum canvas width
     canvas_size.x = std::max(canvas_size.x, 400.0f);
@@ -101,6 +100,9 @@ void TimelineWidget::render_timeline_canvas(const std::vector<TimelineEvent>& ti
     // Calculate timeline dimensions
     int num_lanes = config.show_threads ? thread_ids_.size() : 1;
     float total_lane_height = num_lanes * (config.lane_height + config.padding);
+    float ruler_height = 20.0f;
+    // Grow to fit every thread lane; a fixed height drew extra lanes over the widgets below
+    canvas_size.y = std::max(config.height, ruler_height + total_lane_height + config.padding);
     // float usable_height = std::min(canvas_size.y - 40.0f, total_lane_height); // Leave space for time ruler (unused for now)
     
     // Draw canvas background
@@ -109,7 +111,6 @@ void TimelineWidget::render_timeline_canvas(const std::vector<TimelineEvent>& ti
                            IM_COL32(30, 30, 30, 255));
     
     // Draw time ruler at the top
-    float ruler_height = 20.0f;
     draw_list->AddRectFilled(canvas_pos, 
                            ImVec2(canvas_pos.x + canvas_size.x, canvas_pos.y + ruler_height),
                            IM_COL32(40, 40, 40, 255));
