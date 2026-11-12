@@ -491,11 +491,14 @@ bool ImGuiApp::load_trace_file(const std::string& filename) {
     }
 }
 
-// First-run placement as fractions of the work area (below the menu bar); saved layouts in imgui.ini win
+// First-run placement as fractions of the area below the menu bar; saved layouts in imgui.ini win.
+// WorkPos only excludes the menu bar from the second frame on, so offset by its height directly.
 static void set_default_window_rect(float x, float y, float w, float h) {
     const ImGuiViewport* vp = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(ImVec2(vp->WorkPos.x + x * vp->WorkSize.x, vp->WorkPos.y + y * vp->WorkSize.y), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(w * vp->WorkSize.x, h * vp->WorkSize.y), ImGuiCond_FirstUseEver);
+    float top = ImGui::GetFrameHeight();
+    ImVec2 size(vp->Size.x, vp->Size.y - top);
+    ImGui::SetNextWindowPos(ImVec2(vp->Pos.x + x * size.x, vp->Pos.y + top + y * size.y), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(w * size.x, h * size.y), ImGuiCond_FirstUseEver);
 }
 
 void ImGuiApp::render_timeline_view() {
