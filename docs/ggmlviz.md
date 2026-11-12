@@ -524,9 +524,6 @@ The preferred method for configuring GGMLVIZ trace capture is through JSON confi
 - **`GGML_VIZ_MEMORY_TRACKING`**: Enable memory tracking
   - Values: `0` (default), `1` (enabled)
   - Experimental feature for tensor allocation tracking
-- **`GGML_VIZ_THREAD_TRACKING`**: Enable thread tracking
-  - Values: `0` (default), `1` (enabled)
-  - Tracks thread creation and destruction events
 - **`GGML_VIZ_TENSOR_NAMES`**: Capture tensor names
   - Values: `1` (default), `0` (disabled)
   - Disabling saves space but loses tensor identification
