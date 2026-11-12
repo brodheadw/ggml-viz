@@ -313,6 +313,15 @@ void Config::apply_env_overrides() {
         }
     }
     
+    // Unset leaves the value alone; "0"/"false" turns off, anything else turns on
+    auto env_bool = [](const char* name, bool& value) {
+        const char* v = std::getenv(name);
+        if (v) value = !(std::string(v) == "0" || std::string(v) == "false");
+    };
+    env_bool("GGML_VIZ_OP_TIMING", instrumentation.enable_op_timing);
+    env_bool("GGML_VIZ_MEMORY_TRACKING", instrumentation.enable_memory_tracking);
+    env_bool("GGML_VIZ_TENSOR_NAMES", instrumentation.record_tensor_names);
+    
     const char* env_verbose = std::getenv("GGML_VIZ_VERBOSE");
     if (env_verbose && (std::string(env_verbose) == "1" || std::string(env_verbose) == "true")) {
         logging.level = ConfigLogLevel::DEBUG;
