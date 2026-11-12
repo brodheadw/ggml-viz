@@ -491,10 +491,18 @@ bool ImGuiApp::load_trace_file(const std::string& filename) {
     }
 }
 
+// First-run placement as fractions of the work area (below the menu bar); saved layouts in imgui.ini win
+static void set_default_window_rect(float x, float y, float w, float h) {
+    const ImGuiViewport* vp = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(ImVec2(vp->WorkPos.x + x * vp->WorkSize.x, vp->WorkPos.y + y * vp->WorkSize.y), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(w * vp->WorkSize.x, h * vp->WorkSize.y), ImGuiCond_FirstUseEver);
+}
+
 void ImGuiApp::render_timeline_view() {
     // Color-code timeline panel (blue)
     ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.13f, 0.54f, 0.82f, 1.0f)); // Blue color
     
+    set_default_window_rect(0.0f, 0.55f, 1.0f, 0.45f);
     if (ImGui::Begin("Timeline View")) {
         // Handle both live mode and loaded traces
         const std::vector<Event>* events_ptr = nullptr;
@@ -731,6 +739,7 @@ void ImGuiApp::render_graph_view() {
     // Color-code graph panel (green)
     ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.30f, 0.69f, 0.31f, 1.0f)); // Green color
     
+    set_default_window_rect(0.0f, 0.0f, 0.6f, 0.55f);
     if (ImGui::Begin("Graph View")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
@@ -792,6 +801,7 @@ void ImGuiApp::render_tensor_inspector() {
     // Color-code tensor inspector panel (pink)
     ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.91f, 0.12f, 0.39f, 1.0f)); // Pink color
     
+    set_default_window_rect(0.6f, 0.0f, 0.4f, 0.3f);
     if (ImGui::Begin("Tensor Inspector")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
@@ -850,6 +860,7 @@ void ImGuiApp::render_memory_view() {
     // Color-code memory view panel (orange)
     ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(1.0f, 0.60f, 0.0f, 1.0f)); // Orange color
     
+    set_default_window_rect(0.6f, 0.3f, 0.4f, 0.25f);
     if (ImGui::Begin("Memory View")) {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
