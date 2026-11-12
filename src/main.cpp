@@ -99,6 +99,7 @@ namespace {
                   << "  Configuration Variables:\n"
                   << "    GGML_VIZ_MAX_EVENTS   Maximum events to capture (default: 1,000,000)\n"
                   << "    GGML_VIZ_OP_TIMING    Enable operation timing (default: true)\n"
+                  << "    GGML_VIZ_MEMORY_TRACKING  Record tensor allocations (default: false)\n"
                   << "    GGML_VIZ_TENSOR_NAMES     Capture tensor names (default: true)\n"
                   << "\n"
                   << "  Logging Configuration:\n"
