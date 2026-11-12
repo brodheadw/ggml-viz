@@ -797,22 +797,14 @@ extern "C" {
             hook.start();
         }
         
+        // Only tensors without memory yet get allocated here; weights already live in their own buffers
+        std::vector<ggml_tensor*> pending;
         if (hook.is_active() && graph) {
-            
-            // Record allocation events for all tensors in the graph
             for (int i = 0; i < graph->n_nodes; i++) {
-                if (graph->nodes[i]) {
-                    size_t tensor_size = ggml_nbytes_simple(graph->nodes[i]);
-                    hook.on_tensor_alloc(graph->nodes[i], tensor_size, nullptr);
-                }
+                if (graph->nodes[i] && !graph->nodes[i]->data && !graph->nodes[i]->view_src) pending.push_back(graph->nodes[i]);
             }
-            
-            // Also record leaf tensors (inputs)
             for (int i = 0; i < graph->n_leafs; i++) {
-                if (graph->leafs[i]) {
-                    size_t tensor_size = ggml_nbytes_simple(graph->leafs[i]);
-                    hook.on_tensor_alloc(graph->leafs[i], tensor_size, nullptr);
-                }
+                if (graph->leafs[i] && !graph->leafs[i]->data && !graph->leafs[i]->view_src) pending.push_back(graph->leafs[i]);
             }
         }
         
@@ -829,6 +821,10 @@ extern "C" {
             result = original_gallocr_alloc_graph(galloc, graph);
         } else {
             fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_gallocr_alloc_graph function found\n");
+        }
+        
+        for (ggml_tensor* t : pending) {
+            if (t->data) hook.on_tensor_alloc(t, ggml_nbytes_simple(t), nullptr);
         }
         
         return result;

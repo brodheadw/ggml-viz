@@ -34,7 +34,8 @@ if sys.argv[2:] == ["alloc"]:
     sys.exit(0)
 assert counts["GRAPH_BEGIN"] == counts["GRAPH_END"] == 2, "expected one graph per compute"
 assert counts["OP_BEGIN"] == counts["OP_END"] == 6, "expected 3 ops per graph"
-assert counts["ALLOC"] == 10, "expected 3 nodes + 2 leafs allocated per sched_alloc_graph"
+# 3 nodes + 2 inputs, allocated once: re-allocating the same graph reuses its memory
+assert counts["ALLOC"] == 5, "expected 3 nodes + 2 leafs allocated once"
 # Ops stamped around the whole graph all get the same duration; real ones differ widely.
 fastest = {k: min(v) for k, v in durations.items()}
 assert max(fastest.values()) > 3 * min(fastest.values()), "per-op timings look like whole-graph timings"
