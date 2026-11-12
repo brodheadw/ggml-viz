@@ -183,9 +183,9 @@ jobs:
         for args in "" "cb"; do
           rm -f preload.ggmlviz
           if [ "${{ matrix.platform }}" = "macos" ]; then
-            DYLD_INSERT_LIBRARIES=$PWD/build/src/libggml_viz_hook.dylib GGML_VIZ_OUTPUT=$PWD/preload.ggmlviz ./sched_check $args
+            DYLD_INSERT_LIBRARIES=$PWD/build/src/libggml_viz_hook.dylib GGML_VIZ_OUTPUT=$PWD/preload.ggmlviz GGML_VIZ_MEMORY_TRACKING=1 ./sched_check $args
           else
-            LD_PRELOAD=$PWD/build/src/libggml_viz_hook.so GGML_VIZ_OUTPUT=$PWD/preload.ggmlviz ./sched_check $args
+            LD_PRELOAD=$PWD/build/src/libggml_viz_hook.so GGML_VIZ_OUTPUT=$PWD/preload.ggmlviz GGML_VIZ_MEMORY_TRACKING=1 ./sched_check $args
           fi
           python3 tests/preload/check_trace.py preload.ggmlviz
         done

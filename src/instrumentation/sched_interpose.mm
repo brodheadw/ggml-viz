@@ -186,6 +186,25 @@ ggml_backend_buffer_t viz_alloc_ctx_tensors(struct ggml_context* ctx, ggml_backe
     return buf;
 }
 
+// Scheduler allocations happen inside ggml (gallocr), out of reach; record the graph's tensors as Linux does
+__attribute__((visibility("default")))
+bool viz_sched_alloc_graph(ggml_backend_sched_t sched, struct ggml_cgraph* graph) {
+    bool ok = ggml_backend_sched_alloc_graph(sched, graph);
+    auto& hook = ggml_viz::GGMLHook::instance();
+    if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+        hook.start();
+    }
+    if (ok && graph && hook.is_active()) {
+        for (int i = 0; i < graph->n_nodes; i++) {
+            if (!graph->nodes[i]->view_src) hook.on_tensor_alloc(graph->nodes[i], ggml_nbytes(graph->nodes[i]), nullptr);
+        }
+        for (int i = 0; i < graph->n_leafs; i++) {
+            if (!graph->leafs[i]->view_src) hook.on_tensor_alloc(graph->leafs[i], ggml_nbytes(graph->leafs[i]), nullptr);
+        }
+    }
+    return ok;
+}
+
 __attribute__((visibility("default")))
 ggml_backend_buffer_t viz_alloc_ctx_tensors_from_buft(struct ggml_context* ctx, ggml_backend_buffer_type_t buft) {
     ggml_backend_buffer_t buf = ggml_backend_alloc_ctx_tensors_from_buft(ctx, buft);
@@ -209,3 +228,4 @@ DYLD_INTERPOSE(viz_graph_compute,             ggml_graph_compute)
 DYLD_INTERPOSE(viz_graph_compute_with_ctx,    ggml_graph_compute_with_ctx)
 DYLD_INTERPOSE(viz_alloc_ctx_tensors,          ggml_backend_alloc_ctx_tensors)
 DYLD_INTERPOSE(viz_alloc_ctx_tensors_from_buft, ggml_backend_alloc_ctx_tensors_from_buft)
+DYLD_INTERPOSE(viz_sched_alloc_graph,           ggml_backend_sched_alloc_graph)
