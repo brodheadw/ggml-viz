@@ -134,13 +134,13 @@ extern "C" {
     void ggml_viz_print_status() {
         if (g_auto_initialized) {
             if (GGMLHook::instance().is_active()) {
-                std::cout << "[GGML_VIZ] Status: Active (events recorded: " 
+                std::cerr << "[GGML_VIZ] Status: Active (events recorded: " 
                          << GGMLHook::instance().event_count() << ")" << std::endl;
             } else {
-                std::cout << "[GGML_VIZ] Status: Initialized but not active" << std::endl;
+                std::cerr << "[GGML_VIZ] Status: Initialized but not active" << std::endl;
             }
         } else {
-            std::cout << "[GGML_VIZ] Status: Not initialized" << std::endl;
+            std::cerr << "[GGML_VIZ] Status: Not initialized" << std::endl;
         }
     }
 }

@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cassert>
 #include <iostream>
+#include <cstdio>
 #include <iomanip>
 #include <algorithm>
 #include <unordered_map>
@@ -124,7 +125,7 @@ void GGMLHook::start() {
     
     // Check if hooks are disabled via config
     if (!config->instrumentation.enable_op_timing && !config->instrumentation.enable_memory_tracking) {
-        std::cout << "GGML Viz hooks disabled by configuration.\n";
+        std::cerr << "GGML Viz hooks disabled by configuration.\n";
         return;
     }
 
@@ -161,9 +162,9 @@ void GGMLHook::start() {
 #endif
     }
 
-    std::cout << "GGML Hook started. Output: " << config->output.filename << "\n";
+    std::cerr << "GGML Hook started. Output: " << config->output.filename << "\n";
     if (config->logging.level == ConfigLogLevel::DEBUG) {
-        std::cout << "GGML Viz verbose mode enabled.\n";
+        std::cerr << "GGML Viz verbose mode enabled.\n";
     }
 }
 
@@ -179,7 +180,7 @@ void GGMLHook::stop() {
         output_file_ = nullptr;
     }
 
-    std::cout << "GGML Hook stopped. Recorded " << event_count_ << " events.\n";
+    std::cerr << "GGML Hook stopped. Recorded " << event_count_ << " events.\n";
 }
 
 void GGMLHook::reset_stats() {
@@ -613,7 +614,7 @@ extern "C" {
         
         // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
         if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            fprintf(stderr, "[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
         
@@ -634,7 +635,7 @@ extern "C" {
             NestedComputeScope scope;
             result = original_backend_graph_compute(backend, cgraph);
         } else {
-            printf("[GGML_VIZ] Warning: No original ggml_backend_graph_compute function found\n");
+            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_backend_graph_compute function found\n");
             // For now, just return success to avoid breaking the application
             result = GGML_STATUS_SUCCESS;
         }
@@ -651,7 +652,7 @@ extern "C" {
         
         // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
         if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            fprintf(stderr, "[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
         
@@ -671,7 +672,7 @@ extern "C" {
             NestedComputeScope scope;
             result = original_graph_compute(cgraph, cplan);
         } else {
-            printf("[GGML_VIZ] Warning: No original ggml_graph_compute function found\n");
+            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_graph_compute function found\n");
             // Continue without calling original - this allows pure instrumentation mode
         }
         
@@ -703,7 +704,7 @@ extern "C" {
             NestedComputeScope scope;
             result = original_graph_compute_with_ctx(ctx, cgraph, n_threads);
         } else {
-            printf("[GGML_VIZ] Warning: No original ggml_graph_compute_with_ctx function found\n");
+            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_graph_compute_with_ctx function found\n");
             // Continue without calling original - this allows pure instrumentation mode
         }
 
@@ -720,7 +721,7 @@ extern "C" {
         
         // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
         if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            fprintf(stderr, "[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
         
@@ -741,7 +742,7 @@ extern "C" {
             NestedComputeScope scope;
             result = original_metal_graph_compute(backend, cgraph);
         } else {
-            printf("[GGML_VIZ] Warning: No original ggml_backend_metal_graph_compute function found\n");
+            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_backend_metal_graph_compute function found\n");
             // Continue without calling original - this allows pure instrumentation mode
         }
         
@@ -758,7 +759,7 @@ extern "C" {
         
         // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
         if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            fprintf(stderr, "[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
         
@@ -781,7 +782,7 @@ extern "C" {
         if (original_tallocr_alloc) {
             result = original_tallocr_alloc(talloc, tensor);
         } else {
-            printf("[GGML_VIZ] Warning: No original ggml_tallocr_alloc function found\n");
+            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_tallocr_alloc function found\n");
         }
         
         return result;
@@ -792,7 +793,7 @@ extern "C" {
         
         // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
         if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            fprintf(stderr, "[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
         
@@ -827,7 +828,7 @@ extern "C" {
         if (original_gallocr_alloc_graph) {
             result = original_gallocr_alloc_graph(galloc, graph);
         } else {
-            printf("[GGML_VIZ] Warning: No original ggml_gallocr_alloc_graph function found\n");
+            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_gallocr_alloc_graph function found\n");
         }
         
         return result;
@@ -838,7 +839,7 @@ extern "C" {
         
         // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
         if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-            printf("[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
+            fprintf(stderr, "[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
         
@@ -862,7 +863,7 @@ extern "C" {
         if (original_backend_alloc_ctx_tensors) {
             result = original_backend_alloc_ctx_tensors(ctx, backend);
         } else {
-            printf("[GGML_VIZ] Warning: No original ggml_backend_alloc_ctx_tensors function found\n");
+            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_backend_alloc_ctx_tensors function found\n");
         }
         
         return result;
@@ -890,7 +891,7 @@ extern "C" {
 
 // Installation helpers
 bool install_ggml_hooks() {
-    printf("[GGML_VIZ] Installing GGML function interception hooks...\n");
+    fprintf(stderr, "[GGML_VIZ] Installing GGML function interception hooks...\n");
     
     // The function interception happens automatically when our shared library
     // overrides the weak symbols. This function just confirms setup.
@@ -925,65 +926,65 @@ bool install_ggml_hooks() {
 #if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD) && !defined(__APPLE__)
         if (backend_func && backend_func != ggml_backend_graph_compute) {
             original_backend_graph_compute = backend_func;
-            printf("[GGML_VIZ] Found original ggml_backend_graph_compute\n");
+            fprintf(stderr, "[GGML_VIZ] Found original ggml_backend_graph_compute\n");
         }
         if (graph_func && graph_func != ggml_graph_compute) {
             original_graph_compute = graph_func;
-            printf("[GGML_VIZ] Found original ggml_graph_compute\n");
+            fprintf(stderr, "[GGML_VIZ] Found original ggml_graph_compute\n");
         }
         if (graph_with_ctx_func && graph_with_ctx_func != ggml_graph_compute_with_ctx) {
             original_graph_compute_with_ctx = graph_with_ctx_func;
-            printf("[GGML_VIZ] Found original ggml_graph_compute_with_ctx\n");
+            fprintf(stderr, "[GGML_VIZ] Found original ggml_graph_compute_with_ctx\n");
         }
         if (metal_func && metal_func != ggml_backend_metal_graph_compute) {
             original_metal_graph_compute = metal_func;
-            printf("[GGML_VIZ] Found original ggml_backend_metal_graph_compute\n");
+            fprintf(stderr, "[GGML_VIZ] Found original ggml_backend_metal_graph_compute\n");
         }
         
         // Store memory allocation function pointers
         if (tallocr_alloc_func && tallocr_alloc_func != ggml_tallocr_alloc) {
             original_tallocr_alloc = tallocr_alloc_func;
-            printf("[GGML_VIZ] Found original ggml_tallocr_alloc\n");
+            fprintf(stderr, "[GGML_VIZ] Found original ggml_tallocr_alloc\n");
         }
         if (gallocr_alloc_graph_func && gallocr_alloc_graph_func != ggml_gallocr_alloc_graph) {
             original_gallocr_alloc_graph = gallocr_alloc_graph_func;
-            printf("[GGML_VIZ] Found original ggml_gallocr_alloc_graph\n");
+            fprintf(stderr, "[GGML_VIZ] Found original ggml_gallocr_alloc_graph\n");
         }
         if (backend_alloc_ctx_tensors_func && backend_alloc_ctx_tensors_func != ggml_backend_alloc_ctx_tensors) {
             original_backend_alloc_ctx_tensors = backend_alloc_ctx_tensors_func;
-            printf("[GGML_VIZ] Found original ggml_backend_alloc_ctx_tensors\n");
+            fprintf(stderr, "[GGML_VIZ] Found original ggml_backend_alloc_ctx_tensors\n");
         }
 #else
         // In test mode, just store the functions we find
         if (backend_func) {
             original_backend_graph_compute = backend_func;
-            printf("[GGML_VIZ] Found ggml_backend_graph_compute (test mode)\n");
+            fprintf(stderr, "[GGML_VIZ] Found ggml_backend_graph_compute (test mode)\n");
         }
         if (graph_func) {
             original_graph_compute = graph_func;
-            printf("[GGML_VIZ] Found ggml_graph_compute (test mode)\n");
+            fprintf(stderr, "[GGML_VIZ] Found ggml_graph_compute (test mode)\n");
         }
         if (graph_with_ctx_func) {
             original_graph_compute_with_ctx = graph_with_ctx_func;
-            printf("[GGML_VIZ] Found ggml_graph_compute_with_ctx (test mode)\n");
+            fprintf(stderr, "[GGML_VIZ] Found ggml_graph_compute_with_ctx (test mode)\n");
         }
         if (metal_func) {
             original_metal_graph_compute = metal_func;
-            printf("[GGML_VIZ] Found ggml_backend_metal_graph_compute (test mode)\n");
+            fprintf(stderr, "[GGML_VIZ] Found ggml_backend_metal_graph_compute (test mode)\n");
         }
         
         // Store memory allocation functions in test mode too
         if (tallocr_alloc_func) {
             original_tallocr_alloc = tallocr_alloc_func;
-            printf("[GGML_VIZ] Found ggml_tallocr_alloc (test mode)\n");
+            fprintf(stderr, "[GGML_VIZ] Found ggml_tallocr_alloc (test mode)\n");
         }
         if (gallocr_alloc_graph_func) {
             original_gallocr_alloc_graph = gallocr_alloc_graph_func;
-            printf("[GGML_VIZ] Found ggml_gallocr_alloc_graph (test mode)\n");
+            fprintf(stderr, "[GGML_VIZ] Found ggml_gallocr_alloc_graph (test mode)\n");
         }
         if (backend_alloc_ctx_tensors_func) {
             original_backend_alloc_ctx_tensors = backend_alloc_ctx_tensors_func;
-            printf("[GGML_VIZ] Found ggml_backend_alloc_ctx_tensors (test mode)\n");
+            fprintf(stderr, "[GGML_VIZ] Found ggml_backend_alloc_ctx_tensors (test mode)\n");
         }
 #endif
         
@@ -991,12 +992,12 @@ bool install_ggml_hooks() {
     }
     #endif
     
-    printf("[GGML_VIZ] GGML function hooks installed successfully\n");
+    fprintf(stderr, "[GGML_VIZ] GGML function hooks installed successfully\n");
     return true;
 }
 
 bool uninstall_ggml_hooks() {
-    printf("[GGML_VIZ] Uninstalling GGML hooks...\n");
+    fprintf(stderr, "[GGML_VIZ] Uninstalling GGML hooks...\n");
     
     // Reset function pointers
     original_backend_graph_compute = nullptr;
@@ -1009,7 +1010,7 @@ bool uninstall_ggml_hooks() {
     original_gallocr_alloc_graph = nullptr;
     original_backend_alloc_ctx_tensors = nullptr;
     
-    printf("[GGML_VIZ] GGML hooks uninstalled\n");
+    fprintf(stderr, "[GGML_VIZ] GGML hooks uninstalled\n");
     return true;
 }
 

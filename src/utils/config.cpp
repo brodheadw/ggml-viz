@@ -360,7 +360,7 @@ void ConfigManager::load_with_precedence(
         try {
             Config file_config = Config::from_file(default_config_path);
             config.merge_from(file_config);
-            std::cout << "[GGML_VIZ] Loaded config from: " << default_config_path << "\n";
+            std::cerr << "[GGML_VIZ] Loaded config from: " << default_config_path << "\n";
         } catch (const std::exception& e) {
             // Default config file is optional
         }
@@ -371,7 +371,7 @@ void ConfigManager::load_with_precedence(
         try {
             Config env_file_config = Config::from_file(env_config_path);
             config.merge_from(env_file_config);
-            std::cout << "[GGML_VIZ] Loaded config from env: " << env_config_path << "\n";
+            std::cerr << "[GGML_VIZ] Loaded config from env: " << env_config_path << "\n";
         } catch (const std::exception& e) {
             std::cerr << "[GGML_VIZ] Warning: Could not load env config " 
                      << env_config_path << ": " << e.what() << "\n";
@@ -386,7 +386,7 @@ void ConfigManager::load_with_precedence(
         try {
             Config cli_config = Config::from_file(cli_config_path);
             config.merge_from(cli_config);
-            std::cout << "[GGML_VIZ] Loaded config from CLI: " << cli_config_path << "\n";
+            std::cerr << "[GGML_VIZ] Loaded config from CLI: " << cli_config_path << "\n";
         } catch (const std::exception& e) {
             throw std::runtime_error("Failed to load CLI config " + cli_config_path + ": " + e.what());
         }
@@ -405,11 +405,11 @@ void ConfigManager::load_with_precedence(
     
     // Log resolved settings at INFO level
     auto current_config = config_ptr_;
-    std::cout << "[GGML_VIZ] Configuration loaded successfully:\n";
-    std::cout << "[GGML_VIZ]   Output file: " << current_config->output.filename << "\n";
-    std::cout << "[GGML_VIZ]   Max events: " << current_config->instrumentation.max_events << "\n";
-    std::cout << "[GGML_VIZ]   Log level: " << log_level_to_string(current_config->logging.level) << "\n";
-    std::cout << "[GGML_VIZ]   Op timing: " << (current_config->instrumentation.enable_op_timing ? "enabled" : "disabled") << "\n";
+    std::cerr << "[GGML_VIZ] Configuration loaded successfully:\n";
+    std::cerr << "[GGML_VIZ]   Output file: " << current_config->output.filename << "\n";
+    std::cerr << "[GGML_VIZ]   Max events: " << current_config->instrumentation.max_events << "\n";
+    std::cerr << "[GGML_VIZ]   Log level: " << log_level_to_string(current_config->logging.level) << "\n";
+    std::cerr << "[GGML_VIZ]   Op timing: " << (current_config->instrumentation.enable_op_timing ? "enabled" : "disabled") << "\n";
 }
 
 std::shared_ptr<const Config> ConfigManager::get() const noexcept {
