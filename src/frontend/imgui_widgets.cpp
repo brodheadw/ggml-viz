@@ -1,5 +1,6 @@
 // src/frontend/imgui_widgets.cpp
 #include "imgui_widgets.hpp"
+#include "ggml.h"
 #include <algorithm>
 #include <unordered_map>
 #include <sstream>
@@ -140,8 +141,7 @@ void TimelineWidget::render_timeline_canvas(const std::vector<TimelineEvent>& ti
         
         // Draw time label
         std::string time_str = TimelineUtils::format_timestamp(t);
-        ImVec2 text_size = ImGui::CalcTextSize(time_str.c_str());
-        draw_list->AddText(ImVec2(canvas_pos.x + x - text_size.x * 0.5f, canvas_pos.y + 2),
+        draw_list->AddText(ImVec2(canvas_pos.x + x + 3, canvas_pos.y + 2),  // right of the tick, not across it
                           IM_COL32(200, 200, 200, 255), time_str.c_str());
     }
     
@@ -415,7 +415,9 @@ std::vector<GraphWidget::GraphNode> GraphWidget::build_graph_from_trace(const Tr
         
         // Try to determine operation type from event data or label
         if (timing.begin && timing.begin->data.op.op_type != 0) {
-            node.op_type = "op_" + std::to_string(timing.begin->data.op.op_type);
+            // shortcut: assumes the traced program's ggml numbers ops like ours (true across 2025 releases); store names in the trace if that breaks
+            uint32_t op = timing.begin->data.op.op_type;
+            node.op_type = op < GGML_OP_COUNT ? ggml_op_name(static_cast<enum ggml_op>(op)) : "op_" + std::to_string(op);
         } else {
             // Extract op type from label if possible
             std::string label_str = node.label;
@@ -782,10 +784,10 @@ ImU32 GraphWidget::get_op_color(const std::string& op_type) {
     if (op_type == "ADD" || op_type == "SUB") return IM_COL32(100, 200, 100, 255);      // Green - arithmetic
     if (op_type == "MUL" || op_type == "DIV") return IM_COL32(200, 100, 100, 255);      // Red - arithmetic
     if (op_type == "CONV") return IM_COL32(100, 100, 200, 255);                         // Blue - convolution
-    if (op_type == "LINEAR") return IM_COL32(200, 100, 200, 255);                       // Purple - linear
-    if (op_type == "SOFTMAX") return IM_COL32(200, 200, 100, 255);                      // Yellow - activation
+    if (op_type == "LINEAR" || op_type == "MUL_MAT") return IM_COL32(200, 100, 200, 255);                       // Purple - linear
+    if (op_type == "SOFTMAX" || op_type == "SOFT_MAX") return IM_COL32(200, 200, 100, 255);                      // Yellow - activation
     if (op_type == "RELU") return IM_COL32(100, 200, 200, 255);                         // Cyan - activation
-    if (op_type == "NORM") return IM_COL32(150, 150, 200, 255);                         // Light blue - normalization
+    if (op_type == "NORM" || op_type == "RMS_NORM") return IM_COL32(150, 150, 200, 255);                         // Light blue - normalization
     
     return IM_COL32(120, 120, 120, 255);  // Gray - unknown
 }
