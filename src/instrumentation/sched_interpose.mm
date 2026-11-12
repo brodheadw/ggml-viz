@@ -3,6 +3,7 @@
 
 #import "ggml_hook.hpp"
 #include "ggml-backend.h"
+#include "ggml-alloc.h"
 #include "ggml-impl.h"          // for struct ggml_cgraph
 #include "ggml.h"               // for ggml_context and ggml_status
 #include "ggml-cpu.h"           // for ggml_graph_compute declarations
@@ -162,6 +163,37 @@ enum ggml_status viz_graph_compute_with_ctx(struct ggml_context* ctx, struct ggm
 }
 }
 
+// Allocation: only calls from other images are interposed (ggml's internal tallocr/gallocr calls are not),
+// so record the tensors a context allocation placed in its new buffer.
+static void record_ctx_allocs(struct ggml_context* ctx, ggml_backend_buffer_t buf) {
+    auto& hook = ggml_viz::GGMLHook::instance();
+    if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+        hook.start();
+    }
+    if (!buf || !hook.is_active()) return;
+    for (struct ggml_tensor* t = ggml_get_first_tensor(ctx); t; t = ggml_get_next_tensor(ctx, t)) {
+        if (t->buffer == buf && !t->view_src) {
+            hook.on_tensor_alloc(t, ggml_nbytes(t), nullptr);
+        }
+    }
+}
+
+extern "C" {
+__attribute__((visibility("default")))
+ggml_backend_buffer_t viz_alloc_ctx_tensors(struct ggml_context* ctx, ggml_backend_t backend) {
+    ggml_backend_buffer_t buf = ggml_backend_alloc_ctx_tensors(ctx, backend);
+    record_ctx_allocs(ctx, buf);
+    return buf;
+}
+
+__attribute__((visibility("default")))
+ggml_backend_buffer_t viz_alloc_ctx_tensors_from_buft(struct ggml_context* ctx, ggml_backend_buffer_type_t buft) {
+    ggml_backend_buffer_t buf = ggml_backend_alloc_ctx_tensors_from_buft(ctx, buft);
+    record_ctx_allocs(ctx, buf);
+    return buf;
+}
+}
+
 // --- DYLD interpose glue --------------------------------------------------
 #define DYLD_INTERPOSE(_repl,_orig) \
 __attribute__((used)) static struct{ const void* repl; const void* orig; } \
@@ -175,3 +207,5 @@ DYLD_INTERPOSE(viz_backend_graph_compute,     ggml_backend_graph_compute)
 DYLD_INTERPOSE(viz_backend_graph_compute_async, ggml_backend_graph_compute_async)
 DYLD_INTERPOSE(viz_graph_compute,             ggml_graph_compute)
 DYLD_INTERPOSE(viz_graph_compute_with_ctx,    ggml_graph_compute_with_ctx)
+DYLD_INTERPOSE(viz_alloc_ctx_tensors,          ggml_backend_alloc_ctx_tensors)
+DYLD_INTERPOSE(viz_alloc_ctx_tensors_from_buft, ggml_backend_alloc_ctx_tensors_from_buft)
