@@ -189,18 +189,23 @@ ggml_backend_buffer_t viz_alloc_ctx_tensors(struct ggml_context* ctx, ggml_backe
 // Scheduler allocations happen inside ggml (gallocr), out of reach; record the graph's tensors as Linux does
 __attribute__((visibility("default")))
 bool viz_sched_alloc_graph(ggml_backend_sched_t sched, struct ggml_cgraph* graph) {
-    bool ok = ggml_backend_sched_alloc_graph(sched, graph);
     auto& hook = ggml_viz::GGMLHook::instance();
     if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
         hook.start();
     }
-    if (ok && graph && hook.is_active()) {
+    // Only tensors without memory yet get allocated here; weights already live in their own buffers
+    std::vector<struct ggml_tensor*> pending;
+    if (graph && hook.is_active()) {
         for (int i = 0; i < graph->n_nodes; i++) {
-            if (!graph->nodes[i]->view_src) hook.on_tensor_alloc(graph->nodes[i], ggml_nbytes(graph->nodes[i]), nullptr);
+            if (!graph->nodes[i]->data && !graph->nodes[i]->view_src) pending.push_back(graph->nodes[i]);
         }
         for (int i = 0; i < graph->n_leafs; i++) {
-            if (!graph->leafs[i]->view_src) hook.on_tensor_alloc(graph->leafs[i], ggml_nbytes(graph->leafs[i]), nullptr);
+            if (!graph->leafs[i]->data && !graph->leafs[i]->view_src) pending.push_back(graph->leafs[i]);
         }
+    }
+    bool ok = ggml_backend_sched_alloc_graph(sched, graph);
+    for (struct ggml_tensor* t : pending) {
+        if (t->data) hook.on_tensor_alloc(t, ggml_nbytes(t), nullptr);
     }
     return ok;
 }
