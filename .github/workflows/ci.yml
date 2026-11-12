@@ -189,6 +189,15 @@ jobs:
           fi
           python3 tests/preload/check_trace.py preload.ggmlviz
         done
+        $CC -O1 tests/preload/alloc_check.c -Ithird_party/ggml/include -L$LIBDIR -Wl,-rpath,$LIBDIR \
+            -lggml -lggml-base -lggml-cpu -o alloc_check
+        rm -f preload.ggmlviz
+        if [ "${{ matrix.platform }}" = "macos" ]; then
+          DYLD_INSERT_LIBRARIES=$PWD/build/src/libggml_viz_hook.dylib GGML_VIZ_OUTPUT=$PWD/preload.ggmlviz GGML_VIZ_MEMORY_TRACKING=1 ./alloc_check
+        else
+          LD_PRELOAD=$PWD/build/src/libggml_viz_hook.so GGML_VIZ_OUTPUT=$PWD/preload.ggmlviz GGML_VIZ_MEMORY_TRACKING=1 ./alloc_check
+        fi
+        python3 tests/preload/check_trace.py preload.ggmlviz alloc
 
     - name: Run performance benchmark
       working-directory: build/..
