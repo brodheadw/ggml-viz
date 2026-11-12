@@ -122,13 +122,12 @@ void TimelineWidget::render_timeline_canvas(const std::vector<TimelineEvent>& ti
     float start_time = config.scroll_x * total_duration_ms;
     float end_time = start_time + visible_duration;
     
-    // Calculate time step for markers
-    float time_step = visible_duration / 10.0f; // Aim for ~10 markers
-    float marker_step = 1.0f;
-    if (time_step < 1.0f) marker_step = 0.1f;
-    else if (time_step < 10.0f) marker_step = 1.0f;
-    else if (time_step < 100.0f) marker_step = 10.0f;
-    else marker_step = 100.0f;
+    // Smallest 1-2-5 step that leaves room for a label between markers (labels show 0.1ms precision)
+    float min_step = visible_duration * (ImGui::CalcTextSize("000.0ms").x + 16.0f) / std::max(timeline_width, 1.0f);
+    float marker_step = 0.1f;
+    for (int i = 0; marker_step < min_step; i++) {
+        marker_step *= (i % 3 == 1) ? 2.5f : 2.0f;  // 0.1, 0.2, 0.5, 1, 2, 5, ...
+    }
     
     // Walk only the visible range rather than every marker from 0
     for (float t = std::floor(start_time / marker_step) * marker_step; t <= std::min(end_time, total_duration_ms); t += marker_step) {

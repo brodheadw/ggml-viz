@@ -111,6 +111,7 @@ bool ImGuiApp::initialize() {
     
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
+    ImGui::GetStyle().Colors[ImGuiCol_WindowBg].w = 1.0f;  // stacked panels would otherwise show through
     
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(data_->window, true);
@@ -526,6 +527,7 @@ void ImGuiApp::render_timeline_view() {
         } else {
             ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
+            ImGui::PopStyleColor();
             return;
         }
         
@@ -733,6 +735,7 @@ void ImGuiApp::render_graph_view() {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
+            ImGui::PopStyleColor();
             return;
         }
         
@@ -793,6 +796,7 @@ void ImGuiApp::render_tensor_inspector() {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
+            ImGui::PopStyleColor();
             return;
         }
         
@@ -850,6 +854,7 @@ void ImGuiApp::render_memory_view() {
         if (!data_->trace_reader && !data_->live_mode) {
             ImGui::Text("No trace loaded and live mode not active");
             ImGui::End();
+            ImGui::PopStyleColor();
             return;
         }
         
