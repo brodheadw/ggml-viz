@@ -739,6 +739,7 @@ extern "C" {
         return result;
     }
     
+#if !defined(_WIN32)
     // Every allocation ends here: tallocr, gallocr, and llama.cpp binding mmap'd weights to their buffer.
     GGML_VIZ_API enum ggml_status ggml_backend_tensor_alloc(ggml_backend_buffer_t buffer, struct ggml_tensor* tensor, void* addr) {
         static auto real = reinterpret_cast<enum ggml_status (*)(ggml_backend_buffer_t, struct ggml_tensor*, void*)>(
@@ -754,6 +755,7 @@ extern "C" {
         }
         return result;
     }
+#endif
 
     GGML_VIZ_API struct ggml_backend_buffer* ggml_backend_alloc_ctx_tensors(struct ggml_context* ctx, ggml_backend_t backend) {
         auto& hook = GGMLHook::instance();
