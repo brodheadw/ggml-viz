@@ -1,5 +1,5 @@
 """Assert a sched_check trace has real per-op timings: 2 graphs, 3 ops each, ops not all equal.
-With "alloc": assert an alloc_check trace holds exactly the one Q4_0 weight allocation."""
+With "alloc": assert an alloc_check trace holds exactly its two weight allocations."""
 import struct, sys
 from collections import Counter
 
@@ -30,7 +30,7 @@ while i < len(d):
 
 print(dict(counts), {k: min(v) for k, v in durations.items()}, allocs)
 if sys.argv[2:] == ["alloc"]:
-    assert allocs == [("wq", 147456)], "expected one 147456-byte allocation of wq"
+    assert allocs == [("wq", 147456), ("wk", 4096)], "expected wq (context) then wk (host-pointer buffer)"
     sys.exit(0)
 assert counts["GRAPH_BEGIN"] == counts["GRAPH_END"] == 2, "expected one graph per compute"
 assert counts["OP_BEGIN"] == counts["OP_END"] == 6, "expected 3 ops per graph"
