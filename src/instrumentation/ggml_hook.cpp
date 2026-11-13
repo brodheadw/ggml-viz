@@ -521,7 +521,7 @@ static enum ggml_status (*original_tallocr_alloc)(struct ggml_tallocr*, struct g
 static bool (*original_gallocr_alloc_graph)(ggml_gallocr_t, struct ggml_cgraph*) = nullptr;
 static struct ggml_backend_buffer* (*original_backend_alloc_ctx_tensors)(struct ggml_context*, ggml_backend_t) = nullptr;
 
-static bool hooks_initialized = false;
+static std::once_flag hooks_once;
 
 #if !defined(_WIN32) && !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD)
 // Per-op timing: ggml only exposes node boundaries through the scheduler's eval callback.
@@ -626,10 +626,7 @@ extern "C" {
         enum ggml_status result = GGML_STATUS_FAILED;
         
         // Initialize function pointers if needed
-        if (!hooks_initialized) {
-            install_ggml_hooks();
-            hooks_initialized = true;
-        }
+        install_ggml_hooks();
         
         if (original_backend_graph_compute) {
             NestedComputeScope scope;
@@ -663,10 +660,7 @@ extern "C" {
         enum ggml_status result = GGML_STATUS_SUCCESS;
 
         // Initialize function pointers if needed
-        if (!hooks_initialized) {
-            install_ggml_hooks();
-            hooks_initialized = true;
-        }
+        install_ggml_hooks();
         
         if (original_graph_compute) {
             NestedComputeScope scope;
@@ -695,10 +689,7 @@ extern "C" {
         enum ggml_status result = GGML_STATUS_SUCCESS;
 
         // Initialize function pointers if needed
-        if (!hooks_initialized) {
-            install_ggml_hooks();
-            hooks_initialized = true;
-        }
+        install_ggml_hooks();
 
         if (original_graph_compute_with_ctx) {
             NestedComputeScope scope;
@@ -733,10 +724,7 @@ extern "C" {
         enum ggml_status result = GGML_STATUS_SUCCESS; // Default success
         
         // Initialize function pointers if needed
-        if (!hooks_initialized) {
-            install_ggml_hooks();
-            hooks_initialized = true;
-        }
+        install_ggml_hooks();
         
         if (original_metal_graph_compute) {
             NestedComputeScope scope;
@@ -774,10 +762,7 @@ extern "C" {
         enum ggml_status result = GGML_STATUS_SUCCESS;
         
         // Initialize function pointers if needed
-        if (!hooks_initialized) {
-            install_ggml_hooks();
-            hooks_initialized = true;
-        }
+        install_ggml_hooks();
         
         if (original_tallocr_alloc) {
             result = original_tallocr_alloc(talloc, tensor);
@@ -812,10 +797,7 @@ extern "C" {
         bool result = false;
         
         // Initialize function pointers if needed
-        if (!hooks_initialized) {
-            install_ggml_hooks();
-            hooks_initialized = true;
-        }
+        install_ggml_hooks();
         
         if (original_gallocr_alloc_graph) {
             result = original_gallocr_alloc_graph(galloc, graph);
@@ -851,10 +833,7 @@ extern "C" {
         struct ggml_backend_buffer* result = nullptr;
         
         // Initialize function pointers if needed
-        if (!hooks_initialized) {
-            install_ggml_hooks();
-            hooks_initialized = true;
-        }
+        install_ggml_hooks();
         
         if (original_backend_alloc_ctx_tensors) {
             result = original_backend_alloc_ctx_tensors(ctx, backend);
@@ -887,19 +866,12 @@ extern "C" {
 
 // Installation helpers
 bool install_ggml_hooks() {
-    fprintf(stderr, "[GGML_VIZ] Installing GGML function interception hooks...\n");
-    
-    // The function interception happens automatically when our shared library
-    // overrides the weak symbols. This function just confirms setup.
-    
-    #ifndef _WIN32
-#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD) && !defined(__APPLE__)
-    // Our overrides are first in lookup order under LD_PRELOAD, so search past this library.
-    void* handle = RTLD_NEXT;
-#else
-    void* handle = dlopen(NULL, RTLD_LAZY);
-#endif
-    if (handle) {
+    // Only the Linux overrides call through these pointers; macOS interposes in sched_interpose.mm.
+#if !defined(_WIN32) && !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD) && !defined(__APPLE__)
+    std::call_once(hooks_once, [] {
+        fprintf(stderr, "[GGML_VIZ] Installing GGML function interception hooks...\n");
+        // Our overrides are first in lookup order under LD_PRELOAD, so search past this library.
+        void* handle = RTLD_NEXT;
         // Look for the original functions in case they're not weak symbols
         auto backend_func = reinterpret_cast<enum ggml_status (*)(ggml_backend_t, struct ggml_cgraph*)>
             (dlsym(handle, "ggml_backend_graph_compute"));
@@ -918,8 +890,6 @@ bool install_ggml_hooks() {
         auto backend_alloc_ctx_tensors_func = reinterpret_cast<struct ggml_backend_buffer* (*)(struct ggml_context*, ggml_backend_t)>
             (dlsym(handle, "ggml_backend_alloc_ctx_tensors"));
 
-        // Only store if they're different from our overrides (shared library builds only)
-#if !defined(GGML_VIZ_TEST_MODE) && defined(GGML_VIZ_SHARED_BUILD) && !defined(__APPLE__)
         if (backend_func && backend_func != ggml_backend_graph_compute) {
             original_backend_graph_compute = backend_func;
             fprintf(stderr, "[GGML_VIZ] Found original ggml_backend_graph_compute\n");
@@ -950,45 +920,9 @@ bool install_ggml_hooks() {
             original_backend_alloc_ctx_tensors = backend_alloc_ctx_tensors_func;
             fprintf(stderr, "[GGML_VIZ] Found original ggml_backend_alloc_ctx_tensors\n");
         }
-#else
-        // In test mode, just store the functions we find
-        if (backend_func) {
-            original_backend_graph_compute = backend_func;
-            fprintf(stderr, "[GGML_VIZ] Found ggml_backend_graph_compute (test mode)\n");
-        }
-        if (graph_func) {
-            original_graph_compute = graph_func;
-            fprintf(stderr, "[GGML_VIZ] Found ggml_graph_compute (test mode)\n");
-        }
-        if (graph_with_ctx_func) {
-            original_graph_compute_with_ctx = graph_with_ctx_func;
-            fprintf(stderr, "[GGML_VIZ] Found ggml_graph_compute_with_ctx (test mode)\n");
-        }
-        if (metal_func) {
-            original_metal_graph_compute = metal_func;
-            fprintf(stderr, "[GGML_VIZ] Found ggml_backend_metal_graph_compute (test mode)\n");
-        }
-        
-        // Store memory allocation functions in test mode too
-        if (tallocr_alloc_func) {
-            original_tallocr_alloc = tallocr_alloc_func;
-            fprintf(stderr, "[GGML_VIZ] Found ggml_tallocr_alloc (test mode)\n");
-        }
-        if (gallocr_alloc_graph_func) {
-            original_gallocr_alloc_graph = gallocr_alloc_graph_func;
-            fprintf(stderr, "[GGML_VIZ] Found ggml_gallocr_alloc_graph (test mode)\n");
-        }
-        if (backend_alloc_ctx_tensors_func) {
-            original_backend_alloc_ctx_tensors = backend_alloc_ctx_tensors_func;
-            fprintf(stderr, "[GGML_VIZ] Found ggml_backend_alloc_ctx_tensors (test mode)\n");
-        }
+        fprintf(stderr, "[GGML_VIZ] GGML function hooks installed successfully\n");
+    });
 #endif
-        
-        if (handle != RTLD_NEXT) dlclose(handle);
-    }
-    #endif
-    
-    fprintf(stderr, "[GGML_VIZ] GGML function hooks installed successfully\n");
     return true;
 }
 

@@ -697,21 +697,25 @@ void GraphWidget::render_node(ImDrawList* draw_list, const GraphNode& node, cons
     // Draw node text
     if (config.zoom > 0.5f) {  // Only draw text if zoomed in enough
         ImVec2 text_pos = ImVec2(screen_pos.x + 5 * config.zoom, screen_pos.y + 5 * config.zoom);
-        
+
+        // Dark text on light fills (yellow SOFT_MAX, the selection highlight), light text otherwise
+        float luma = 0.299f * (bg_color & 0xFF) + 0.587f * ((bg_color >> 8) & 0xFF) + 0.114f * ((bg_color >> 16) & 0xFF);
+        bool light_bg = luma > 160.0f;
+
         // Node label
-        draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), node.label.c_str());
+        draw_list->AddText(text_pos, light_bg ? IM_COL32(0, 0, 0, 255) : IM_COL32(255, 255, 255, 255), node.label.c_str());
         
         // Operation type
         if (config.show_op_types && !node.op_type.empty()) {
             text_pos.y += 15 * config.zoom;
-            draw_list->AddText(text_pos, IM_COL32(200, 200, 200, 255), node.op_type.c_str());
+            draw_list->AddText(text_pos, light_bg ? IM_COL32(40, 40, 40, 255) : IM_COL32(200, 200, 200, 255), node.op_type.c_str());
         }
         
         // Timing information
         if (config.show_timing && node.duration_ms > 0) {
             text_pos.y += 15 * config.zoom;
             std::string timing = TimelineUtils::format_duration(node.duration_ms);
-            draw_list->AddText(text_pos, IM_COL32(255, 255, 100, 255), timing.c_str());
+            draw_list->AddText(text_pos, light_bg ? IM_COL32(120, 60, 0, 255) : IM_COL32(255, 255, 100, 255), timing.c_str());
         }
     }
 }
