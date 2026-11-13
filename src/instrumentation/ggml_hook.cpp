@@ -517,8 +517,6 @@ static enum ggml_status (*original_graph_compute_with_ctx)(struct ggml_context*,
 static enum ggml_status (*original_metal_graph_compute)(ggml_backend_t, struct ggml_cgraph*) = nullptr;
 
 // Memory allocation function pointers
-static enum ggml_status (*original_tallocr_alloc)(struct ggml_tallocr*, struct ggml_tensor*) = nullptr;
-static bool (*original_gallocr_alloc_graph)(ggml_gallocr_t, struct ggml_cgraph*) = nullptr;
 static struct ggml_backend_buffer* (*original_backend_alloc_ctx_tensors)(struct ggml_context*, ggml_backend_t) = nullptr;
 
 static std::once_flag hooks_once;
@@ -741,77 +739,24 @@ extern "C" {
         return result;
     }
     
-    // Memory allocation hooks
-    GGML_VIZ_API enum ggml_status ggml_tallocr_alloc(struct ggml_tallocr* talloc, struct ggml_tensor* tensor) {
+#if !defined(_WIN32)
+    // Every allocation ends here: tallocr, gallocr, and llama.cpp binding mmap'd weights to their buffer.
+    GGML_VIZ_API enum ggml_status ggml_backend_tensor_alloc(ggml_backend_buffer_t buffer, struct ggml_tensor* tensor, void* addr) {
+        static auto real = reinterpret_cast<enum ggml_status (*)(ggml_backend_buffer_t, struct ggml_tensor*, void*)>(
+            dlsym(RTLD_NEXT, "ggml_backend_tensor_alloc"));
         auto& hook = GGMLHook::instance();
-        
-        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
         if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
             fprintf(stderr, "[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
             hook.start();
         }
-        
-        // Calculate tensor size before allocation
-        size_t tensor_size = 0;
-        if (tensor && hook.is_active()) {
-            tensor_size = ggml_nbytes_simple(tensor);
-            hook.on_tensor_alloc(tensor, tensor_size, nullptr);
+        enum ggml_status result = real(buffer, tensor, addr);
+        if (result == GGML_STATUS_SUCCESS && hook.is_active()) {
+            hook.on_tensor_alloc(tensor, ggml_nbytes_simple(tensor), nullptr);
         }
-        
-        // Call the original function
-        enum ggml_status result = GGML_STATUS_SUCCESS;
-        
-        // Initialize function pointers if needed
-        install_ggml_hooks();
-        
-        if (original_tallocr_alloc) {
-            result = original_tallocr_alloc(talloc, tensor);
-        } else {
-            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_tallocr_alloc function found\n");
-        }
-        
         return result;
     }
-    
-    GGML_VIZ_API bool ggml_gallocr_alloc_graph(ggml_gallocr_t galloc, struct ggml_cgraph* graph) {
-        auto& hook = GGMLHook::instance();
-        
-        // Auto-start hooks if GGML_VIZ_OUTPUT is set but hooks aren't active
-        if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
-            fprintf(stderr, "[GGML_VIZ] Auto-starting hooks due to GGML_VIZ_OUTPUT environment variable\n");
-            hook.start();
-        }
-        
-        // Only tensors without memory yet get allocated here; weights already live in their own buffers
-        std::vector<ggml_tensor*> pending;
-        if (hook.is_active() && graph) {
-            for (int i = 0; i < graph->n_nodes; i++) {
-                if (graph->nodes[i] && !graph->nodes[i]->data && !graph->nodes[i]->view_src) pending.push_back(graph->nodes[i]);
-            }
-            for (int i = 0; i < graph->n_leafs; i++) {
-                if (graph->leafs[i] && !graph->leafs[i]->data && !graph->leafs[i]->view_src) pending.push_back(graph->leafs[i]);
-            }
-        }
-        
-        // Call the original function
-        bool result = false;
-        
-        // Initialize function pointers if needed
-        install_ggml_hooks();
-        
-        if (original_gallocr_alloc_graph) {
-            result = original_gallocr_alloc_graph(galloc, graph);
-        } else {
-            fprintf(stderr, "[GGML_VIZ] Warning: No original ggml_gallocr_alloc_graph function found\n");
-        }
-        
-        for (ggml_tensor* t : pending) {
-            if (t->data) hook.on_tensor_alloc(t, ggml_nbytes_simple(t), nullptr);
-        }
-        
-        return result;
-    }
-    
+#endif
+
     GGML_VIZ_API struct ggml_backend_buffer* ggml_backend_alloc_ctx_tensors(struct ggml_context* ctx, ggml_backend_t backend) {
         auto& hook = GGMLHook::instance();
         
@@ -883,10 +828,6 @@ bool install_ggml_hooks() {
             (dlsym(handle, "ggml_backend_metal_graph_compute"));
         
         // Look for memory allocation functions
-        auto tallocr_alloc_func = reinterpret_cast<enum ggml_status (*)(struct ggml_tallocr*, struct ggml_tensor*)>
-            (dlsym(handle, "ggml_tallocr_alloc"));
-        auto gallocr_alloc_graph_func = reinterpret_cast<bool (*)(ggml_gallocr_t, struct ggml_cgraph*)>
-            (dlsym(handle, "ggml_gallocr_alloc_graph"));
         auto backend_alloc_ctx_tensors_func = reinterpret_cast<struct ggml_backend_buffer* (*)(struct ggml_context*, ggml_backend_t)>
             (dlsym(handle, "ggml_backend_alloc_ctx_tensors"));
 
@@ -908,14 +849,6 @@ bool install_ggml_hooks() {
         }
         
         // Store memory allocation function pointers
-        if (tallocr_alloc_func && tallocr_alloc_func != ggml_tallocr_alloc) {
-            original_tallocr_alloc = tallocr_alloc_func;
-            fprintf(stderr, "[GGML_VIZ] Found original ggml_tallocr_alloc\n");
-        }
-        if (gallocr_alloc_graph_func && gallocr_alloc_graph_func != ggml_gallocr_alloc_graph) {
-            original_gallocr_alloc_graph = gallocr_alloc_graph_func;
-            fprintf(stderr, "[GGML_VIZ] Found original ggml_gallocr_alloc_graph\n");
-        }
         if (backend_alloc_ctx_tensors_func && backend_alloc_ctx_tensors_func != ggml_backend_alloc_ctx_tensors) {
             original_backend_alloc_ctx_tensors = backend_alloc_ctx_tensors_func;
             fprintf(stderr, "[GGML_VIZ] Found original ggml_backend_alloc_ctx_tensors\n");
@@ -936,8 +869,6 @@ bool uninstall_ggml_hooks() {
     original_metal_graph_compute = nullptr;
     
     // Reset memory allocation function pointers
-    original_tallocr_alloc = nullptr;
-    original_gallocr_alloc_graph = nullptr;
     original_backend_alloc_ctx_tensors = nullptr;
     
     fprintf(stderr, "[GGML_VIZ] GGML hooks uninstalled\n");

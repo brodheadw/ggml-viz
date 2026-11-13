@@ -210,6 +210,18 @@ bool viz_sched_alloc_graph(ggml_backend_sched_t sched, struct ggml_cgraph* graph
     return ok;
 }
 
+// Direct calls from other images, e.g. llama.cpp binding mmap'd weights to a host-pointer buffer
+__attribute__((visibility("default")))
+enum ggml_status viz_backend_tensor_alloc(ggml_backend_buffer_t buffer, struct ggml_tensor* tensor, void* addr) {
+    auto& hook = ggml_viz::GGMLHook::instance();
+    if (!hook.is_active() && getenv("GGML_VIZ_OUTPUT")) {
+        hook.start();
+    }
+    enum ggml_status rc = ggml_backend_tensor_alloc(buffer, tensor, addr);
+    if (rc == GGML_STATUS_SUCCESS && hook.is_active()) hook.on_tensor_alloc(tensor, ggml_nbytes(tensor), nullptr);
+    return rc;
+}
+
 __attribute__((visibility("default")))
 ggml_backend_buffer_t viz_alloc_ctx_tensors_from_buft(struct ggml_context* ctx, ggml_backend_buffer_type_t buft) {
     ggml_backend_buffer_t buf = ggml_backend_alloc_ctx_tensors_from_buft(ctx, buft);
@@ -234,3 +246,4 @@ DYLD_INTERPOSE(viz_graph_compute_with_ctx,    ggml_graph_compute_with_ctx)
 DYLD_INTERPOSE(viz_alloc_ctx_tensors,          ggml_backend_alloc_ctx_tensors)
 DYLD_INTERPOSE(viz_alloc_ctx_tensors_from_buft, ggml_backend_alloc_ctx_tensors_from_buft)
 DYLD_INTERPOSE(viz_sched_alloc_graph,           ggml_backend_sched_alloc_graph)
+DYLD_INTERPOSE(viz_backend_tensor_alloc,        ggml_backend_tensor_alloc)
