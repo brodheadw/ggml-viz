@@ -480,13 +480,16 @@ void GraphWidget::auto_layout_nodes(std::vector<GraphNode>& nodes, const GraphCo
     }
 
     // Position nodes in layers
+    size_t widest = 0;
+    for (const auto& layer_nodes : layers) widest = std::max(widest, layer_nodes.size());
+
     for (size_t layer = 0; layer < layers.size(); layer++) {
         const auto& layer_nodes = layers[layer];
         float y = layer * config.node_spacing_y;
         
-        // Center nodes horizontally in each layer
+        // Center each layer under the widest one, which starts at x = 0 so the graph opens in view
         float total_width = (layer_nodes.size() - 1) * config.node_spacing_x;
-        float start_x = -total_width * 0.5f;
+        float start_x = ((widest - 1) * config.node_spacing_x - total_width) * 0.5f;
         
         for (size_t i = 0; i < layer_nodes.size(); i++) {
             int node_idx = layer_nodes[i];
