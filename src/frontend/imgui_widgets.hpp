@@ -98,6 +98,7 @@ public:
         bool auto_layout = true;
         float zoom = 1.0f;
         ImVec2 pan_offset{0.0f, 0.0f};
+        int graph_index = 0;  // which recorded graph to draw
     };
 
     struct GraphNode {
@@ -127,7 +128,7 @@ public:
 
 private:
     // Build graph structure from trace data
-    std::vector<GraphNode> build_graph_from_trace(const TraceReader* trace_reader);
+    std::vector<GraphNode> build_graph_from_trace(const TraceReader* trace_reader, int graph_index);
     
     // Auto-layout the graph nodes
     void auto_layout_nodes(std::vector<GraphNode>& nodes, const GraphConfig& config);
@@ -162,6 +163,8 @@ private:
     std::vector<GraphNode> cached_nodes_;
     const TraceReader* built_from_ = nullptr;
     size_t built_event_count_ = 0;
+    int built_graph_index_ = -1;
+    int graph_count_ = 0;
 };
 
 } // namespace ggml_viz

@@ -439,6 +439,7 @@ private:
             case EventType::BARRIER_WAIT: return "barrier_wait";
             case EventType::THREAD_BEGIN: return "thread_begin";
             case EventType::THREAD_FREE: return "thread_free";
+            case EventType::OP_INPUTS: return "op_inputs";
             default: return "unknown";
         }
     }

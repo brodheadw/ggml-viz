@@ -351,6 +351,25 @@ void GGMLHook::on_graph_compute_begin(const ggml_cgraph* graph, const ggml_backe
     event.label = nullptr;
 
     record_event(event);
+
+    // The graph's structure, so the viewer can draw the real data flow
+    for (int i = 0; i < n_nodes; i++) {
+        const ggml_tensor* node = graph->nodes[i];
+        int n_src = 0;
+        while (n_src < GGML_MAX_SRC && node->src[n_src]) n_src++;
+        for (int k = 0; k == 0 || k < n_src; k += 2) {
+            Event in = {};
+            in.type = EventType::OP_INPUTS;
+            in.timestamp_ns = event.timestamp_ns;
+            in.thread_id = event.thread_id;
+            in.data.inputs.tensor_ptr = node;
+            in.data.inputs.op_type = node->op;
+            in.data.inputs.n_src = static_cast<uint32_t>(std::min(2, n_src - k));
+            for (uint32_t m = 0; m < in.data.inputs.n_src; m++) in.data.inputs.src[m] = node->src[k + m];
+            in.label = (k == 0 && config->instrumentation.record_tensor_names) ? intern_label(node->name) : nullptr;
+            record_event(in);
+        }
+    }
 }
 
 void GGMLHook::on_graph_compute_end(const ggml_cgraph* graph, const ggml_backend* backend, int n_threads) {

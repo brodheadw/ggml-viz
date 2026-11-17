@@ -658,6 +658,9 @@ void ImGuiApp::render_timeline_view() {
                                 case EventType::OP_COMPUTE_END:
                                     event_name = "OP_END";
                                     break;
+                                case EventType::OP_INPUTS:
+                                    event_name = "OP_INPUTS";
+                                    break;
                                 default:
                                     event_name = "UNKNOWN";
                             }

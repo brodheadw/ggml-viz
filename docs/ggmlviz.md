@@ -31,6 +31,7 @@ enum ggmlviz_event_type: uint8_t {
     GGMLVIZ_EVENT_BARRIER_WAIT        = 6,
     GGMLVIZ_EVENT_THREAD_BEGIN        = 7,
     GGMLVIZ_EVENT_THREAD_FREE         = 8,
+    GGMLVIZ_EVENT_OP_INPUTS           = 9,
 };
 
 struct ggmlviz_header_t {
@@ -73,6 +74,17 @@ union ggmlviz_event_data_t {
         // Size of the memory block
         uint64_t size;
     } memory;
+
+    struct {
+        // Pointer to the graph node
+        uint64_t tensor_ptr;
+        // GGML operation type (enum ggml_op)
+        uint32_t op_type;
+        // Number of entries of src used (0-2)
+        uint32_t n_src;
+        // Pointers to the node's source tensors
+        uint64_t src[2];
+    } inputs;
 };
 
 struct ggmlviz_event_t {
@@ -129,6 +141,11 @@ struct ggmlviz_file_t {
 
 - **OP_COMPUTE_END**: Marks the end of individual operation computation
   - Same data structure as `OP_COMPUTE_BEGIN`
+
+- **OP_INPUTS**: One graph node and its sources, written right after `GRAPH_COMPUTE_BEGIN` for every node in execution order
+  - `data.inputs.tensor_ptr`, `data.inputs.op_type`: the node
+  - `data.inputs.src[0..n_src)`: its sources; a node with more than 2 sources gets further `OP_INPUTS` events for the same `tensor_ptr`
+  - `label`: tensor name, on the node's first event only
 
 ### Memory Events (Future Extension)
 - **TENSOR_ALLOC**: Tensor memory allocation
