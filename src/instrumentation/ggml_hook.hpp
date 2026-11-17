@@ -36,7 +36,8 @@ enum class EventType : uint8_t {
     TENSOR_FREE,
     BARRIER_WAIT,
     THREAD_BEGIN,
-    THREAD_FREE
+    THREAD_FREE,
+    OP_INPUTS       // one node's sources, recorded with its graph; more than 2 sources take several events
 };
 
 struct Event {
@@ -63,6 +64,13 @@ struct Event {
             const void* ptr;
             size_t size;
         } memory;
+
+        struct {
+            const void* tensor_ptr;
+            uint32_t op_type;
+            uint32_t n_src;       // sources in this event (0-2)
+            const void* src[2];
+        } inputs;
     } data;
 
     // Optional string data (e.g, tensor names)

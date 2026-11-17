@@ -3,13 +3,14 @@ With "alloc": assert an alloc_check trace holds exactly its two weight allocatio
 import struct, sys
 from collections import Counter
 
-NAMES = ["GRAPH_BEGIN", "GRAPH_END", "OP_BEGIN", "OP_END", "ALLOC", "FREE", "BARRIER", "THREAD_BEGIN", "THREAD_FREE"]
+NAMES = ["GRAPH_BEGIN", "GRAPH_END", "OP_BEGIN", "OP_END", "ALLOC", "FREE", "BARRIER", "THREAD_BEGIN", "THREAD_FREE", "OP_INPUTS"]
 EVENT_DATA = 32  # sizeof(Event::data) on 64-bit
 
 d = open(sys.argv[1], "rb").read()
 assert d[:8] == b"GGMLVIZ1", "bad magic"
-i, counts, begin, durations, allocs = 12, Counter(), {}, {}, []
+i, counts, begin, durations, allocs, srcs, names = 12, Counter(), {}, {}, [], {}, {}
 while i < len(d):
+    start = i
     etype, ts = struct.unpack_from("<BQ", d, i)
     ptr, size = struct.unpack_from("<QQ", d, i + 13)
     i += 13 + EVENT_DATA
@@ -25,6 +26,10 @@ while i < len(d):
         allocs.append((label, size))
     elif name == "OP_BEGIN":
         begin[ptr] = ts
+    elif name == "OP_INPUTS":
+        n_src, = struct.unpack_from("<I", d, start + 13 + 12)
+        srcs.setdefault(ptr, []).extend(struct.unpack_from("<%dQ" % n_src, d, start + 13 + 16))
+        names[ptr] = label or names.get(ptr, "")
     elif name == "OP_END":
         durations.setdefault(label, []).append(ts - begin.pop(ptr))
 
@@ -39,3 +44,7 @@ assert counts["ALLOC"] == 5, "expected 3 nodes + 2 leafs allocated once"
 # Ops stamped around the whole graph all get the same duration; real ones differ widely.
 fastest = {k: min(v) for k, v in durations.items()}
 assert max(fastest.values()) > 3 * min(fastest.values()), "per-op timings look like whole-graph timings"
+# Each graph records its 3 nodes' sources: sum = mm + mm, out = scale(sum)
+assert counts["OP_INPUTS"] == 6, "expected 3 nodes' sources per graph"
+by_name = {v: k for k, v in names.items()}
+assert srcs[by_name["sum"]][-2:] == [by_name["mm"]] * 2 and srcs[by_name["out"]][-1:] == [by_name["sum"]], "wrong graph edges"

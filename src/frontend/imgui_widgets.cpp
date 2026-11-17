@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <sstream>
 #include <iomanip>
-#include <queue>
 #include <cmath>
 
 namespace ggml_viz {
@@ -372,13 +371,15 @@ bool GraphWidget::render(const char* label, const TraceReader* trace_reader, Gra
     ImGui::PushID(label);
     
     // Rebuild graph if needed
-    if (trace_reader != built_from_ || trace_reader->event_count() != built_event_count_) {
-        cached_nodes_ = build_graph_from_trace(trace_reader);
+    if (trace_reader != built_from_ || trace_reader->event_count() != built_event_count_ ||
+        config.graph_index != built_graph_index_) {
+        cached_nodes_ = build_graph_from_trace(trace_reader, config.graph_index);
         if (config.auto_layout) {
             auto_layout_nodes(cached_nodes_, config);
         }
         built_from_ = trace_reader;
         built_event_count_ = trace_reader->event_count();
+        built_graph_index_ = config.graph_index;
         selected_node_ = -1;
     }
     
@@ -386,135 +387,109 @@ bool GraphWidget::render(const char* label, const TraceReader* trace_reader, Gra
     render_graph_controls(config);
     
     // Render the graph canvas
-    render_graph_canvas(cached_nodes_, config);
+    if (cached_nodes_.empty()) {
+        ImGui::Text("No graph structure in this trace (recorded by an older hook)");
+    } else {
+        render_graph_canvas(cached_nodes_, config);
+    }
     
     ImGui::PopID();
     
     return false; // No changes for now
 }
 
-std::vector<GraphWidget::GraphNode> GraphWidget::build_graph_from_trace(const TraceReader* trace_reader) {
+std::vector<GraphWidget::GraphNode> GraphWidget::build_graph_from_trace(const TraceReader* trace_reader, int graph_index) {
     std::vector<GraphNode> nodes;
-    const auto& events = trace_reader->events();
-    auto op_timings = trace_reader->get_op_timings();
-    
-    // Create a map of tensor pointers to node IDs
     std::unordered_map<const void*, int> tensor_to_node;
-    
-    int node_id = 0;
-    
-    // Build nodes from operation timings
-    for (const auto& timing : op_timings) {
-        GraphNode node;
-        node.node_id = node_id++;
-        node.label = timing.name.empty() ? ("op_" + std::to_string(node.node_id)) : timing.name;
-        node.duration_ms = timing.duration_ns / 1e6f;
-        node.tensor_ptr = timing.begin->data.op.tensor_ptr;
-        node.size = ImVec2(120.0f, 60.0f);
-        node.is_selected = false;
-        
-        // Try to determine operation type from event data or label
-        if (timing.begin && timing.begin->data.op.op_type != 0) {
-            // shortcut: assumes the traced program's ggml numbers ops like ours (true across 2025 releases); store names in the trace if that breaks
-            uint32_t op = timing.begin->data.op.op_type;
-            node.op_type = op < GGML_OP_COUNT ? ggml_op_name(static_cast<enum ggml_op>(op)) : "op_" + std::to_string(op);
-        } else {
-            // Extract op type from label if possible
-            std::string label_str = node.label;
-            if (label_str.find("add") != std::string::npos) node.op_type = "ADD";
-            else if (label_str.find("mul") != std::string::npos) node.op_type = "MUL";
-            else if (label_str.find("conv") != std::string::npos) node.op_type = "CONV";
-            else if (label_str.find("linear") != std::string::npos) node.op_type = "LINEAR";
-            else if (label_str.find("softmax") != std::string::npos) node.op_type = "SOFTMAX";
-            else if (label_str.find("relu") != std::string::npos) node.op_type = "RELU";
-            else if (label_str.find("norm") != std::string::npos) node.op_type = "NORM";
-            else node.op_type = "UNKNOWN";
+    std::unordered_map<const void*, uint64_t> op_begin;
+    std::unordered_map<const void*, uint64_t> op_ns;
+    graph_count_ = 0;
+    bool in_graph = false;
+
+    for (const auto& event : trace_reader->events()) {
+        if (event.type == EventType::GRAPH_COMPUTE_BEGIN) {
+            in_graph = graph_count_++ == graph_index;
+        } else if (event.type == EventType::GRAPH_COMPUTE_END) {
+            in_graph = false;
+        } else if (!in_graph) {
+            continue;
+        } else if (event.type == EventType::OP_INPUTS) {
+            const auto& in = event.data.inputs;
+            auto found = tensor_to_node.find(in.tensor_ptr);
+            int id;
+            if (found == tensor_to_node.end()) {
+                GraphNode node;
+                node.node_id = id = static_cast<int>(nodes.size());
+                node.label = event.label ? event.label : "node_" + std::to_string(id);
+                // shortcut: assumes the traced program's ggml numbers ops like ours (true across 2025 releases); store names in the trace if that breaks
+                node.op_type = in.op_type < GGML_OP_COUNT ? ggml_op_name(static_cast<enum ggml_op>(in.op_type)) : "op_" + std::to_string(in.op_type);
+                node.color = get_op_color(node.op_type);
+                node.duration_ms = 0.0f;
+                node.tensor_ptr = in.tensor_ptr;
+                node.size = ImVec2(120.0f, 60.0f);
+                node.is_selected = false;
+                tensor_to_node[in.tensor_ptr] = id;
+                nodes.push_back(node);
+            } else {
+                id = found->second;
+            }
+            // Sources that are other nodes become edges; weights and graph inputs are left out
+            for (uint32_t k = 0; k < in.n_src && k < 2; k++) {
+                auto src = tensor_to_node.find(in.src[k]);
+                if (src == tensor_to_node.end()) continue;
+                auto& ins = nodes[id].inputs;
+                if (std::find(ins.begin(), ins.end(), src->second) != ins.end()) continue;
+                ins.push_back(src->second);
+                nodes[src->second].outputs.push_back(id);
+            }
+        } else if (event.type == EventType::OP_COMPUTE_BEGIN) {
+            op_begin[event.data.op.tensor_ptr] = event.timestamp_ns;
+        } else if (event.type == EventType::OP_COMPUTE_END) {
+            auto b = op_begin.find(event.data.op.tensor_ptr);
+            if (b != op_begin.end()) op_ns[event.data.op.tensor_ptr] += event.timestamp_ns - b->second;
         }
-        
-        node.color = get_op_color(node.op_type);
-        
-        // Map tensor pointer to node ID for later connection building
-        // TODO: Use tensor_to_node for dependency analysis
-        (void)tensor_to_node[node.tensor_ptr]; // Suppress unused warning
-        
-        nodes.push_back(node);
     }
-    
-    // For now, create a simple linear connection pattern
-    // In a real implementation, this would analyze tensor dependencies
-    for (size_t i = 1; i < nodes.size(); i++) {
-        nodes[i].inputs.push_back(nodes[i-1].node_id);
-        nodes[i-1].outputs.push_back(nodes[i].node_id);
+
+    for (auto& node : nodes) {
+        auto t = op_ns.find(node.tensor_ptr);
+        if (t != op_ns.end()) node.duration_ms = t->second / 1e6f;
     }
-    
     return nodes;
 }
 
 void GraphWidget::auto_layout_nodes(std::vector<GraphNode>& nodes, const GraphConfig& config) {
     if (nodes.empty()) return;
-    
-    // Simple layered layout algorithm
-    // Group nodes by their depth in the graph
+
+    // Nodes are in execution order, so every input precedes its consumer: a forward pass gives each
+    // node its earliest layer, then a backward pass sinks it to just above its first consumer, which
+    // keeps cache views and other weight-only ops next to where they are used instead of all in row 0
+    std::vector<int> depth(nodes.size(), 0);
+    for (size_t i = 0; i < nodes.size(); i++) {
+        for (int in : nodes[i].inputs) depth[i] = std::max(depth[i], depth[in] + 1);
+    }
+    for (size_t i = nodes.size(); i-- > 0;) {
+        if (nodes[i].outputs.empty()) continue;
+        int first_use = depth[nodes[i].outputs[0]];
+        for (int out : nodes[i].outputs) first_use = std::min(first_use, depth[out]);
+        depth[i] = first_use - 1;
+    }
     std::vector<std::vector<int>> layers;
-    std::vector<int> node_depths(nodes.size(), -1);
-    
-    // Find root nodes (no inputs)
-    std::vector<int> roots;
     for (size_t i = 0; i < nodes.size(); i++) {
-        if (nodes[i].inputs.empty()) {
-            roots.push_back(i);
-            node_depths[i] = 0;
-        }
+        if (depth[i] >= static_cast<int>(layers.size())) layers.resize(depth[i] + 1);
+        layers[depth[i]].push_back(static_cast<int>(i));
     }
-    
-    // If no clear roots, start with first node
-    if (roots.empty() && !nodes.empty()) {
-        roots.push_back(0);
-        node_depths[0] = 0;
-    }
-    
-    // Breadth-first traversal to assign depths
-    std::queue<int> queue;
-    for (int root : roots) {
-        queue.push(root);
-    }
-    
-    int max_depth = 0;
-    while (!queue.empty()) {
-        int current = queue.front();
-        queue.pop();
-        
-        int current_depth = node_depths[current];
-        max_depth = std::max(max_depth, current_depth);
-        
-        for (int output_id : nodes[current].outputs) {
-            if (output_id < nodes.size() && node_depths[output_id] < current_depth + 1) {
-                node_depths[output_id] = current_depth + 1;
-                queue.push(output_id);
-            }
-        }
-    }
-    
-    // Group nodes by depth
-    layers.resize(max_depth + 1);
-    for (size_t i = 0; i < nodes.size(); i++) {
-        int depth = node_depths[i];
-        if (depth >= 0) {
-            layers[depth].push_back(i);
-        } else {
-            // Handle disconnected nodes
-            layers[0].push_back(i);
-        }
-    }
-    
+
     // Position nodes in layers
+    size_t widest = 0;
+    for (const auto& layer_nodes : layers) widest = std::max(widest, layer_nodes.size());
+
     for (size_t layer = 0; layer < layers.size(); layer++) {
         const auto& layer_nodes = layers[layer];
         float y = layer * config.node_spacing_y;
         
-        // Center nodes horizontally in each layer
+        // Center each layer under the widest one, which starts at x = 0 so the graph opens in view
         float total_width = (layer_nodes.size() - 1) * config.node_spacing_x;
-        float start_x = -total_width * 0.5f;
+        float start_x = ((widest - 1) * config.node_spacing_x - total_width) * 0.5f;
         
         for (size_t i = 0; i < layer_nodes.size(); i++) {
             int node_idx = layer_nodes[i];
@@ -661,6 +636,14 @@ void GraphWidget::render_graph_controls(GraphConfig& config) {
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100);
     ImGui::SliderFloat("##zoom", &config.zoom, 0.1f, 5.0f, "%.1fx", ImGuiSliderFlags_AlwaysClamp);
+
+    if (graph_count_ > 1) {
+        ImGui::SameLine();
+        ImGui::Text("Graph:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(120);
+        ImGui::SliderInt("##graph", &config.graph_index, 0, graph_count_ - 1, "%d", ImGuiSliderFlags_AlwaysClamp);
+    }
 }
 
 void GraphWidget::render_node(ImDrawList* draw_list, const GraphNode& node, const GraphConfig& config, 
@@ -726,8 +709,9 @@ void GraphWidget::render_connections(ImDrawList* draw_list, const std::vector<Gr
     float thickness = 2.0f * config.zoom;
     
     for (const auto& node : nodes) {
+        // Layers run top to bottom: leave from the node's bottom edge, arrive at the consumer's top edge
         ImVec2 node_center = graph_to_screen(
-            ImVec2(node.position.x + node.size.x * 0.5f, node.position.y + node.size.y * 0.5f),
+            ImVec2(node.position.x + node.size.x * 0.5f, node.position.y + node.size.y),
             config, canvas_pos);
         
         // Draw connections to output nodes
@@ -735,13 +719,12 @@ void GraphWidget::render_connections(ImDrawList* draw_list, const std::vector<Gr
             if (output_id < nodes.size()) {
                 const auto& output_node = nodes[output_id];
                 ImVec2 output_center = graph_to_screen(
-                    ImVec2(output_node.position.x + output_node.size.x * 0.5f, 
-                           output_node.position.y + output_node.size.y * 0.5f),
+                    ImVec2(output_node.position.x + output_node.size.x * 0.5f, output_node.position.y),
                     config, canvas_pos);
                 
                 // Draw curved connection
-                ImVec2 cp1 = ImVec2(node_center.x + 50 * config.zoom, node_center.y);
-                ImVec2 cp2 = ImVec2(output_center.x - 50 * config.zoom, output_center.y);
+                ImVec2 cp1 = ImVec2(node_center.x, node_center.y + 30 * config.zoom);
+                ImVec2 cp2 = ImVec2(output_center.x, output_center.y - 30 * config.zoom);
                 
                 draw_list->AddBezierCubic(node_center, cp1, cp2, output_center, 
                                         connection_color, thickness);
