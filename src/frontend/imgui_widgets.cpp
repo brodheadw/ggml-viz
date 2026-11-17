@@ -338,7 +338,7 @@ ImU32 get_operation_color(const Event& event) {
 std::string format_duration(float duration_ms) {
     std::stringstream ss;
     if (duration_ms < 1.0f) {
-        ss << std::fixed << std::setprecision(3) << (duration_ms * 1000.0f) << " μs";
+        ss << std::fixed << std::setprecision(3) << (duration_ms * 1000.0f) << " us";
     } else if (duration_ms < 1000.0f) {
         ss << std::fixed << std::setprecision(2) << duration_ms << " ms";
     } else {

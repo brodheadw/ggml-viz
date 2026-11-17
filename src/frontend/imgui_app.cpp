@@ -405,7 +405,7 @@ bool ImGuiApp::load_trace_file(const std::string& filename) {
                 data_->error_message = "Error: Invalid file type.\n\nExpected a .ggmlviz trace file.\nSelected: " + filename;
             } else {
                 data_->error_message = "Error: File not found or access denied.\n\nFile: " + filename + 
-                                      "\n\nPlease check:\n• File exists\n• File permissions\n• Path is correct";
+                                      "\n\nPlease check:\n- File exists\n- File permissions\n- Path is correct";
             }
             return false;
         }
@@ -459,7 +459,7 @@ bool ImGuiApp::load_trace_file(const std::string& filename) {
         if (reader->event_count() == 0) {
             data_->error_message = "Warning: Empty trace data.\n\nFile: " + filename + 
                                   "\n\nThe trace file loaded successfully but contains no events.\n" +
-                                  "This might indicate:\n• No GGML operations were traced\n• Tracing was not enabled\n• The model ran but no operations occurred";
+                                  "This might indicate:\n- No GGML operations were traced\n- Tracing was not enabled\n- The model ran but no operations occurred";
             // Still allow loading empty traces for debugging
         }
         
@@ -519,7 +519,7 @@ void ImGuiApp::render_timeline_view() {
             
             // Show live mode status
             if (data_->live_trace_reader) {
-                ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "✅ LIVE: %s", data_->live_file_path.c_str());
+                ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "LIVE: %s", data_->live_file_path.c_str());
             } else {
                 ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Waiting for %s", data_->live_file_path.c_str());
             }
@@ -567,7 +567,7 @@ void ImGuiApp::render_timeline_view() {
         
         // Search/Filter bar for operations
         static char search_buffer[256] = "";
-        ImGui::InputTextWithHint("##search", "🔍 Filter operations...", search_buffer, sizeof(search_buffer));
+        ImGui::InputTextWithHint("##search", "Filter operations...", search_buffer, sizeof(search_buffer));
         ImGui::SameLine();
         if (ImGui::Button("Clear")) {
             search_buffer[0] = '\0';
@@ -755,7 +755,7 @@ void ImGuiApp::render_graph_view() {
         }
         
         if (data_->live_mode) {
-            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "📊 LIVE GRAPH VIEW");
+            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "LIVE GRAPH VIEW");
             ImGui::Text("Live events: %zu", data_->live_events.size());
             
             // Count graph events in live mode
@@ -817,7 +817,7 @@ void ImGuiApp::render_tensor_inspector() {
         }
         
         if (data_->live_mode) {
-            ImGui::TextColored(ImVec4(0.91f, 0.12f, 0.39f, 1.0f), "🔬 LIVE TENSOR INSPECTOR");
+            ImGui::TextColored(ImVec4(0.91f, 0.12f, 0.39f, 1.0f), "LIVE TENSOR INSPECTOR");
             ImGui::Text("Live events: %zu", data_->live_events.size());
             
             int live_index = data_->selected_event - static_cast<int>(data_->live_events_offset);
@@ -889,7 +889,7 @@ void ImGuiApp::render_hook_status_notification() {
     if (data_->live_mode) {
         if (!data_->live_trace_reader || data_->live_trace_reader->events().empty()) {
             should_show_notification = true;
-            notification_text = "📄  FILE-BASED LIVE MODE - WAITING FOR DATA\n\n"
+            notification_text = "FILE-BASED LIVE MODE - WAITING FOR DATA\n\n"
                               "Monitoring trace file: " + data_->live_file_path + "\n\n"
                               "To generate data, run:\n\n"
                               "env GGML_VIZ_OUTPUT=" + data_->live_file_path + " \\\n"
@@ -900,8 +900,8 @@ void ImGuiApp::render_hook_status_notification() {
         }
     } else if (!data_->trace_loaded) {
         should_show_notification = true;
-        notification_text = "📁  NO TRACE LOADED\n\n"
-                          "Load a trace file using File → Open Trace...\n"
+        notification_text = "NO TRACE LOADED\n\n"
+                          "Load a trace file using File > Open Trace...\n"
                           "or enable Live Mode to capture real-time data.";
     }
     
